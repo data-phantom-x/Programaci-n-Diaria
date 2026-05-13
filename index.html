@@ -98,7 +98,30 @@
         .btn-leader { background-color: var(--leader-color); color: #fff; }
         .btn-clear { background-color: var(--danger); }
 
-        /* --- ESTILOS BUSCADOR INTELIGENTE DE TÉCNICOS --- */
+        /* --- ETIQUETAS DE TÉCNICOS --- */
+        .tech-pill {
+            background-color: var(--primary);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 11px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-weight: bold;
+        }
+
+        .tech-pill span {
+            cursor: pointer;
+            color: #fc8181;
+            font-weight: bold;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .tech-pill span:hover { color: #e53e3e; }
+
+        /* --- BUSCADOR INTELIGENTE --- */
         .autocomplete-container {
             position: relative;
             display: inline-block;
@@ -127,24 +150,11 @@
             cursor: pointer;
             border-bottom: 1px solid var(--border);
             font-size: 13px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
         }
 
         .autocomplete-items div:hover {
             background-color: #e2e8f0;
         }
-
-        .tech-cab-badge {
-            background-color: #3182ce;
-            color: white;
-            font-size: 10px;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-weight: bold;
-        }
-        /* ----------------------------------------------- */
 
         .document-header {
             font-size: 1.4em;
@@ -299,7 +309,17 @@
             <input type="text" id="in-jefe" placeholder="JEFE DE TURNO" oninput="updateHeader()">
         </div>
 
-        <div class="control-group">
+        <!-- NUEVA SECCIÓN: GESTIÓN DE TÉCNICOS -->
+        <div class="control-group" style="border-top: 1px solid #e2e8f0; padding-top: 15px; margin-top: 15px;">
+            <strong>TÉCNICOS EN TURNO:</strong>
+            <input type="text" id="in-new-tech" placeholder="NOMBRE TÉCNICO (EJ: ROJAS)" onkeypress="if(event.key === 'Enter') addTech()">
+            <button class="btn-leader" onclick="addTech()">+ AGREGAR AL TURNO</button>
+        </div>
+        <div class="control-group" id="tech-pills-container" style="gap: 8px; margin-bottom: 20px;">
+            <!-- Aquí aparecen los técnicos agregados -->
+        </div>
+
+        <div class="control-group" style="border-top: 1px solid #e2e8f0; padding-top: 15px;">
             <strong>AERONAVE:</strong>
             <input type="text" id="in-ac-reg" placeholder="MATRÍCULA" maxlength="6" style="width: 110px;" oninput="formatMatricula(this)">
             <input type="text" id="in-ac-wp" placeholder="WP (T00...)" maxlength="8" style="width: 100px;">
@@ -316,9 +336,9 @@
             <input type="text" id="in-task-desc" placeholder="TAREA" oninput="detectTango(this)">
             <input type="text" id="in-task-tango" placeholder="TANGO (8 CARAC.)" maxlength="8" style="width: 130px;">
             
-            <!-- BUSCADOR INTELIGENTE DE TÉCNICOS -->
+            <!-- BUSCADOR INTELIGENTE VINCULADO AL TURNO -->
             <div class="autocomplete-container">
-                <input type="text" id="in-task-techs" placeholder="TÉCNICOS (BUSCAR)" style="width: 100%; box-sizing: border-box;">
+                <input type="text" id="in-task-techs" placeholder="TÉCNICOS (CLIC PARA VER LISTA)" style="width: 100%; box-sizing: border-box;">
                 <div id="techs-dropdown" class="autocomplete-items"></div>
             </div>
 
@@ -326,7 +346,7 @@
         </div>
         
         <div class="control-group" style="justify-content: flex-end;">
-            <button class="btn-clear" onclick="clearAllData()">🗑️ BORRAR TODO</button>
+            <button class="btn-clear" onclick="clearAllData()">🗑️ BORRAR TODA LA HOJA</button>
         </div>
     </div>
 
@@ -338,6 +358,7 @@
 
 <script>
     let avionesData = [];
+    let shiftTechs = []; // Array de técnicos del turno
     let isTeamLeader = false;
     const MAINTENIX_URL = "https://maintenix.lan.com/maintenix/common/ToDoList.jsp";
     
@@ -345,50 +366,70 @@
     const KEY_TURNO = 'latam_header_turno';
     const KEY_FECHA = 'latam_header_fecha';
     const KEY_JEFE = 'latam_header_jefe';
-
-    // ==========================================
-    // BASE DE DATOS LOCAL DE TÉCNICOS (MOCKUP)
-    // Aquí puedes editar la lista de los técnicos del mes/turno
-    // ==========================================
-    const listadoTecnicos = [
-        { name: "PEREZ, J.", group: "CAB" },
-        { name: "SOTO, M.", group: "CAB" },
-        { name: "GOMEZ, A.", group: "CAB" },
-        { name: "ROJAS, P.", group: "LINEA" },
-        { name: "SILVA, C.", group: "LINEA" },
-        { name: "DIAZ, R.", group: "LINEA" },
-        { name: "CONTRERAS, F.", group: "LINEA" },
-        { name: "MUNOZ, D.", group: "LINEA" }
-    ];
-    // ==========================================
+    const KEY_TECHS = 'latam_shift_techs';
 
     loadData();
     updateHeader();
     setupAutocomplete();
 
-    // Lógica del Buscador Inteligente
+    // ==========================================
+    // LÓGICA DE TÉCNICOS EN TURNO
+    // ==========================================
+    function addTech() {
+        const input = document.getElementById('in-new-tech');
+        const name = input.value.trim().toUpperCase();
+        
+        if (!name) return;
+        if (shiftTechs.includes(name)) {
+            alert("ESTE TÉCNICO YA ESTÁ EN LA LISTA DEL TURNO.");
+            return;
+        }
+
+        shiftTechs.push(name);
+        shiftTechs.sort(); // Ordenar alfabéticamente
+        input.value = '';
+        saveTechs();
+        renderTechPills();
+    }
+
+    function removeTech(index) {
+        shiftTechs.splice(index, 1);
+        saveTechs();
+        renderTechPills();
+    }
+
+    function saveTechs() {
+        localStorage.setItem(KEY_TECHS, JSON.stringify(shiftTechs));
+    }
+
+    function renderTechPills() {
+        const container = document.getElementById('tech-pills-container');
+        container.innerHTML = '';
+        
+        shiftTechs.forEach((tech, index) => {
+            const pill = document.createElement('div');
+            pill.className = 'tech-pill';
+            pill.innerHTML = `${tech} <span onclick="removeTech(${index})" title="Eliminar Técnico">✖</span>`;
+            container.appendChild(pill);
+        });
+    }
+
+    // Buscador interactivo
     function setupAutocomplete() {
         const input = document.getElementById("in-task-techs");
         const dropdown = document.getElementById("techs-dropdown");
 
-        // Función para mostrar la lista
-        function renderList(searchValue) {
+        function renderList() {
             dropdown.innerHTML = '';
+            
+            // Ver qué está escribiendo el líder
             let currentInputParts = input.value.split(' - ').map(s => s.trim());
-            // Extraer solo la última palabra que se está escribiendo
             let currentSearch = currentInputParts[currentInputParts.length - 1].toUpperCase();
 
-            // Filtrar lista
-            let filtered = listadoTecnicos.filter(t => t.name.toUpperCase().includes(currentSearch));
-            
-            // Ordenar: Primero CAB, luego alfabético
-            filtered.sort((a, b) => {
-                if (a.group === 'CAB' && b.group !== 'CAB') return -1;
-                if (a.group !== 'CAB' && b.group === 'CAB') return 1;
-                return a.name.localeCompare(b.name);
-            });
+            // Filtrar técnicos agregados en el turno que coincidan
+            let filtered = shiftTechs.filter(tech => tech.includes(currentSearch));
 
-            if (filtered.length === 0 || (filtered.length === 1 && filtered[0].name === currentSearch)) {
+            if (filtered.length === 0) {
                 dropdown.style.display = "none";
                 return;
             }
@@ -397,12 +438,10 @@
 
             filtered.forEach(tech => {
                 let div = document.createElement("div");
-                let badge = tech.group === 'CAB' ? `<span class="tech-cab-badge">CAB</span>` : '';
-                div.innerHTML = `<span>${tech.name}</span> ${badge}`;
+                div.innerHTML = tech;
                 
                 div.addEventListener("click", function() {
-                    // Reemplazar la última parte escrita con el nombre completo y agregar el guion
-                    currentInputParts[currentInputParts.length - 1] = tech.name;
+                    currentInputParts[currentInputParts.length - 1] = tech;
                     input.value = currentInputParts.join(' - ') + ' - ';
                     dropdown.style.display = "none";
                     input.focus();
@@ -412,21 +451,22 @@
         }
 
         input.addEventListener("input", function() {
-            renderList(this.value);
-            formatTechs(this); // Mantiene el formato automático
+            renderList();
+            formatTechs(this); 
         });
 
         input.addEventListener("focus", function() {
-            renderList(this.value);
+            renderList();
         });
 
-        // Ocultar dropdown si se hace clic afuera
         document.addEventListener("click", function (e) {
             if (e.target !== input && e.target !== dropdown) {
                 dropdown.style.display = "none";
             }
         });
     }
+
+    // ==========================================
 
     function toggleMode() {
         isTeamLeader = !isTeamLeader;
@@ -460,11 +500,15 @@
         const savedJefe = localStorage.getItem(KEY_JEFE);
         if (savedJefe) document.getElementById('in-jefe').value = savedJefe;
 
+        const savedTechs = localStorage.getItem(KEY_TECHS);
+        if (savedTechs) shiftTechs = JSON.parse(savedTechs);
+
         render();
+        renderTechPills();
     }
 
     function clearAllData() {
-        if(confirm("⚠️ ¿ESTÁS SEGURO DE QUE QUIERES BORRAR TODA LA HOJA DE TURNO?")) {
+        if(confirm("⚠️ ¿ESTÁS SEGURO DE QUE QUIERES BORRAR TODA LA HOJA DE TURNO? (Los técnicos guardados no se borrarán)")) {
             avionesData = [];
             saveData();
             render();
@@ -552,7 +596,7 @@
         let tango = document.getElementById('in-task-tango').value.toUpperCase().trim();
         let techs = document.getElementById('in-task-techs').value.toUpperCase().trim();
 
-        // Limpiar el guion extra final si el usuario lo dejó
+        // Limpiar el guion extra final si quedó
         techs = techs.replace(/\s*-\s*$/, '');
 
         if (!avionId || !desc) return alert("COMPLETE LOS DATOS DE LA TAREA.");
@@ -730,6 +774,7 @@
         }
     }
 
+    // Edición de tarea (Aquí se sigue usando el texto manual por ser ventana flotante)
     function editTask(aId, tId) {
         const avion = avionesData.find(a => a.id == aId);
         const tarea = avion.tareas.find(t => t.id == tId);
@@ -745,10 +790,10 @@
             tarea.tango = val;
         }
 
-        const newTechs = prompt("EDITAR TÉCNICOS:", tarea.techs);
+        const newTechs = prompt("EDITAR TÉCNICOS (ESCRIBE LOS NOMBRES SEPARADOS POR -):", tarea.techs);
         if (newTechs !== null) {
             let fTechs = newTechs.toUpperCase().replace(/\s*[,/]\s*/g, ' - ').replace(/\s*-\s*/g, ' - ');
-            tarea.techs = fTechs.trim();
+            tarea.techs = fTechs.trim().replace(/\s*-\s*$/, '');
         }
         
         saveData(); render();
