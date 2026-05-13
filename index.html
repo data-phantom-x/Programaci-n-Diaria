@@ -13,6 +13,7 @@
             --border: #e2e8f0;
             --leader-color: #d69e2e;
             --danger: #e53e3e;
+            --comment: #718096;
         }
 
         body, input, select, button, textarea {
@@ -137,7 +138,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Tareas marcadas como prioridad */
         .task-item.priority {
             background-color: #fff5f5;
             border-left: 4px solid var(--danger);
@@ -150,7 +150,6 @@
             margin-left: 8px;
         }
 
-        /* NUEVO INDICADOR DE ESTADO (Reemplaza al checkbox) */
         .status-toggle {
             width: 20px;
             height: 20px;
@@ -166,7 +165,7 @@
             align-items: center;
             justify-content: center;
             font-weight: bold;
-            color: transparent; /* Oculta el ticket si no está checkeado */
+            color: transparent;
             font-size: 14px;
             transition: all 0.2s;
             user-select: none;
@@ -175,7 +174,7 @@
         .task-item.completed .status-toggle {
             background-color: var(--accent);
             border-color: var(--accent);
-            color: white; /* Muestra el ticket */
+            color: white;
         }
 
         .task-info { flex: 1; transition: all 0.3s ease; }
@@ -192,12 +191,23 @@
 
         .task-desc { font-weight: 500; font-size: 1.05em; }
         .task-techs { font-size: 0.85em; font-weight: 700; color: #4a5568; margin-top: 4px; }
+        
+        .task-comment {
+            font-size: 0.85em;
+            color: var(--comment);
+            margin-top: 5px;
+            font-style: italic;
+            font-weight: 600;
+        }
 
         .action-btns {
             display: flex;
             gap: 6px;
             margin-left: auto;
+            align-items: center;
         }
+
+        .leader-btns { display: flex; gap: 6px; }
 
         .small-btn {
             background: none;
@@ -209,17 +219,35 @@
         .delete-btn { color: var(--danger); border: 1px solid var(--danger); }
         .edit-btn { color: var(--leader-color); border: 1px solid var(--leader-color); }
         .priority-btn { color: var(--danger); border: 1px solid var(--danger); font-weight: bold; }
+        .comment-btn { color: var(--comment); border: 1px solid var(--comment); }
 
+        /* MODO IMPRESIÓN / PDF (Ajustes de espacio y fuentes) */
         @media print {
-            @page { size: letter; margin: 1.5cm; }
+            @page { 
+                size: letter; 
+                margin: 1cm; /* Margen estandarizado para evitar links feos si el navegador lo permite */
+            }
             .no-print { display: none !important; }
-            body { padding: 0; background-color: white; }
+            body { 
+                padding: 0; 
+                background-color: white; 
+                font-size: 11px; /* Letra más pequeña general */
+            }
+            .document-header { font-size: 1.2em; margin-bottom: 15px; padding-bottom: 5px; }
+            .avion-section { margin-bottom: 20px; }
+            .avion-title { font-size: 1.1em; margin-bottom: 8px; padding: 4px; }
+            .task-item { margin-bottom: 4px; padding: 2px 5px; }
+            .task-desc { font-size: 1em; }
+            .task-techs { font-size: 0.8em; margin-top: 2px; }
+            .task-comment { font-size: 0.8em; margin-top: 2px; }
             .tango-link { text-decoration: none; color: black; }
             .task-item.completed .task-info { opacity: 1; text-decoration: none; }
             .task-item.priority { border-left: none; }
             .status-toggle {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
+                margin-top: 0px;
+                width: 16px; min-width: 16px; height: 16px; min-height: 16px; font-size: 12px;
             }
         }
     </style>
@@ -365,7 +393,7 @@
         avion.tareas.push({
             id: Date.now(),
             desc, tango, techs,
-            done: false, priority: false // Agregada la propiedad de prioridad
+            done: false, priority: false, comment: "" // Se añade la propiedad comentario
         });
 
         document.getElementById('in-task-desc').value = '';
@@ -402,7 +430,7 @@
             let html = `
                 <div class="avion-title">
                     • ${avion.reg} ${wpDisplay} ${avion.pos ? '(' + avion.pos + ')' : ''}
-                    <div class="action-btns leader-only no-print">
+                    <div class="leader-btns leader-only no-print" style="margin-left: auto;">
                         <button class="small-btn edit-btn" onclick="editAvion(${avion.id})">EDITAR</button>
                         <button class="small-btn delete-btn" onclick="deleteAvion(${avion.id})">ELIMINAR</button>
                     </div>
@@ -421,21 +449,25 @@
                 }
 
                 const priorityLabel = t.priority ? '<span class="priority-badge">🔥 URGENTE</span>' : '';
+                const commentBtnText = t.comment ? '💬 EDITAR NOTA' : '💬 NOTA';
 
                 html += `
                     <div class="task-item ${t.done ? 'completed' : ''} ${t.priority ? 'priority' : ''}">
-                        <!-- EL DIV REEMPLAZA AL CHECKBOX RECTANGULAR -->
                         <div class="status-toggle no-print" onclick="toggleTask(${avion.id}, ${t.id})">✓</div>
                         
                         <div class="task-info">
                             <div class="task-desc">- ${cleanDesc} ${tangoDisplay} ${priorityLabel}</div>
                             ${t.techs ? `<div class="task-techs">${t.techs}</div>` : ''}
+                            ${t.comment ? `<div class="task-comment">↳ NOTA: ${t.comment}</div>` : ''}
                         </div>
 
-                        <div class="action-btns leader-only no-print">
-                            <button class="small-btn priority-btn" onclick="togglePriority(${avion.id}, ${t.id})">⭐</button>
-                            <button class="small-btn edit-btn" onclick="editTask(${avion.id}, ${t.id})">EDITAR</button>
-                            <button class="small-btn delete-btn" onclick="deleteTask(${avion.id}, ${t.id})">X</button>
+                        <div class="action-btns no-print">
+                            <button class="small-btn comment-btn" onclick="editComment(${avion.id}, ${t.id})">${commentBtnText}</button>
+                            <div class="leader-btns leader-only">
+                                <button class="small-btn priority-btn" onclick="togglePriority(${avion.id}, ${t.id})">⭐</button>
+                                <button class="small-btn edit-btn" onclick="editTask(${avion.id}, ${t.id})">EDITAR</button>
+                                <button class="small-btn delete-btn" onclick="deleteTask(${avion.id}, ${t.id})">X</button>
+                            </div>
                         </div>
                     </div>
                 `;
@@ -453,11 +485,11 @@
         const avion = avionesData.find(a => a.id == aId);
         const tarea = avion.tareas.find(t => t.id == tId);
         
-        // Confirmación solo si la tarea se va a marcar como completada
         if (!tarea.done) {
-            if (!confirm("¿CONFIRMAS QUE ESTA TAREA ESTÁ COMPLETADA Y CERRADA?")) {
-                return;
-            }
+            if (!confirm("¿CONFIRMAS QUE ESTA TAREA ESTÁ COMPLETADA Y CERRADA?")) return;
+        } else {
+            // Confirmación agregada para cuando se DESMARCA una tarea
+            if (!confirm("¿CONFIRMAS QUE DESEAS REABRIR ESTA TAREA?")) return;
         }
         
         tarea.done = !tarea.done;
@@ -469,6 +501,18 @@
         const tarea = avion.tareas.find(t => t.id == tId);
         tarea.priority = !tarea.priority;
         saveData(); render();
+    }
+
+    // Agregar/Editar comentarios a las tareas
+    function editComment(aId, tId) {
+        const avion = avionesData.find(a => a.id == aId);
+        const tarea = avion.tareas.find(t => t.id == tId);
+        const newComment = prompt("INGRESAR/EDITAR NOTA (DEJA EN BLANCO PARA BORRAR):", tarea.comment || "");
+        
+        if (newComment !== null) {
+            tarea.comment = newComment.trim().toUpperCase();
+            saveData(); render();
+        }
     }
 
     // Resto de funciones de edición y borrado
