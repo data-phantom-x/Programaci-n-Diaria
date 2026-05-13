@@ -41,6 +41,18 @@
             align-items: center;
         }
 
+        /* Botones de la barra superior: Mismo tamaño y más pequeños */
+        .btn-top {
+            width: 150px;
+            height: 36px;
+            font-size: 12px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+        }
+
         /* Ocultar elementos exclusivos del Team Leader cuando NO está en ese modo */
         body:not(.team-leader-mode) .leader-only {
             display: none !important;
@@ -133,20 +145,23 @@
         /* Checkbox tipo CUADRADO PERFECTO Y COMPACTO */
         .checkbox-custom {
             appearance: none;
+            -webkit-appearance: none; /* Asegura compatibilidad */
             width: 18px; 
             height: 18px;
             min-width: 18px;
             min-height: 18px;
             box-sizing: border-box;
-            aspect-ratio: 1 / 1;
+            background-color: white;
             border: 2px solid var(--primary);
-            border-radius: 0px; 
+            border-radius: 0px !important; /* Fuerza a que sea cuadrado sí o sí */
             margin-right: 12px;
             margin-top: 3px;
             cursor: pointer;
             position: relative;
             flex-shrink: 0;
-            align-self: flex-start;
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
             transition: all 0.2s;
         }
 
@@ -157,12 +172,10 @@
 
         .checkbox-custom:checked::after {
             content: '✓';
-            position: absolute;
             color: white;
-            left: 1px;
-            top: -4px;
             font-weight: bold;
-            font-size: 16px;
+            font-size: 14px;
+            position: absolute;
         }
 
         /* Tarea completada: opacidad y tachado */
@@ -208,11 +221,21 @@
             margin-left: auto;
         }
 
+        /* Configuraciones para el modo de Impresión / PDF */
         @media print {
+            @page {
+                size: letter; /* Fuerza a generar PDF en tamaño Carta sí o sí */
+                margin: 1.5cm;
+            }
             .no-print { display: none !important; }
-            body { padding: 0; }
+            body { padding: 0; background-color: white; }
             .tango-link { text-decoration: none; color: black; }
             .task-item.completed .task-info { opacity: 1; text-decoration: none; }
+            /* Mantiene los colores del checkbox al imprimir */
+            .checkbox-custom {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
         }
     </style>
 </head>
@@ -221,8 +244,8 @@
 <div class="container">
     
     <div class="top-bar no-print">
-        <button id="btn-mode-toggle" class="btn-accent" onclick="toggleMode()">MODO TÉCNICO</button>
-        <button onclick="window.print()" style="background-color: #718096;">🖨️ IMPRIMIR / PDF</button>
+        <button id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">MODO TÉCNICO</button>
+        <button class="btn-top" onclick="window.print()" style="background-color: #718096;">🖨️ IMPRIMIR / PDF</button>
     </div>
 
     <div class="controls-panel leader-only no-print">
