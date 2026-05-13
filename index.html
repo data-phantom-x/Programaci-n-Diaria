@@ -221,7 +221,7 @@
 <div class="container">
     
     <div class="top-bar no-print">
-        <button id="btn-mode-toggle" class="btn-accent" onclick="toggleMode()">MODO ACTUAL: TÉCNICO (CAMBIAR A TEAM LEADER)</button>
+        <button id="btn-mode-toggle" class="btn-accent" onclick="toggleMode()">MODO TÉCNICO</button>
         <button onclick="window.print()" style="background-color: #718096;">🖨️ IMPRIMIR / PDF</button>
     </div>
 
@@ -238,8 +238,8 @@
 
         <div class="control-group">
             <strong>AERONAVE:</strong>
-            <input type="text" id="in-ac-reg" placeholder="MATRÍCULA (CC-...)">
-            <input type="text" id="in-ac-wp" placeholder="WP (TANGO)">
+            <input type="text" id="in-ac-reg" placeholder="MATRÍCULA">
+            <input type="text" id="in-ac-wp" placeholder="WP">
             <input type="text" id="in-ac-pos" placeholder="GANTT / VUELO / POS">
             <button class="btn-leader" onclick="addAvion()">+ AVIÓN</button>
         </div>
@@ -247,8 +247,8 @@
         <div class="control-group">
             <strong>TAREA:</strong>
             <select id="sel-avion"><option value="">SELECCIONAR AVIÓN</option></select>
-            <input type="text" id="in-task-desc" placeholder="PEGAR DESCRIPCIÓN AQUÍ" oninput="detectTango(this)">
-            <input type="text" id="in-task-tango" placeholder="TANGO DETECTADA">
+            <input type="text" id="in-task-desc" placeholder="TAREA" oninput="detectTango(this)">
+            <input type="text" id="in-task-tango" placeholder="TANGO">
             <input type="text" id="in-task-techs" placeholder="TÉCNICOS">
             <button class="btn-leader" onclick="addTask()">+ TAREA</button>
         </div>
@@ -282,11 +282,11 @@
 
         if (isTeamLeader) {
             body.classList.add('team-leader-mode');
-            btnToggle.innerText = "MODO ACTUAL: TEAM LEADER (CAMBIAR A TÉCNICO)";
+            btnToggle.innerText = "MODO TEAM LEADER";
             btnToggle.style.backgroundColor = "var(--leader-color)";
         } else {
             body.classList.remove('team-leader-mode');
-            btnToggle.innerText = "MODO ACTUAL: TÉCNICO (CAMBIAR A TEAM LEADER)";
+            btnToggle.innerText = "MODO TÉCNICO";
             btnToggle.style.backgroundColor = "var(--accent)";
         }
     }
@@ -459,7 +459,7 @@
         const newReg = prompt("EDITAR MATRÍCULA:", avion.reg);
         if (newReg !== null) avion.reg = newReg.trim().toUpperCase();
 
-        const newWp = prompt("EDITAR WP (TANGO):", avion.wp);
+        const newWp = prompt("EDITAR TANGO WP:", avion.wp);
         if (newWp !== null) avion.wp = newWp.trim().toUpperCase();
 
         const newPos = prompt("EDITAR POSICIÓN:", avion.pos);
