@@ -14,7 +14,7 @@
             --leader-color: #d69e2e;
             --danger: #e53e3e;
             --comment: #718096;
-            --help: #dd6b20; /* Color naranja para pedir ayuda */
+            --help: #dd6b20; 
         }
 
         body, input, select, button, textarea {
@@ -122,6 +122,7 @@
         }
 
         .avion-info-main { flex: 1; min-width: 250px; }
+        .avion-pos { color: var(--primary); background: #edf2f7; padding: 2px 6px; border-radius: 3px; font-size: 0.9em; margin-left: 8px;}
         .avion-times { color: #4a5568; font-size: 0.85em; display: inline-block; margin-left: 8px; background: #e2e8f0; padding: 2px 6px; border-radius: 3px; }
         .avion-comment { font-size: 0.85em; color: var(--comment); margin-top: 6px; font-weight: normal; font-style: italic; }
 
@@ -147,27 +148,43 @@
             border: 1px solid transparent;
         }
 
+        /* --- ANIMACIONES DE RESPIRACIÓN --- */
+        @keyframes breathePriority {
+            0% { background-color: #fff5f5; border-left-color: var(--danger); }
+            50% { background-color: #ffffff; border-left-color: #fed7d7; }
+            100% { background-color: #fff5f5; border-left-color: var(--danger); }
+        }
+
+        @keyframes breatheHelp {
+            0% { background-color: #fffaf0; border-left-color: var(--help); }
+            50% { background-color: #ffffff; border-left-color: #feebc8; }
+            100% { background-color: #fffaf0; border-left-color: var(--help); }
+        }
+
+        @keyframes breatheBoth {
+            0% { background-color: #fff5f5; border-left-color: var(--danger); }
+            50% { background-color: #fffaf0; border-left-color: var(--help); }
+            100% { background-color: #fff5f5; border-left-color: var(--danger); }
+        }
+
+        /* Modos de Tareas */
         .task-item.priority {
-            background-color: #fff5f5;
+            animation: breathePriority 2.5s infinite ease-in-out;
             border-left: 4px solid var(--danger);
-            border-color: #fed7d7;
         }
 
-        /* Diseño de la tarea cuando piden ayuda */
         .task-item.help-needed {
-            background-color: #fffaf0;
+            animation: breatheHelp 2.5s infinite ease-in-out;
             border-left: 4px solid var(--help);
-            border-color: #feebc8;
         }
 
-        @keyframes pulseAlert {
-            0% { opacity: 1; }
-            50% { opacity: 0.6; }
-            100% { opacity: 1; }
+        .task-item.priority.help-needed {
+            animation: breatheBoth 2.5s infinite ease-in-out;
+            border-left: 4px solid var(--danger);
         }
 
         .priority-badge { color: var(--danger); font-weight: 800; font-size: 0.85em; margin-left: 8px; }
-        .help-badge { color: var(--help); font-weight: 800; font-size: 0.85em; margin-left: 8px; animation: pulseAlert 1.5s infinite; }
+        .help-badge { color: var(--help); font-weight: 800; font-size: 0.85em; margin-left: 8px; }
 
         .status-toggle {
             width: 22px;
@@ -196,9 +213,10 @@
             color: white;
         }
 
+        /* Tareas completadas pierden la animación y opacidad */
+        .task-item.completed { animation: none !important; border-left-color: transparent !important; background-color: transparent !important; }
         .task-main { flex: 1; min-width: 0; display: flex; flex-direction: column; }
         .task-info { width: 100%; transition: all 0.3s ease; }
-
         .task-item.completed .task-info { opacity: 0.5; text-decoration: line-through; }
         .task-item.completed .tango-link { text-decoration: line-through; color: var(--primary); }
 
@@ -216,7 +234,7 @@
         .comment-btn { color: var(--comment); border: 1px solid var(--comment); }
         
         .help-btn { color: var(--help); border: 1px solid var(--help); font-weight: bold; }
-        .task-item.help-needed .help-btn { background-color: var(--help); color: white; }
+        .task-item.help-needed:not(.completed) .help-btn { background-color: var(--help); color: white; }
 
         @media print {
             @page { size: letter; margin: 1cm; }
@@ -225,16 +243,11 @@
             .document-header { font-size: 1.2em; margin-bottom: 15px; padding-bottom: 5px; }
             .avion-section { margin-bottom: 20px; }
             .avion-title { font-size: 1.1em; margin-bottom: 8px; padding: 6px; flex-direction: column; align-items: flex-start; }
-            .avion-times { padding: 0; background: none; border-radius: 0; }
-            .task-item { margin-bottom: 6px; padding: 0px 5px; border: none; }
+            .avion-pos, .avion-times { padding: 0; background: none; border-radius: 0; }
+            .task-item { margin-bottom: 6px; padding: 0px 5px; border: none; animation: none !important; background: none !important; }
             .task-item.completed .task-info { opacity: 0.85 !important; text-decoration: line-through; color: #333; }
-            .task-item.completed .status-toggle {
-                -webkit-print-color-adjust: exact; print-color-adjust: exact;
-                background-color: var(--accent) !important; border-color: var(--accent) !important; color: white !important;
-            }
+            .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: var(--accent) !important; border-color: var(--accent) !important; color: white !important; }
             .tango-link { text-decoration: none; color: black; }
-            .task-item.priority, .task-item.help-needed { border-left: none; background: none; }
-            .help-badge { animation: none; }
             .status-toggle { margin-top: 0px; width: 16px; min-width: 16px; height: 16px; min-height: 16px; font-size: 12px; }
         }
     </style>
@@ -258,12 +271,12 @@
             <input type="text" id="in-jefe" placeholder="JEFE DE TURNO" oninput="updateHeader()">
         </div>
 
-        <!-- AVIÓN: Campos ampliados -->
         <div class="control-group">
             <strong>AERONAVE:</strong>
             <input type="text" id="in-ac-reg" placeholder="MATRÍCULA" maxlength="6" style="width: 110px;" oninput="formatMatricula(this)">
-            <input type="text" id="in-ac-wp" placeholder="WP" maxlength="5" style="width: 90px;">
-            <input type="text" id="in-ac-pos" placeholder="POS / VUELO" style="width: 110px;">
+            <!-- Se ajustó a 8 caracteres máximo por precaución, pero validará 7 -->
+            <input type="text" id="in-ac-wp" placeholder="WP (T00...)" maxlength="8" style="width: 95px;">
+            <input type="text" id="in-ac-pos" placeholder="POSICIÓN" style="width: 110px;">
             <input type="time" id="in-ac-start" title="Inicio Gantt">
             <input type="time" id="in-ac-end" title="Término Gantt">
             <input type="text" id="in-ac-comment" placeholder="NOTA AVIÓN" style="flex: 2;">
@@ -274,8 +287,10 @@
             <strong>TAREA:</strong>
             <select id="sel-avion"><option value="">SELECCIONAR AVIÓN</option></select>
             <input type="text" id="in-task-desc" placeholder="TAREA" oninput="detectTango(this)">
-            <input type="text" id="in-task-tango" placeholder="TANGO" maxlength="5" style="width: 90px;">
-            <input type="text" id="in-task-techs" placeholder="TÉCNICOS">
+            <!-- Se ajustó a 8 caracteres máximo por precaución, pero validará 7 -->
+            <input type="text" id="in-task-tango" placeholder="TANGO" maxlength="8" style="width: 95px;">
+            <!-- Técnicos ahora se formatea automáticamente -->
+            <input type="text" id="in-task-techs" placeholder="TÉCNICOS" oninput="formatTechs(this)">
             <button class="btn-leader" onclick="addTask()">+ TAREA</button>
         </div>
         
@@ -362,7 +377,6 @@
         document.getElementById('display-header').innerText = `${turno} ${fecha} ${jefe ? '- ' + jefe : ''}`;
     }
 
-    // FORMATEO INTELIGENTE: Escriben "CCBGM" y se convierte en "CC-BGM"
     function formatMatricula(input) {
         let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); 
         if (val.length > 2) {
@@ -372,9 +386,18 @@
         }
     }
 
+    // FORMATEO TÉCNICOS: Reemplaza comas o slashes por " - "
+    function formatTechs(input) {
+        let val = input.value.toUpperCase();
+        val = val.replace(/\s*[,/]\s*/g, ' - '); // Cambia , o / por guion con espacios
+        val = val.replace(/\s*-\s*/g, ' - ');    // Normaliza guiones ya existentes
+        input.value = val;
+    }
+
+    // DETECCIÓN TANGO DE 7 (u 8) CARACTERES
     function detectTango(input) {
         const text = input.value.toUpperCase();
-        const regex = /\b(?=.*[0-9])[A-Z0-9]{5}\b/g;
+        const regex = /\bT00[A-Z0-9]{4,5}\b/g; 
         const matches = text.match(regex);
         if (matches && matches.length > 0) {
             document.getElementById('in-task-tango').value = matches[matches.length - 1];
@@ -391,11 +414,14 @@
         
         if (!reg || reg.length !== 6) return alert("LA MATRÍCULA DEBE ESTAR COMPLETA (EJ: CC-BGM)");
 
-        // WP INTELIGENTE: Si ponen "1A", lo convierte a "T001A"
-        if (wp.length > 0 && wp.length <= 2 && !wp.startsWith('T')) {
+        // WP INTELIGENTE (T00...)
+        if (wp.length > 0 && wp.length <= 5 && !wp.startsWith('T00')) {
             wp = 'T00' + wp;
-        } else if (wp && wp.length !== 5) {
-            return alert("EL WP DEBE TENER 5 CARACTERES (EJ: T004A).");
+        } 
+        
+        // Valida que sean 7 (u 8 por seguridad)
+        if (wp && wp.length !== 7 && wp.length !== 8) {
+            return alert("EL WP DEBE TENER 7 CARACTERES (EJ: T00RWT2).");
         }
 
         const existingAvion = avionesData.find(a => a.reg === reg);
@@ -427,11 +453,13 @@
 
         if (!avionId || !desc) return alert("COMPLETE LOS DATOS DE LA TAREA.");
         
-        // WP INTELIGENTE TAREA: Si ponen "2B", lo convierte a "T002B"
-        if (tango.length > 0 && tango.length <= 2 && !tango.startsWith('T')) {
+        // TANGO INTELIGENTE (T00...)
+        if (tango.length > 0 && tango.length <= 5 && !tango.startsWith('T00')) {
             tango = 'T00' + tango;
-        } else if (tango && tango.length !== 5) {
-            return alert("EL TANGO DEBE TENER EXACTAMENTE 5 CARACTERES.");
+        } 
+        
+        if (tango && tango.length !== 7 && tango.length !== 8) {
+            return alert("EL TANGO DEBE TENER 7 CARACTERES (EJ: T00RWT2).");
         }
 
         const avion = avionesData.find(a => a.id == avionId);
@@ -485,12 +513,13 @@
             div.className = 'avion-section';
             
             const wpDisplay = avion.wp ? `<span class="tango-link" onclick="handleTangoClick('${avion.wp}')">(${avion.wp})</span>` : '';
+            const posDisplay = avion.pos ? `<span class="avion-pos">POSICIÓN: ${avion.pos}</span>` : '';
             const timesDisplay = (avion.start || avion.end) ? `<span class="avion-times">🕒 ${avion.start || '--:--'} - ${avion.end || '--:--'}</span>` : '';
             
             let html = `
                 <div class="avion-title">
                     <div class="avion-info-main">
-                        • ${avion.reg} ${wpDisplay} ${avion.pos ? '(' + avion.pos + ')' : ''} ${timesDisplay}
+                        • ${avion.reg} ${wpDisplay} ${posDisplay} ${timesDisplay}
                         ${avion.comment ? `<div class="avion-comment">↳ NOTA AVIÓN: ${avion.comment}</div>` : ''}
                     </div>
                     <div class="leader-btns leader-only no-print" style="margin-left: auto;">
@@ -526,7 +555,6 @@
                             </div>
 
                             <div class="action-btns no-print">
-                                <!-- Botón Ayuda visible para todos -->
                                 <button class="small-btn help-btn" onclick="toggleHelp(${avion.id}, ${t.id})">🆘 PEDIR AYUDA</button>
                                 <button class="small-btn comment-btn" onclick="editComment(${avion.id}, ${t.id})">${commentBtnText}</button>
                                 
@@ -554,7 +582,7 @@
         
         if (!tarea.done) {
             if (!confirm("¿CONFIRMAS QUE ESTA TAREA ESTÁ COMPLETADA Y CERRADA?")) return;
-            tarea.help = false; // Quita la solicitud de ayuda si se completa la tarea
+            tarea.help = false; 
         } else {
             if (!confirm("¿CONFIRMAS QUE DESEAS REABRIR ESTA TAREA?")) return;
         }
@@ -570,11 +598,15 @@
         saveData(); render();
     }
 
-    // BOTÓN SOS
+    // BOTÓN SOS CON CONFIRMACIÓN
     function toggleHelp(aId, tId) {
         const avion = avionesData.find(a => a.id == aId);
         const tarea = avion.tareas.find(t => t.id == tId);
+        
         if (tarea.done) return alert("LA TAREA YA ESTÁ COMPLETADA.");
+        
+        const accion = tarea.help ? "DESACTIVAR" : "ACTIVAR";
+        if (!confirm(`¿CONFIRMAS QUE DESEAS ${accion} LA SOLICITUD DE APOYO?`)) return;
         
         tarea.help = !tarea.help;
         saveData(); render();
@@ -598,15 +630,20 @@
         const newDesc = prompt("EDITAR DESCRIPCIÓN:", tarea.desc);
         if (newDesc !== null) tarea.desc = newDesc.trim().toUpperCase();
         
-        const newTango = prompt("EDITAR TANGO (5 CARACTERES):", tarea.tango);
+        let newTango = prompt("EDITAR TANGO (7 CARACTERES):", tarea.tango);
         if (newTango !== null) {
             let val = newTango.trim().toUpperCase();
-            if (val && val.length !== 5) return alert("EL TANGO DEBE TENER EXACTAMENTE 5 CARACTERES.");
+            if (val && val.length !== 7 && val.length !== 8) return alert("EL TANGO DEBE TENER 7 CARACTERES (EJ: T00RWT2).");
+            if (val && !val.startsWith('T00')) return alert("EL TANGO DEBE EMPEZAR CON 'T00'.");
             tarea.tango = val;
         }
 
         const newTechs = prompt("EDITAR TÉCNICOS:", tarea.techs);
-        if (newTechs !== null) tarea.techs = newTechs.trim().toUpperCase();
+        if (newTechs !== null) {
+            // Formatea automáticamente al editar
+            let fTechs = newTechs.toUpperCase().replace(/\s*[,/]\s*/g, ' - ').replace(/\s*-\s*/g, ' - ');
+            tarea.techs = fTechs.trim();
+        }
         
         saveData(); render();
     }
