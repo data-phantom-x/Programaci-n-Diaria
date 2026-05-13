@@ -12,9 +12,9 @@
             --light-gray: #f4f5f7;
             --border: #e2e8f0;
             --leader-color: #d69e2e;
+            --danger: #e53e3e;
         }
 
-        /* Fuerza a que TODO el texto sea en mayúsculas */
         body, input, select, button, textarea {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             text-transform: uppercase;
@@ -29,7 +29,6 @@
 
         .container { max-width: 1000px; margin: 0 auto; }
 
-        /* Barra Superior (Visible en ambos modos) */
         .top-bar {
             display: flex;
             justify-content: space-between;
@@ -41,7 +40,6 @@
             align-items: center;
         }
 
-        /* Botones de la barra superior: Mismo tamaño y más pequeños */
         .btn-top {
             width: 150px;
             height: 36px;
@@ -53,12 +51,10 @@
             box-sizing: border-box;
         }
 
-        /* Ocultar elementos exclusivos del Team Leader cuando NO está en ese modo */
         body:not(.team-leader-mode) .leader-only {
             display: none !important;
         }
 
-        /* Panel de Control */
         .controls-panel {
             background-color: var(--light-gray);
             padding: 20px;
@@ -97,9 +93,8 @@
         button:hover { opacity: 0.9; }
         .btn-accent { background-color: var(--accent); }
         .btn-leader { background-color: var(--leader-color); color: #fff; }
-        .btn-clear { background-color: #e53e3e; }
+        .btn-clear { background-color: var(--danger); }
 
-        /* Estilos de la Lista */
         .document-header {
             font-size: 1.4em;
             font-weight: 800;
@@ -131,61 +126,62 @@
             transition: background 0.2s;
         }
 
-        .tango-link:hover {
-            background-color: rgba(56, 178, 172, 0.1);
-        }
+        .tango-link:hover { background-color: rgba(56, 178, 172, 0.1); }
 
         .task-item {
             display: flex;
-            margin-bottom: 15px;
-            padding-left: 10px;
+            margin-bottom: 12px;
+            padding: 8px 10px;
             align-items: flex-start;
-        }
-
-        /* Checkbox tipo CUADRADO PERFECTO Y COMPACTO */
-        .checkbox-custom {
-            appearance: none;
-            -webkit-appearance: none; /* Asegura compatibilidad */
-            width: 18px; 
-            height: 18px;
-            min-width: 18px;
-            min-height: 18px;
-            box-sizing: border-box;
-            background-color: white;
-            border: 2px solid var(--primary);
-            border-radius: 0px !important; /* Fuerza a que sea cuadrado sí o sí */
-            margin-right: 12px;
-            margin-top: 3px;
-            cursor: pointer;
-            position: relative;
-            flex-shrink: 0;
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.2s;
-        }
-
-        .checkbox-custom:checked {
-            background-color: var(--accent);
-            border-color: var(--accent);
-        }
-
-        .checkbox-custom:checked::after {
-            content: '✓';
-            color: white;
-            font-weight: bold;
-            font-size: 14px;
-            position: absolute;
-        }
-
-        /* Tarea completada: opacidad y tachado */
-        .task-info { 
-            flex: 1; 
+            border-radius: 4px;
             transition: all 0.3s ease;
         }
 
+        /* Tareas marcadas como prioridad */
+        .task-item.priority {
+            background-color: #fff5f5;
+            border-left: 4px solid var(--danger);
+        }
+
+        .priority-badge {
+            color: var(--danger);
+            font-weight: 800;
+            font-size: 0.85em;
+            margin-left: 8px;
+        }
+
+        /* NUEVO INDICADOR DE ESTADO (Reemplaza al checkbox) */
+        .status-toggle {
+            width: 20px;
+            height: 20px;
+            min-width: 20px;
+            min-height: 20px;
+            box-sizing: border-box;
+            border: 2px solid var(--primary);
+            background-color: white;
+            margin-right: 12px;
+            margin-top: 2px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: transparent; /* Oculta el ticket si no está checkeado */
+            font-size: 14px;
+            transition: all 0.2s;
+            user-select: none;
+        }
+
+        .task-item.completed .status-toggle {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: white; /* Muestra el ticket */
+        }
+
+        .task-info { flex: 1; transition: all 0.3s ease; }
+
         .task-item.completed .task-info {
-            opacity: 0.35;
+            opacity: 0.4;
             text-decoration: line-through;
         }
 
@@ -195,44 +191,33 @@
         }
 
         .task-desc { font-weight: 500; font-size: 1.05em; }
-        .task-techs { 
-            font-size: 0.85em; 
-            font-weight: 700; 
-            color: #4a5568; 
-            margin-top: 4px;
-        }
+        .task-techs { font-size: 0.85em; font-weight: 700; color: #4a5568; margin-top: 4px; }
 
-        /* Botones de acción en la lista */
-        .delete-btn {
-            background: none;
-            color: #e53e3e;
-            border: 1px solid #e53e3e;
-            padding: 2px 8px;
-            font-size: 11px;
-            margin-left: 10px;
-        }
-
-        .edit-btn {
-            background: none;
-            color: var(--leader-color);
-            border: 1px solid var(--leader-color);
-            padding: 2px 8px;
-            font-size: 11px;
+        .action-btns {
+            display: flex;
+            gap: 6px;
             margin-left: auto;
         }
 
-        /* Configuraciones para el modo de Impresión / PDF */
+        .small-btn {
+            background: none;
+            padding: 2px 8px;
+            font-size: 11px;
+            border-radius: 3px;
+        }
+
+        .delete-btn { color: var(--danger); border: 1px solid var(--danger); }
+        .edit-btn { color: var(--leader-color); border: 1px solid var(--leader-color); }
+        .priority-btn { color: var(--danger); border: 1px solid var(--danger); font-weight: bold; }
+
         @media print {
-            @page {
-                size: letter; /* Fuerza a generar PDF en tamaño Carta sí o sí */
-                margin: 1.5cm;
-            }
+            @page { size: letter; margin: 1.5cm; }
             .no-print { display: none !important; }
             body { padding: 0; background-color: white; }
             .tango-link { text-decoration: none; color: black; }
             .task-item.completed .task-info { opacity: 1; text-decoration: none; }
-            /* Mantiene los colores del checkbox al imprimir */
-            .checkbox-custom {
+            .task-item.priority { border-left: none; }
+            .status-toggle {
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
@@ -289,7 +274,7 @@
 
 <script>
     let avionesData = [];
-    let isTeamLeader = false; // El modo por defecto es Técnico
+    let isTeamLeader = false;
     const MAINTENIX_URL = "https://maintenix.lan.com/maintenix/common/ToDoList.jsp";
     const STORAGE_KEY = 'latam_line_maintenance_data';
 
@@ -297,7 +282,6 @@
     loadData();
     updateHeader();
 
-    // Sistema de Cambio de Modo
     function toggleMode() {
         isTeamLeader = !isTeamLeader;
         const body = document.body;
@@ -314,9 +298,7 @@
         }
     }
 
-    function saveData() {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(avionesData));
-    }
+    function saveData() { localStorage.setItem(STORAGE_KEY, JSON.stringify(avionesData)); }
 
     function loadData() {
         const saved = localStorage.getItem(STORAGE_KEY);
@@ -327,7 +309,7 @@
     }
 
     function clearAllData() {
-        if(confirm("⚠️ ¿ESTÁS SEGURO DE QUE QUIERES BORRAR TODA LA HOJA DE TURNO? ESTO NO SE PUEDE DESHACER.")) {
+        if(confirm("⚠️ ¿ESTÁS SEGURO DE QUE QUIERES BORRAR TODA LA HOJA DE TURNO?")) {
             avionesData = [];
             saveData();
             render();
@@ -350,7 +332,6 @@
         const text = input.value.toUpperCase();
         const regex = /T[0-9]{2}[A-Z0-9]{5}/g;
         const matches = text.match(regex);
-        
         if (matches && matches.length > 0) {
             document.getElementById('in-task-tango').value = matches[matches.length - 1];
         } else {
@@ -362,22 +343,14 @@
         const reg = document.getElementById('in-ac-reg').value.toUpperCase();
         const wp = document.getElementById('in-ac-wp').value.toUpperCase();
         const pos = document.getElementById('in-ac-pos').value.toUpperCase();
-
         if (!reg) return alert("INGRESE MATRÍCULA");
 
-        avionesData.push({
-            id: Date.now(),
-            reg,
-            wp,
-            pos,
-            tareas: []
-        });
+        avionesData.push({ id: Date.now(), reg, wp, pos, tareas: [] });
 
         document.getElementById('in-ac-reg').value = '';
         document.getElementById('in-ac-wp').value = '';
         document.getElementById('in-ac-pos').value = '';
-        saveData();
-        render();
+        saveData(); render();
     }
 
     function addTask() {
@@ -391,31 +364,25 @@
         const avion = avionesData.find(a => a.id == avionId);
         avion.tareas.push({
             id: Date.now(),
-            desc,
-            tango,
-            techs,
-            done: false
+            desc, tango, techs,
+            done: false, priority: false // Agregada la propiedad de prioridad
         });
 
         document.getElementById('in-task-desc').value = '';
         document.getElementById('in-task-tango').value = '';
-        saveData();
-        render();
+        saveData(); render();
     }
 
     async function handleTangoClick(tangoCode) {
         try {
             await navigator.clipboard.writeText(tangoCode);
             window.open(MAINTENIX_URL, '_blank');
-        } catch (err) {
-            console.error('ERROR AL COPIAR:', err);
-        }
+        } catch (err) { console.error('ERROR AL COPIAR:', err); }
     }
 
     function render() {
         const container = document.getElementById('aviones-container');
         const select = document.getElementById('sel-avion');
-        
         const currentSelection = select.value;
         
         container.innerHTML = '';
@@ -432,12 +399,13 @@
             
             const wpDisplay = avion.wp ? `<span class="tango-link" onclick="handleTangoClick('${avion.wp}')">(${avion.wp})</span>` : '';
             
-            // Los botones Editar/Eliminar ahora tienen la clase "leader-only"
             let html = `
                 <div class="avion-title">
                     • ${avion.reg} ${wpDisplay} ${avion.pos ? '(' + avion.pos + ')' : ''}
-                    <button class="edit-btn leader-only no-print" onclick="editAvion(${avion.id})">EDITAR</button>
-                    <button class="delete-btn leader-only no-print" onclick="deleteAvion(${avion.id})">ELIMINAR</button>
+                    <div class="action-btns leader-only no-print">
+                        <button class="small-btn edit-btn" onclick="editAvion(${avion.id})">EDITAR</button>
+                        <button class="small-btn delete-btn" onclick="deleteAvion(${avion.id})">ELIMINAR</button>
+                    </div>
                 </div>
             `;
 
@@ -449,19 +417,26 @@
                     const regexClean = new RegExp(`\\[?${t.tango}\\]?`, 'gi');
                     cleanDesc = cleanDesc.replace(regexClean, '').trim();
                     cleanDesc = cleanDesc.replace(/[- ]+$/, '').trim();
-                    
                     tangoDisplay = ` [<span class="tango-link" onclick="handleTangoClick('${t.tango}')">${t.tango}</span>]`;
                 }
 
+                const priorityLabel = t.priority ? '<span class="priority-badge">🔥 URGENTE</span>' : '';
+
                 html += `
-                    <div class="task-item ${t.done ? 'completed' : ''}">
-                        <input type="checkbox" class="checkbox-custom no-print" ${t.done ? 'checked' : ''} onchange="toggleTask(${avion.id}, ${t.id})">
+                    <div class="task-item ${t.done ? 'completed' : ''} ${t.priority ? 'priority' : ''}">
+                        <!-- EL DIV REEMPLAZA AL CHECKBOX RECTANGULAR -->
+                        <div class="status-toggle no-print" onclick="toggleTask(${avion.id}, ${t.id})">✓</div>
+                        
                         <div class="task-info">
-                            <div class="task-desc">- ${cleanDesc} ${tangoDisplay}</div>
+                            <div class="task-desc">- ${cleanDesc} ${tangoDisplay} ${priorityLabel}</div>
                             ${t.techs ? `<div class="task-techs">${t.techs}</div>` : ''}
                         </div>
-                        <button class="edit-btn leader-only no-print" onclick="editTask(${avion.id}, ${t.id})">EDITAR</button>
-                        <button class="delete-btn leader-only no-print" onclick="deleteTask(${avion.id}, ${t.id})">X</button>
+
+                        <div class="action-btns leader-only no-print">
+                            <button class="small-btn priority-btn" onclick="togglePriority(${avion.id}, ${t.id})">⭐</button>
+                            <button class="small-btn edit-btn" onclick="editTask(${avion.id}, ${t.id})">EDITAR</button>
+                            <button class="small-btn delete-btn" onclick="deleteTask(${avion.id}, ${t.id})">X</button>
+                        </div>
                     </div>
                 `;
             });
@@ -470,67 +445,67 @@
             container.appendChild(div);
         });
 
-        if (currentSelection && avionesData.find(a => a.id == currentSelection)) {
-            select.value = currentSelection;
-        }
+        if (currentSelection && avionesData.find(a => a.id == currentSelection)) select.value = currentSelection;
     }
 
+    // Funciones de control de estado de tarea
+    function toggleTask(aId, tId) {
+        const avion = avionesData.find(a => a.id == aId);
+        const tarea = avion.tareas.find(t => t.id == tId);
+        
+        // Confirmación solo si la tarea se va a marcar como completada
+        if (!tarea.done) {
+            if (!confirm("¿CONFIRMAS QUE ESTA TAREA ESTÁ COMPLETADA Y CERRADA?")) {
+                return;
+            }
+        }
+        
+        tarea.done = !tarea.done;
+        saveData(); render(); 
+    }
+
+    function togglePriority(aId, tId) {
+        const avion = avionesData.find(a => a.id == aId);
+        const tarea = avion.tareas.find(t => t.id == tId);
+        tarea.priority = !tarea.priority;
+        saveData(); render();
+    }
+
+    // Resto de funciones de edición y borrado
     function editAvion(id) {
         const avion = avionesData.find(a => a.id == id);
         if (!avion) return;
-
         const newReg = prompt("EDITAR MATRÍCULA:", avion.reg);
         if (newReg !== null) avion.reg = newReg.trim().toUpperCase();
-
         const newWp = prompt("EDITAR TANGO WP:", avion.wp);
         if (newWp !== null) avion.wp = newWp.trim().toUpperCase();
-
         const newPos = prompt("EDITAR POSICIÓN:", avion.pos);
         if (newPos !== null) avion.pos = newPos.trim().toUpperCase();
-
-        saveData();
-        render();
+        saveData(); render();
     }
 
     function editTask(aId, tId) {
         const avion = avionesData.find(a => a.id == aId);
-        if (!avion) return;
         const tarea = avion.tareas.find(t => t.id == tId);
-        if (!tarea) return;
-
         const newDesc = prompt("EDITAR DESCRIPCIÓN:", tarea.desc);
         if (newDesc !== null) tarea.desc = newDesc.trim().toUpperCase();
-
         const newTango = prompt("EDITAR TANGO:", tarea.tango);
         if (newTango !== null) tarea.tango = newTango.trim().toUpperCase();
-
         const newTechs = prompt("EDITAR TÉCNICOS:", tarea.techs);
         if (newTechs !== null) tarea.techs = newTechs.trim().toUpperCase();
-
-        saveData();
-        render();
-    }
-
-    function toggleTask(aId, tId) {
-        const avion = avionesData.find(a => a.id == aId);
-        const tarea = avion.tareas.find(t => t.id == tId);
-        tarea.done = !tarea.done;
-        saveData();
-        render(); 
+        saveData(); render();
     }
 
     function deleteTask(aId, tId) {
         const avion = avionesData.find(a => a.id == aId);
         avion.tareas = avion.tareas.filter(t => t.id != tId);
-        saveData();
-        render();
+        saveData(); render();
     }
 
     function deleteAvion(id) {
         if (confirm("¿BORRAR ESTE AVIÓN Y TODAS SUS TAREAS?")) {
             avionesData = avionesData.filter(a => a.id != id);
-            saveData();
-            render();
+            saveData(); render();
         }
     }
 </script>
