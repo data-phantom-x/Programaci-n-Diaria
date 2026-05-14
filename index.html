@@ -370,7 +370,7 @@
 <div id="add-task-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">📝 AGREGAR TAREA</div>
-        <input type="text" id="add-task-desc" placeholder="DESCRIPCIÓN DE LA TAREA">
+        <input type="text" id="add-task-desc" placeholder="TÍTULO DE LA TAREA">
         <input type="text" id="add-task-tango" placeholder="T00..." maxlength="8" oninput="autoFormatTango(this)">
         
         <div style="font-size: 10px; font-weight: bold; color: var(--comment); margin-bottom: 6px;">ASIGNAR TÉCNICOS:</div>
@@ -387,7 +387,7 @@
 <div id="edit-task-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">✏️ EDITAR TAREA</div>
-        <input type="text" id="edit-task-desc" placeholder="DESCRIPCIÓN DE LA TAREA">
+        <input type="text" id="edit-task-desc" placeholder="TÍTULO DE LA TAREA">
         <input type="text" id="edit-task-tango" placeholder="T00..." maxlength="8" oninput="autoFormatTango(this)">
         
         <div style="font-size: 10px; font-weight: bold; color: var(--comment); margin-bottom: 6px;">TÉCNICOS ASIGNADOS:</div>
@@ -721,7 +721,7 @@
         const desc = document.getElementById('add-task-desc').value.trim().toUpperCase();
         let tango = document.getElementById('add-task-tango').value.trim().toUpperCase();
         
-        if (!desc) return showConfirm("INGRESE LA DESCRIPCIÓN DE LA TAREA.", null);
+        if (!desc) return showConfirm("INGRESE EL TÍTULO DE LA TAREA.", null);
         if (tango && tango.length !== 8) return showConfirm("EL TANGO DEBE TENER 8 CARACTERES.", null);
 
         const checkboxes = document.querySelectorAll('.add-task-techs-cb:checked');
