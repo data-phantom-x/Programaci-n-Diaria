@@ -66,7 +66,7 @@
 
         input, select, button {
             padding: 6px 10px; border: 1px solid var(--border);
-            border-radius: 4px; font-size: 11px; outline: none;
+            border-radius: 4px; font-size: 11px; outline: none; box-sizing: border-box;
         }
         
         input:focus, select:focus { border-color: var(--accent); }
@@ -84,12 +84,26 @@
         .btn-danger-outline { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
         .btn-danger-outline:hover { background: var(--danger); color: white; }
 
-        .tech-pill {
-            background-color: var(--primary); color: white; padding: 4px 10px;
-            border-radius: 12px; font-size: 10px; display: flex; align-items: center; gap: 6px; font-weight: bold;
+        /* Etiquetas de técnicos (Mejoradas) */
+        #tech-pills-container {
+            display: flex; flex-wrap: wrap; gap: 8px; width: 100%;
+            padding: 10px; background: rgba(255,255,255,0.5); border-radius: 4px; border: 1px dashed #cbd5e0;
         }
-        .tech-pill span { cursor: pointer; color: #fc8181; font-size: 12px; line-height: 1; transition: 0.2s;}
-        .tech-pill span:hover { color: #fff; }
+
+        .tech-pill {
+            background-color: var(--primary); color: white; padding: 6px 10px;
+            border-radius: 4px; font-size: 11px; display: inline-flex; align-items: center; gap: 8px; font-weight: bold;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        
+        .tech-pill span.tech-name { line-height: 1; }
+        
+        .tech-pill span.tech-remove { 
+            cursor: pointer; color: white; background: rgba(229, 62, 62, 0.8); 
+            width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; 
+            border-radius: 3px; font-size: 10px; transition: 0.2s;
+        }
+        .tech-pill span.tech-remove:hover { background: var(--danger); }
 
         .document-header { font-size: 1.3em; font-weight: 800; margin-bottom: 20px; border-bottom: 2px solid var(--primary); padding-bottom: 8px; }
         .avion-section { margin-bottom: 25px; }
@@ -142,16 +156,25 @@
         .task-techs { font-size: 0.85em; font-weight: 700; color: #4a5568; margin-top: 6px; }
         .task-comment { font-size: 0.85em; color: var(--comment); margin-top: 6px; font-style: italic; font-weight: 600; }
 
-        /* Botoneras Tácticas */
-        .action-bar { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; align-items: stretch; justify-content: flex-end; }
-        .action-bar.avion-bar { margin-top: 0; }
+        /* ==========================================
+           BOTONERAS TÁCTICAS (TAMAÑOS EXACTOS)
+           ========================================== */
+        .action-bar { 
+            display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; 
+            align-items: stretch; width: 100%;
+        }
+        
+        .action-bar.avion-bar { margin-top: 0; justify-content: flex-end; width: auto; }
 
         .action-btn {
-            flex: 1; min-width: 80px; max-width: 120px;
-            padding: 4px 6px; font-size: 10px; font-weight: 700;
+            flex: 1 1 0%; /* OBLIGA A QUE TODOS SEAN EXACTAMENTE DEL MISMO TAMAÑO */
+            min-width: 60px; /* Permite que se encojan equitativamente en móviles */
+            padding: 6px 4px; font-size: 10px; font-weight: 700;
             border-radius: 3px; border: 1px solid var(--border);
             background: #ffffff; color: var(--primary);
-            cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 4px;
+            cursor: pointer; transition: all 0.2s; 
+            display: flex; align-items: center; justify-content: center; gap: 4px;
+            text-align: center;
         }
 
         .action-btn:hover { background: var(--light-gray); border-color: #a0aec0; }
@@ -168,7 +191,7 @@
         .modal-content {
             background-color: var(--bg); margin: 6% auto; padding: 20px;
             border: 1px solid var(--border); width: 90%; max-width: 480px; border-radius: 6px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2); max-height: 85vh; overflow-y: auto;
         }
         
         .modal-header { font-weight: 800; font-size: 1.1em; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--leader-color); padding-bottom: 8px; }
@@ -179,25 +202,28 @@
         /* Grid de Técnicos Corregido */
         .tech-grid {
             display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
-            gap: 6px; max-height: 140px; overflow-y: auto; margin-bottom: 15px; padding: 2px;
+            gap: 6px; max-height: 160px; overflow-y: auto; margin-bottom: 15px; padding: 2px;
         }
 
         .tech-checkbox-label {
             display: flex; align-items: center; gap: 6px;
-            background: #f8fafc; border: 1px solid var(--border); padding: 6px 8px;
+            background: #f8fafc; border: 1px solid var(--border); padding: 8px;
             border-radius: 4px; cursor: pointer; font-size: 10px; font-weight: 700;
             transition: all 0.2s; user-select: none; color: var(--comment);
-            overflow: hidden; box-sizing: border-box;
         }
 
         .tech-checkbox-label:hover { border-color: var(--accent); color: var(--primary); }
         .tech-checkbox-label:has(input:checked) { border-color: var(--accent); background: #f0fbfb; color: var(--accent); }
-        .tech-checkbox-label input { margin: 0; width: auto; cursor: pointer; flex-shrink: 0; }
-        .tech-checkbox-label span { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .tech-checkbox-label input { margin: 0; flex-shrink: 0; cursor: pointer; }
+        
+        /* Solución al texto invisible */
+        .tech-checkbox-label span { 
+            flex: 1; word-wrap: break-word; white-space: normal; line-height: 1.2;
+        }
 
         /* Botones modales unificados */
         .modal-footer { display: flex; gap: 8px; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border); }
-        .btn-modal-action { flex: 1; padding: 8px 0; font-size: 11px; text-align: center; display: flex; justify-content: center; align-items: center; }
+        .btn-modal-action { flex: 1; padding: 10px 0; font-size: 11px; text-align: center; display: flex; justify-content: center; align-items: center; }
 
         @media print {
             @page { size: letter; margin: 1cm; } .no-print { display: none !important; }
@@ -226,12 +252,12 @@
     <div class="header-controls leader-only no-print">
         <div class="leader-panel-header">
             <div class="leader-title">⚙️ PANEL DE CONTROL TEAM LEADER</div>
-            <button class="btn-danger-outline" onclick="clearAllData()" style="padding: 4px 10px; font-size: 10px;">⚠️ BORRAR HOJA ENTERA</button>
+            <button class="btn-danger-outline" onclick="clearAllData()" style="padding: 6px 10px; font-size: 10px;">⚠️ BORRAR HOJA ENTERA</button>
         </div>
 
         <div class="leader-grid">
             <div class="control-group">
-                <span style="font-size: 10px; font-weight: bold; color: var(--comment); width: 60px;">TURNO:</span>
+                <span style="font-size: 10px; font-weight: bold; color: var(--comment); width: 65px;">TURNO:</span>
                 <select id="in-turno" onchange="updateHeader()" style="max-width: 130px;">
                     <option value="Turno Día">DÍA</option>
                     <option value="Turno Tarde">TARDE</option>
@@ -241,13 +267,14 @@
                 <input type="text" id="in-jefe" placeholder="NOMBRE JEFE DE TURNO" oninput="updateHeader()">
             </div>
             
-            <div class="control-group">
-                <span style="font-size: 10px; font-weight: bold; color: var(--comment); width: 60px;">TÉCNICOS:</span>
+            <div class="control-group" style="margin-bottom: 5px;">
+                <span style="font-size: 10px; font-weight: bold; color: var(--comment); width: 65px;">TÉCNICOS:</span>
                 <input type="text" id="in-new-tech" placeholder="AGREGAR APELLIDO" onkeypress="if(event.key === 'Enter') addTech()" style="max-width: 270px;">
                 <button class="btn-leader" onclick="addTech()">+ AGREGAR A LA LISTA</button>
             </div>
 
-            <div class="control-group" id="tech-pills-container" style="gap: 6px; margin-left: 70px;"></div>
+            <!-- Contenedor ordenado para Técnicos -->
+            <div id="tech-pills-container"></div>
         </div>
     </div>
 
@@ -433,9 +460,13 @@
 
     function renderTechPills() {
         const container = document.getElementById('tech-pills-container'); container.innerHTML = '';
+        if(shiftTechs.length === 0) {
+            container.innerHTML = '<span style="font-size:10px; color:var(--comment); font-style:italic;">No hay técnicos registrados.</span>';
+            return;
+        }
         shiftTechs.forEach((tech, index) => {
             const pill = document.createElement('div'); pill.className = 'tech-pill';
-            pill.innerHTML = `<span>${tech}</span> <span onclick="removeTech(${index})" title="Eliminar">✖</span>`;
+            pill.innerHTML = `<span class="tech-name">${tech}</span> <span class="tech-remove" onclick="removeTech(${index})" title="Eliminar">✖</span>`;
             container.appendChild(pill);
         });
     }
@@ -485,12 +516,12 @@
     function autoFormatTango(input) {
         let val = input.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
         if (val === 'T' || val === 'T0' || val === 'T00') {
-            // Permite borrar o tipear el inicio naturalmente
+            // Permite tipeo inicial
         } else if (val.length > 0 && !val.startsWith('T00')) {
-            val = val.replace(/^T0?0?/, ''); // Limpia intentos raros
-            val = 'T00' + val; // Fuerza T00
+            val = val.replace(/^T0?0?/, ''); // Limpia si intentan pegar algo como "00HW..."
+            val = 'T00' + val; // Autocompleta
         }
-        input.value = val.substring(0, 8); // Bloquea en 8 caracteres
+        input.value = val.substring(0, 8); // Bloquea longitud
     }
 
     async function handleTangoClick(tangoCode) {
@@ -536,7 +567,7 @@
                 }
 
                 const priorityLabel = t.priority ? '<span class="priority-badge">🔥 URGENTE</span>' : '';
-                const helpLabel = t.help ? '<span class="help-badge">🆘 APOYO SOLICITADO</span>' : '';
+                const helpLabel = t.help ? '<span class="help-badge">🆘 APOYO</span>' : '';
 
                 html += `
                     <div class="task-item ${t.done ? 'completed' : ''} ${t.priority ? 'priority' : ''} ${t.help ? 'help-needed' : ''}">
