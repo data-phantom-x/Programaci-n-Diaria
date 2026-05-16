@@ -419,7 +419,7 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyADC1Wwcypek8g1gwOTcgqKskpqiTo0-oM",
@@ -461,11 +461,47 @@
     let editCurrentAvionId = null;
     let editCurrentTaskId = null;
     const MAINTENIX_URL = "https://maintenix.lan.com/maintenix/common/ToDoList.jsp";
+    const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000; // 12 horas asíncronas
 
     // ESTADOS LOCALES DE VISTA Y FILTRO
     let currentViewMode = localStorage.getItem('viewMode') || 'default';
     let currentTechFilter = localStorage.getItem('techFilter') || '';
     document.getElementById('view-mode-select').value = currentViewMode;
+
+    // --- MANEJO DE SESIÓN PERSISTENTE (12 HORAS) ---
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            const userEmail = user.email.toLowerCase();
+            const loginTime = localStorage.getItem('teamLeaderLoginTime');
+            
+            if (correosAutorizados.includes(userEmail) && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
+                // Sesión válida y vigente
+                isTeamLeader = true;
+                document.body.classList.add('team-leader-mode');
+                const btnToggle = document.getElementById('btn-mode-toggle');
+                btnToggle.innerText = "MODO TEAM LEADER";
+                btnToggle.style.backgroundColor = "var(--leader-color)";
+                render();
+            } else {
+                // Sesión expirada o usuario no autorizado
+                signOut(auth).then(() => {
+                    localStorage.removeItem('teamLeaderLoginTime');
+                    deactivateLeaderUI();
+                });
+            }
+        } else {
+            deactivateLeaderUI();
+        }
+    });
+
+    function deactivateLeaderUI() {
+        isTeamLeader = false;
+        document.body.classList.remove('team-leader-mode');
+        const btnToggle = document.getElementById('btn-mode-toggle');
+        btnToggle.innerText = "MODO TÉCNICO";
+        btnToggle.style.backgroundColor = "var(--accent)";
+        render();
+    }
 
     // --- SINCRONIZACIÓN EN TIEMPO REAL ---
     onValue(dbRefs.aviones, (snapshot) => {
@@ -604,26 +640,19 @@
 
     // 🛡️ LÓGICA DE AUTENTICACIÓN
     async function toggleMode() {
-        const body = document.body; 
-        const btnToggle = document.getElementById('btn-mode-toggle');
-
         if (isTeamLeader) {
-            isTeamLeader = false;
-            body.classList.remove('team-leader-mode'); 
-            btnToggle.innerText = "MODO TÉCNICO"; 
-            btnToggle.style.backgroundColor = "var(--accent)";
-            render(); 
+            await signOut(auth);
+            localStorage.removeItem('teamLeaderLoginTime');
+            // onAuthStateChanged se encarga de la UI y los estados al cerrar sesión
         } else {
             try {
                 const result = await signInWithPopup(auth, provider);
                 const userEmail = result.user.email.toLowerCase();
 
                 if (correosAutorizados.includes(userEmail)) {
-                    isTeamLeader = true;
-                    body.classList.add('team-leader-mode'); 
-                    btnToggle.innerText = "MODO TEAM LEADER"; 
-                    btnToggle.style.backgroundColor = "var(--leader-color)";
-                    render();
+                    // Establecer timestamp de inicio de sesión de 12 horas
+                    localStorage.setItem('teamLeaderLoginTime', Date.now().toString());
+                    // onAuthStateChanged procesará el login exitoso validando el tiempo
                 } else {
                     await signOut(auth); 
                     showConfirm(`ACCESO DENEGADO.\nEl correo ${userEmail} no tiene permisos.`, null);
