@@ -257,7 +257,6 @@
         <button class="btn-top" onclick="window.print()" style="background-color: #718096; color:white; border:none;">🖨️ IMPRIMIR HOJA</button>
     </div>
 
-    <!-- CONTROLES DE VISTA Y FILTRO (LOCAL) -->
     <div class="view-controls no-print">
         <div style="display: flex; gap: 8px; align-items: center;">
             <span style="font-size: 11px; font-weight: bold; color: var(--comment);">MODO DE VISTA:</span>
@@ -276,7 +275,6 @@
         </div>
     </div>
 
-    <!-- CONFIGURACIÓN DE TURNO (TEAM LEADER) -->
     <div class="header-controls leader-only no-print">
         <div class="leader-panel-header">
             <div class="leader-title">⚙️ PANEL DE CONTROL TEAM LEADER</div>
@@ -305,7 +303,6 @@
         </div>
     </div>
 
-    <!-- ÁREA PRINCIPAL -->
     <div id="print-area">
         <div class="document-header" id="display-header">CARGANDO DATOS...</div>
         <div id="aviones-container"></div>
@@ -314,8 +311,6 @@
         </div>
     </div>
 </div>
-
-<!-- ================= MODALS ================= -->
 
 <div id="confirm-modal" class="modal">
     <div class="modal-content" style="max-width: 350px; text-align: center;">
@@ -415,7 +410,6 @@
     </div>
 </div>
 
-<!-- ================= SCRIPT Y FIREBASE REALTIME + AUTH ================= -->
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
@@ -461,7 +455,7 @@
     let editCurrentAvionId = null;
     let editCurrentTaskId = null;
     const MAINTENIX_URL = "https://maintenix.lan.com/maintenix/common/ToDoList.jsp";
-    const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000; // 12 horas asíncronas
+    const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000;
 
     // ESTADOS LOCALES DE VISTA Y FILTRO
     let currentViewMode = localStorage.getItem('viewMode') || 'default';
@@ -472,21 +466,37 @@
     onAuthStateChanged(auth, (user) => {
         if (user) {
             const userEmail = user.email.toLowerCase();
-            const loginTime = localStorage.getItem('teamLeaderLoginTime');
             
-            if (correosAutorizados.includes(userEmail) && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
-                // Sesión válida y vigente
-                isTeamLeader = true;
-                document.body.classList.add('team-leader-mode');
-                const btnToggle = document.getElementById('btn-mode-toggle');
-                btnToggle.innerText = "MODO TEAM LEADER";
-                btnToggle.style.backgroundColor = "var(--leader-color)";
-                render();
+            if (correosAutorizados.includes(userEmail)) {
+                let loginTime = localStorage.getItem('teamLeaderLoginTime');
+                
+                // Si el usuario acaba de iniciar sesión exitosamente y no hay marca de tiempo, la generamos ahora
+                if (!loginTime) {
+                    loginTime = Date.now().toString();
+                    localStorage.setItem('teamLeaderLoginTime', loginTime);
+                }
+
+                if ((Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
+                    // Sesión válida y dentro del rango de 12 horas
+                    isTeamLeader = true;
+                    document.body.classList.add('team-leader-mode');
+                    const btnToggle = document.getElementById('btn-mode-toggle');
+                    btnToggle.innerText = "MODO TEAM LEADER";
+                    btnToggle.style.backgroundColor = "var(--leader-color)";
+                    render();
+                } else {
+                    // Tiempo expirado
+                    signOut(auth).then(() => {
+                        localStorage.removeItem('teamLeaderLoginTime');
+                        deactivateLeaderUI();
+                    });
+                }
             } else {
-                // Sesión expirada o usuario no autorizado
+                // Usuario no autorizado en la lista de correos
                 signOut(auth).then(() => {
                     localStorage.removeItem('teamLeaderLoginTime');
                     deactivateLeaderUI();
+                    showConfirm(`ACCESO DENEGADO.\nEl correo ${userEmail} no tiene permisos.`, null);
                 });
             }
         } else {
@@ -626,14 +636,12 @@
 
     function handleTaskDescInput(inputElem, tangoElemId) {
         let val = inputElem.value;
-        // Detecta patrón T00 seguido de 5 caracteres alfanuméricos al tipear o pegar
         const regex = /(T00[A-Z0-9]{5})/i;
         const match = val.match(regex);
         if (match) {
             const tangoCode = match[1].toUpperCase();
             const tangoInput = document.getElementById(tangoElemId);
             if (!tangoInput.value) { tangoInput.value = tangoCode; }
-            // Remueve el tango (y posibles corchetes/paréntesis que lo envuelvan) del título
             inputElem.value = val.replace(new RegExp(`[\\[\\(]?${tangoCode}[\\]\\)]?`, 'i'), '').trim();
         }
     }
@@ -641,22 +649,13 @@
     // 🛡️ LÓGICA DE AUTENTICACIÓN
     async function toggleMode() {
         if (isTeamLeader) {
-            await signOut(auth);
             localStorage.removeItem('teamLeaderLoginTime');
-            // onAuthStateChanged se encarga de la UI y los estados al cerrar sesión
+            await signOut(auth);
         } else {
             try {
-                const result = await signInWithPopup(auth, provider);
-                const userEmail = result.user.email.toLowerCase();
-
-                if (correosAutorizados.includes(userEmail)) {
-                    // Establecer timestamp de inicio de sesión de 12 horas
-                    localStorage.setItem('teamLeaderLoginTime', Date.now().toString());
-                    // onAuthStateChanged procesará el login exitoso validando el tiempo
-                } else {
-                    await signOut(auth); 
-                    showConfirm(`ACCESO DENEGADO.\nEl correo ${userEmail} no tiene permisos.`, null);
-                }
+                // Al iniciar sesión de forma exitosa, el observador onAuthStateChanged 
+                // se encargará de registrar el timestamp de forma inmediata y asíncrona.
+                await signInWithPopup(auth, provider);
             } catch (error) {
                 if (error.code !== 'auth/popup-closed-by-user') console.error("Error táctico de autenticación:", error);
             }
@@ -690,7 +689,6 @@
 
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
-    // Generador HTML para tareas reutilizable
     function generateTaskHTML(avion, t, showPlaneReg = false) {
         let cleanDesc = t.desc; let tangoDisplay = '';
         if (t.tango) {
@@ -765,22 +763,17 @@
 
     function render() {
         const container = document.getElementById('aviones-container'); container.innerHTML = '';
-        
-        // Copia profunda para manipular la vista sin afectar los datos en Firebase
         let displayData = JSON.parse(JSON.stringify(avionesData));
 
-        // Aplicar Filtro Local
         if (currentTechFilter) {
             displayData.forEach(avion => {
                 if (avion.tareas) {
                     avion.tareas = avion.tareas.filter(t => t.techs && t.techs.includes(currentTechFilter));
                 }
             });
-            // Remover aviones que queden sin tareas (para limpiar la vista)
             displayData = displayData.filter(avion => avion.tareas && avion.tareas.length > 0);
         }
 
-        // Aplicar Ordenamiento por Tiempo
         if (currentViewMode === 'time') {
             displayData.sort((a, b) => {
                 if (!a.start && !b.start) return 0;
@@ -790,13 +783,11 @@
             });
         }
 
-        // Aplicar Vista por Técnicos
         if (currentViewMode === 'tech') {
             renderGroupedByTech(displayData, container);
             return;
         }
 
-        // Renderizado Default (Por Avión) o Por Tiempo
         displayData.forEach(avion => {
             const div = document.createElement('div'); div.className = 'avion-section';
             const wpDisplay = avion.wp ? `<span class="tango-link" onclick="handleTangoClick('${avion.wp}')">(${avion.wp})</span>` : '';
@@ -990,7 +981,6 @@
         });
     }
 
-    // EXPORTAR FUNCIONES AL ÁMBITO GLOBAL PARA EL HTML
     Object.assign(window, {
         updateHeader, addTech, removeTech, toggleMode, clearAllData,
         formatMatricula, autoFormatTango, handleTangoClick, closeModal,
