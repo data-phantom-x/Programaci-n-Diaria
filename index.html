@@ -797,23 +797,27 @@
         input.value = val;
     }
 
-    async function toggleMode() {
-        if (isTeamLeader) {
-            deactivateLeaderUI();
+   async function toggleMode() {
+    if (isTeamLeader) {
+        deactivateLeaderUI();
+    } else {
+        let loginTime = localStorage.getItem('teamLeaderLoginTime');
+        if (auth.currentUser && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
+            activateLeaderUI();
         } else {
-            let loginTime = localStorage.getItem('teamLeaderLoginTime');
-            if (auth.currentUser && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
-                activateLeaderUI();
-            } else {
-                try {
-                    await signInWithPopup(auth, provider);
-                } catch (error) {
-                    if (error.code !== 'auth/popup-closed-by-user') console.error("Error de autenticación:", error);
+            try {
+                await signInWithPopup(auth, provider);
+            } catch (error) {
+                if (error.code !== 'auth/popup-closed-by-user') {
+                    console.error("Error de autenticación:", error);
+                    // Agrega esta línea para ver el error en pantalla:
+                    alert("Error de Firebase: " + error.code + "\n" + error.message);
                 }
             }
         }
     }
-
+}
+    
     function clearAllData() {
         showConfirm("⚠️ ¿ESTÁS SEGURO DE BORRAR TODA LA HOJA DE ESTE TURNO? (Los técnicos se mantendrán)", () => {
             avionesData = []; saveData(); 
