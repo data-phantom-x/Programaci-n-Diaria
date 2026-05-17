@@ -312,11 +312,11 @@
 <div class="container">
     <div class="top-bar no-print">
         <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">MODO TÉCNICO</button>
+        <button type="button" id="btn-logout" class="btn-top btn-danger-outline" onclick="logoutLeader()" style="display:none; background-color: var(--danger); color:white; border:none;">CERRAR SESIÓN</button>
         <button class="btn-top" onclick="window.print()" style="background-color: #64748b; color:white;">🖨️ IMPRIMIR HOJA</button>
     </div>
 
     <div class="view-controls no-print">
-        <!-- SELECTOR DE TURNO GLOBAL CON MEMORIA -->
         <div style="display: flex; gap: 8px; align-items: center;">
             <span style="font-size: 11px; font-weight: bold; color: var(--accent);">TURNO:</span>
             <select id="global-turno-select" onchange="changeTurno()" style="min-width: 100px; font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
@@ -510,7 +510,6 @@
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyADC1Wwcypek8g1gwOTcgqKskpqiTo0-oM",
@@ -524,8 +523,6 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-    const auth = getAuth(app);
-    const provider = new GoogleAuthProvider();
 
     const correosAutorizados = [
         "ndfuentesa@gmail.com",
@@ -547,62 +544,84 @@
     let editCurrentAvionId = null;
     let editCurrentTaskId = null;
     const MAINTENIX_URL = "https://maintenix.lan.com/maintenix/common/ToDoList.jsp";
-    const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000;
+    const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000; // 12 horas
 
     let currentViewMode = 'default';
     let currentTechFilter = ''; 
     
-    // MEMORIA LOCAL PARA EL TURNO
     let activeTurno = localStorage.getItem('latam_active_turno') || 'Turno Día';
     document.getElementById('global-turno-select').value = activeTurno;
     document.getElementById('view-mode-select').value = currentViewMode;
 
-    onAuthStateChanged(auth, (user) => {
-        if (user) {
-            const userEmail = user.email.toLowerCase();
-            if (correosAutorizados.includes(userEmail)) {
-                let loginTime = localStorage.getItem('teamLeaderLoginTime');
-                if (!loginTime) {
-                    loginTime = Date.now().toString();
-                    localStorage.setItem('teamLeaderLoginTime', loginTime);
-                }
+    // Validación de sesión local al iniciar la página
+    checkSession();
 
-                if ((Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
-                    activateLeaderUI();
-                } else {
-                    signOut(auth).then(() => {
-                        localStorage.removeItem('teamLeaderLoginTime');
-                        deactivateLeaderUI();
-                    });
-                }
+    function checkSession() {
+        const savedEmail = localStorage.getItem('tl_email');
+        const loginTime = localStorage.getItem('tl_login_time');
+
+        if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
+            if (correosAutorizados.includes(savedEmail)) {
+                activateLeaderUI();
             } else {
-                signOut(auth).then(() => {
-                    localStorage.removeItem('teamLeaderLoginTime');
-                    deactivateLeaderUI();
-                    showConfirm(`ACCESO DENEGADO.\nEl correo ${userEmail} no tiene permisos.`, null);
-                });
+                logoutLeader();
             }
         } else {
             deactivateLeaderUI();
         }
-    });
+    }
 
     function activateLeaderUI() {
         isTeamLeader = true;
         document.body.classList.add('team-leader-mode');
+        
         const btnToggle = document.getElementById('btn-mode-toggle');
         btnToggle.innerText = "MODO TEAM LEADER";
         btnToggle.style.backgroundColor = "var(--leader-color)";
+        
+        const btnLogout = document.getElementById('btn-logout');
+        if (btnLogout) btnLogout.style.display = 'flex';
+        
         render();
     }
 
     function deactivateLeaderUI() {
         isTeamLeader = false;
         document.body.classList.remove('team-leader-mode');
+        
         const btnToggle = document.getElementById('btn-mode-toggle');
         btnToggle.innerText = "MODO TÉCNICO";
         btnToggle.style.backgroundColor = "var(--primary)";
+        
+        const btnLogout = document.getElementById('btn-logout');
+        if (btnLogout) btnLogout.style.display = 'none';
+        
         render();
+    }
+
+    function toggleMode() {
+        if (isTeamLeader) {
+            deactivateLeaderUI();
+        } else {
+            const email = prompt("🔒 ACCESO TEAM LEADER\nIngrese su correo corporativo autorizado:");
+            if (!email) return; 
+
+            const emailLower = email.trim().toLowerCase();
+            
+            if (correosAutorizados.includes(emailLower)) {
+                localStorage.setItem('tl_email', emailLower);
+                localStorage.setItem('tl_login_time', Date.now().toString());
+                activateLeaderUI();
+            } else {
+                showConfirm(`ACCESO DENEGADO.\nEl correo ${emailLower} no está autorizado.`, null);
+            }
+        }
+    }
+
+    function logoutLeader() {
+        localStorage.removeItem('tl_email');
+        localStorage.removeItem('tl_login_time');
+        deactivateLeaderUI();
     }
 
     function changeTurno() {
@@ -612,12 +631,10 @@
     }
 
     function listenToTurno(turno) {
-        // Desconectar escuchadores del turno anterior
         if (unsubAviones) unsubAviones();
         if (unsubTechs) unsubTechs();
         if (unsubHeader) unsubHeader();
 
-        // Crear una ruta segura en Firebase para cada turno (reemplaza espacios por _)
         const safeTurno = turno.replace(/\s+/g, '_');
         
         dbRefs = {
@@ -626,7 +643,6 @@
             header: ref(db, `mantenimiento/${safeTurno}/header`)
         };
 
-        // Resetear datos visuales mientras carga el nuevo turno
         avionesData = [];
         shiftTechs = [];
         document.getElementById('display-header').innerHTML = 'CARGANDO DATOS...';
@@ -634,7 +650,6 @@
         renderTechPills();
         updateTechFilterDropdown();
 
-        // Conectar nuevos escuchadores
         unsubAviones = onValue(dbRefs.aviones, (snapshot) => {
             avionesData = snapshot.val() || [];
             render();
@@ -668,7 +683,6 @@
         });
     }
 
-    // Iniciar con el turno guardado en memoria
     listenToTurno(activeTurno);
 
     function saveData() { set(dbRefs.aviones, avionesData); }
@@ -677,7 +691,6 @@
     function updateHeader() {
         const fecha = document.getElementById('in-fecha').value;
         const jefe = document.getElementById('in-jefe').value.toUpperCase();
-        // Guardamos usando el turno activo global
         set(dbRefs.header, { turno: activeTurno, fecha, jefe });
     }
 
@@ -795,23 +808,6 @@
             if (m > 59) val = val.substring(0, 3) + '59'; 
         }
         input.value = val;
-    }
-
-    async function toggleMode() {
-        if (isTeamLeader) {
-            deactivateLeaderUI();
-        } else {
-            let loginTime = localStorage.getItem('teamLeaderLoginTime');
-            if (auth.currentUser && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
-                activateLeaderUI();
-            } else {
-                try {
-                    await signInWithPopup(auth, provider);
-                } catch (error) {
-                    if (error.code !== 'auth/popup-closed-by-user') console.error("Error de autenticación:", error);
-                }
-            }
-        }
     }
 
     function clearAllData() {
@@ -1257,7 +1253,7 @@
 
     // Exponer funciones necesarias al entorno global (window)
     Object.assign(window, {
-        updateHeader, addTech, removeTech, removeAllTechs, toggleMode, clearAllData,
+        updateHeader, addTech, removeTech, removeAllTechs, toggleMode, clearAllData, logoutLeader,
         formatMatricula, autoFormatTango, handleTangoClick, closeModal,
         toggleTask, togglePriority, toggleHelp,
         openAddAvionModal, saveAddAvion, openAddActivityModal, saveAddActivity, 
