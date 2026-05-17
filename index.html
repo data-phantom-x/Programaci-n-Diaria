@@ -49,14 +49,21 @@
         .leader-wrapper { display: contents; } 
         body:not(.team-leader-mode) .leader-only { display: none !important; }
 
-        /* Controles de vista y filtros locales */
-        .view-controls {
-            display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; 
-            background: #ffffff; padding: 12px 15px; border-radius: 6px; 
-            border: 1px solid var(--border); align-items: center; justify-content: flex-start;
-        }
-        
-        /* Regla especial para pantallas de celulares (Móvil) */
+        /* Controles de vista y filtros locales (CORREGIDO) */
+.view-controls {
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 12px;               /* Separación pequeña y uniforme entre elementos */
+    margin-bottom: 25px; 
+    background: #ffffff; 
+    padding: 12px 15px; 
+    border-radius: 6px; 
+    border: 1px solid var(--border); 
+    align-items: center; 
+    justify-content: flex-start; /* Hace que "Modo de vista" y el menú queden juntos */
+}
+
+/* Regla especial para pantallas de celulares (Móvil) */
 @media (max-width: 600px) {
     .view-controls {
         flex-direction: column;   /* Alinea los elementos uno debajo del otro */
@@ -68,6 +75,7 @@
         box-sizing: border-box;
     }
 }
+
 
         /* PANEL DE CONTROL TEAM LEADER */
         .header-controls {
