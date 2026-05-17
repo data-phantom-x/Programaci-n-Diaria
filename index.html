@@ -79,7 +79,7 @@
         
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(27, 0, 136, 0.1); }
         input { flex: 1; min-width: 130px; }
-        input[type="time"] { min-width: auto; width: 100px; }
+        input.time-input { min-width: auto; width: 75px; text-align: center; font-weight: bold; }
         
         button { background-color: var(--primary); color: white; border: none; cursor: pointer; font-weight: 700; transition: all 0.2s; }
         button:hover { opacity: 0.9; }
@@ -119,7 +119,13 @@
         }
         
         .logo-container svg { width: 140px; height: auto; }
-        .document-header { font-size: 1.4em; font-weight: 800; color: var(--primary); margin: 0; }
+        
+        /* Modificación: Tamaño ajustado a 1.25em para hacer el turno un poco más pequeño */
+        .document-header { 
+            font-size: 1.3em; font-weight: 800; color: var(--primary); margin: 0; 
+            flex: 1; text-align: center; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center;
+        }
         
         /* Listado de Aviones y Tareas (Estilo Tabla/Lista) */
         .avion-section { margin-bottom: 30px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
@@ -386,8 +392,8 @@
             <input type="text" id="add-ac-pos" placeholder="POSICIÓN">
         </div>
         <div class="modal-row">
-            <input type="time" id="add-ac-start" title="Inicio">
-            <input type="time" id="add-ac-end" title="Término">
+            <input type="text" class="time-input" id="add-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
+            <input type="text" class="time-input" id="add-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
         </div>
         <input type="text" id="add-ac-comment" placeholder="NOTA DEL AVIÓN (OPCIONAL)">
         
@@ -403,8 +409,8 @@
         <div class="modal-header" style="color: var(--leader-color);">⭐ AGREGAR ACTIVIDAD EXTRA</div>
         <input type="text" id="add-act-title" placeholder="TÍTULO (EJ: REUNIÓN, CURSO, INVENTARIO)">
         <div class="modal-row">
-            <input type="time" id="add-act-start" title="Inicio">
-            <input type="time" id="add-act-end" title="Término">
+            <input type="text" class="time-input" id="add-act-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
+            <input type="text" class="time-input" id="add-act-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
         </div>
         <div style="font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">ASIGNAR TÉCNICOS:</div>
         <div class="tech-grid" id="add-act-techs"></div>
@@ -424,8 +430,8 @@
             <input type="text" id="edit-ac-pos" placeholder="POSICIÓN">
         </div>
         <div class="modal-row">
-            <input type="time" id="edit-ac-start" title="Inicio">
-            <input type="time" id="edit-ac-end" title="Término">
+            <input type="text" class="time-input" id="edit-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
+            <input type="text" class="time-input" id="edit-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
         </div>
         <input type="text" id="edit-ac-comment" placeholder="NOTA (OPCIONAL)">
         
@@ -515,8 +521,8 @@
     const MAINTENIX_URL = "https://maintenix.lan.com/maintenix/common/ToDoList.jsp";
     const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000;
 
-    let currentViewMode = localStorage.getItem('viewMode') || 'default';
-    let currentTechFilter = ''; // Se inicializa vacío siempre (filtro local temporal)
+    let currentViewMode = 'default';
+    let currentTechFilter = ''; 
     
     document.getElementById('view-mode-select').value = currentViewMode;
 
@@ -590,7 +596,11 @@
             if(data.fecha) {
                  fechaDisplay = new Date(data.fecha + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
             }
-            document.getElementById('display-header').innerText = `${data.turno || ''} | ${fechaDisplay} | ${data.jefe ? 'TL: ' + data.jefe : ''}`;
+            
+            const turnoInfo = `${data.turno || ''} | ${fechaDisplay}`;
+            const jefeInfo = data.jefe ? `TL: ${data.jefe}` : '';
+            // Modificación: Ambas líneas heredan exactamente el mismo tamaño sin restricción de 0.8em
+            document.getElementById('display-header').innerHTML = `<span>${turnoInfo}</span>${jefeInfo ? `<span style="margin-top: 4px;">${jefeInfo}</span>` : ''}`;
         } else {
             document.getElementById('display-header').innerText = `CONFIGURAR TURNO`;
         }
@@ -677,20 +687,19 @@
 
     function changeViewMode() {
         currentViewMode = document.getElementById('view-mode-select').value;
-        localStorage.setItem('viewMode', currentViewMode);
         render();
     }
 
     function applyLocalFilter() {
         currentTechFilter = document.getElementById('local-tech-filter').value;
-        // Se remueve la línea que guardaba en localStorage
         render();
     }
 
     function resetLocalFilter() {
         currentTechFilter = '';
         document.getElementById('local-tech-filter').value = '';
-        // Se remueve la línea que borraba de localStorage
+        currentViewMode = 'default';
+        document.getElementById('view-mode-select').value = 'default';
         render();
     }
 
@@ -704,6 +713,22 @@
             if (!tangoInput.value) { tangoInput.value = tangoCode; }
             inputElem.value = val.replace(new RegExp(`[\\[\\(]?${tangoCode}[\\]\\)]?`, 'i'), '').trim();
         }
+    }
+
+    function formatTime(input) {
+        let val = input.value.replace(/\D/g, ''); 
+        if (val.length >= 3) {
+            val = val.substring(0, 2) + ':' + val.substring(2, 4);
+        }
+        if (val.length >= 2) {
+            let h = parseInt(val.substring(0, 2));
+            if (h > 23) val = '23' + val.substring(2); 
+        }
+        if (val.length >= 5) {
+            let m = parseInt(val.substring(3, 5));
+            if (m > 59) val = val.substring(0, 3) + '59'; 
+        }
+        input.value = val;
     }
 
     async function toggleMode() {
@@ -786,7 +811,6 @@
         `;
     }
 
-    // Vista: Agrupar separando a cada técnico de manera individual (como lo tenías)
     function renderGroupedByTech(data, container) {
         let grouped = {};
         shiftTechs.forEach(tech => grouped[tech] = []);
@@ -827,7 +851,6 @@
         }
     }
 
-    // NUEVA VISTA: Agrupar por el grupo exacto de técnicos asignados
     function renderGroupedByExactTechs(data, container) {
         let grouped = {};
 
@@ -843,7 +866,6 @@
             }
         });
 
-        // Ordenamos alfabéticamente dejando "SIN ASIGNAR" al final
         let keys = Object.keys(grouped).sort((a, b) => {
             if (a === "SIN ASIGNAR") return 1;
             if (b === "SIN ASIGNAR") return -1;
@@ -1175,7 +1197,8 @@
         openEditAvionModal, saveEditAvion, confirmDeleteAvion,
         openAddTaskModal, saveAddTask, openEditTaskModal, saveEditTask, confirmDeleteTask,
         editAvionComment, editTaskComment, closeConfirmModal, closePromptModal,
-        changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput
+        changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput,
+        formatTime
     });
 
 </script>
