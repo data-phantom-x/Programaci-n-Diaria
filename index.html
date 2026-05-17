@@ -94,7 +94,7 @@
 
         /* Etiquetas de técnicos */
         #tech-pills-container {
-            display: flex; flex-wrap: wrap; gap: 8px; width: 100%;
+            display: flex; flex-wrap: wrap; gap: 8px; width: auto;
             padding: 12px; background: white; border-radius: 6px; border: 1px dashed var(--border);
         }
 
@@ -292,7 +292,7 @@
         <!-- SELECTOR DE TURNO GLOBAL CON MEMORIA -->
         <div style="display: flex; gap: 8px; align-items: center;">
             <span style="font-size: 11px; font-weight: bold; color: var(--accent);">TURNO:</span>
-            <select id="global-turno-select" onchange="changeTurno()" style="min-width: 120px; font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
+            <select id="global-turno-select" onchange="changeTurno()" style="min-width: 110px; font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
                 <option value="Turno Día">DÍA</option>
                 <option value="Turno Tarde">TARDE</option>
                 <option value="Turno Noche">NOCHE</option>
@@ -301,11 +301,11 @@
         
         <div style="display: flex; gap: 8px; align-items: center;">
             <span style="font-size: 11px; font-weight: bold; color: var(--comment);">MODO DE VISTA:</span>
-            <select id="view-mode-select" onchange="changeViewMode()" style="min-width: 180px; font-weight: bold;">
-                <option value="default">✈️ POR AVIÓN (DEFAULT)</option>
+            <select id="view-mode-select" onchange="changeViewMode()" style="min-width: 160px;">
+                <option value="default">✈️ POR AVIÓN</option>
                 <option value="time">🕒 POR HORA DE INICIO</option>
-                <option value="tech">👨‍🔧 AGRUPAR POR TÉCNICO (INDIVIDUAL)</option>
-                <option value="tech-group">👥 AGRUPAR POR GRUPO EXACTO</option>
+                <option value="tech">👨‍🔧 AGRUPAR POR TÉCNICO</option>
+                <option value="tech-group">👥 AGRUPAR POR GRUPO</option>
             </select>
         </div>
         <div style="display: flex; gap: 8px; align-items: center;">
@@ -320,7 +320,7 @@
     <div class="header-controls leader-only no-print">
         <div class="leader-panel-header">
             <div class="leader-title">⚙️ PANEL DE CONTROL TEAM LEADER</div>
-            <button class="btn-danger-outline" onclick="clearAllData()" style="padding: 8px 12px; font-size: 10px;">⚠️ BORRAR TODO EL TURNO</button>
+            <button class="btn-danger-outline" onclick="clearAllData()" style="padding: 8px 12px; font-size: 10px;">⚠️ BORRAR PROGRAMACIÓN</button>
         </div>
 
         <div class="leader-grid">
@@ -334,7 +334,7 @@
                 <span style="font-size: 11px; font-weight: bold; color: var(--primary); width: 65px;">TÉCNICOS:</span>
                 <input type="text" id="in-new-tech" placeholder="NOMBRE DEL TÉCNICO" onkeypress="if(event.key === 'Enter') addTech()" style="max-width: 270px;">
                 <button class="btn-leader" onclick="addTech()">+ AGREGAR A LA LISTA</button>
-                <button class="btn-danger-outline" onclick="removeAllTechs()" style="padding: 8px 12px; font-size: 10px; margin-left: auto;">🗑️ BORRAR TODOS</button>
+                <button class="btn-danger-outline" onclick="removeAllTechs()" style="padding: 8px 12px; font-size: 10px; margin-left: auto;">🗑️ BORRAR TÉCNICOS</button>
             </div>
 
             <div id="tech-pills-container"></div>
@@ -918,7 +918,7 @@
             
             let html = `
                 <div class="avion-title" style="background: var(--leader-color);">
-                    <div class="avion-info-main">👥 GRUPO ASIGNADO: ${group}</div>
+                    <div class="avion-info-main">👥 ${group}</div>
                 </div>
                 <div class="task-container">
             `;
