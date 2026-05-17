@@ -49,33 +49,45 @@
         .leader-wrapper { display: contents; } 
         body:not(.team-leader-mode) .leader-only { display: none !important; }
 
-        /* Controles de vista y filtros locales (CORREGIDO) */
+        /* Controles de vista y filtros locales - Escritorio */
 .view-controls {
     display: flex; 
     flex-wrap: wrap; 
-    gap: 12px;               /* Separación pequeña y uniforme entre elementos */
+    gap: 15px; 
     margin-bottom: 25px; 
     background: #ffffff; 
-    padding: 12px 15px; 
+    padding: 15px; 
     border-radius: 6px; 
     border: 1px solid var(--border); 
     align-items: center; 
-    justify-content: flex-start; /* Hace que "Modo de vista" y el menú queden juntos */
+    justify-content: space-between;
 }
 
-/* Regla especial para pantallas de celulares (Móvil) */
+/* DISEÑO EXCLUSIVO PARA CELULARES (Pantallas menores a 600px) */
 @media (max-width: 600px) {
     .view-controls {
-        flex-direction: column;   /* Alinea los elementos uno debajo del otro */
-        align-items: stretch;     /* Hace que ocupen todo el ancho del contenedor */
+        display: flex;
+        flex-direction: column;  /* Pone cada filtro en una fila propia hacia abajo */
+        align-items: stretch;    /* Estira los elementos al ancho total de la caja */
+        gap: 12px;               /* Separación limpia entre filas */
+        padding: 15px;
     }
-    
-    .view-controls > * {
-        width: 100%;             /* Fuerza a los inputs y botones a no salirse */
+
+    /* Forzamos a que los selectores ocupen el espacio disponible sin salirse */
+    .view-controls select {
+        width: 100% !important;
+        max-width: 100% !important;
         box-sizing: border-box;
+        margin-top: 4px;         /* Espacio entre el texto del título y su cajita */
+    }
+
+    /* El botón restablecer se adaptará al ancho para que nunca rompa el contenedor */
+    .view-controls button {
+        width: 100% !important;
+        box-sizing: border-box;
+        margin-top: 8px;         /* Lo separa del selector de técnicos */
     }
 }
-
 
         /* PANEL DE CONTROL TEAM LEADER */
         .header-controls {
