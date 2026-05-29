@@ -309,6 +309,8 @@
 </head>
 <body>
 
+<datalist id="global-techs-list"></datalist>
+
 <div class="container">
     <div class="top-bar no-print">
         <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">MODO TÉCNICO</button>
@@ -359,8 +361,9 @@
             
             <div class="control-group" style="margin-bottom: 5px;">
                 <span style="font-size: 11px; font-weight: bold; color: var(--primary); width: 65px;">TÉCNICOS:</span>
-                <input type="text" id="in-new-tech" placeholder="NOMBRE DEL TÉCNICO" onkeypress="if(event.key === 'Enter') addTech()" style="max-width: 270px;">
-                <button class="btn-leader" onclick="addTech()">+ AGREGAR A LA LISTA</button>
+                <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()" style="max-width: 230px;">
+                <button class="btn-leader" onclick="addTech()">+ AGREGAR AL TURNO</button>
+                <button class="btn-outline" onclick="openManageTechsModal()" style="padding: 8px 12px; font-size: 10px;" title="Editar Base Global de Técnicos">👥 BASE GLOBAL</button>
                 <button class="btn-danger-outline" onclick="removeAllTechs()" style="padding: 8px 12px; font-size: 10px; margin-left: auto;">🗑️ BORRAR TÉCNICOS</button>
             </div>
 
@@ -373,7 +376,7 @@
             <div class="logo-container">
                 <svg viewBox="0.13 -0.275 234.736 70.807" xmlns="http://www.w3.org/2000/svg">
                     <g fill="none" fill-rule="evenodd">
-                        <path d="M228.193 54.161c-4.395 0-7.267 1.82-7.267 4.63 0 2.646 2.196 3.639 5.745 4.3l1.69.33c2.535.496 3.886 1.323 3.886 2.646 0 1.322-1.35 2.316-4.731 2.316-3.041 0-5.408-.994-6.084-1.49l-.677 2.316c.677.33 3.043 1.323 6.591 1.323 4.734 0 7.438-1.82 7.438-4.63 0-2.645-2.367-3.968-6.085-4.63l-1.69-.331c-2.704-.496-3.549-.992-3.549-2.315 0-1.322 1.522-2.314 4.562-2.314 2.536 0 4.395.495 5.24.826l.509-1.984c-1.015-.33-2.875-.993-5.578-.993zM75.596 70.366h2.533l-7.604-15.212c-.337-.497-.676-.662-1.182-.662h-1.859l-7.942 15.874h2.534l2.029-4.133h9.462l2.03 4.133zm31.261 0v-5.787c1.184.66 2.874.992 4.734.992 1.013 0 1.69 0 2.533-.165l3.38 4.96h2.704l-3.718-5.622c2.368-.992 3.887-2.976 3.887-5.291 0-2.976-2.534-5.126-7.097-5.126h-8.956v16.039zm62.866 0V57.304l11.152 12.4c.338.497.845.662 1.52.662h1.523V54.492h-2.367V67.06l-10.985-11.905c-.337-.497-.673-.662-1.519-.662h-1.691v15.874h2.367zm-97.17-6.283h-7.434l3.717-7.44zm39.206-.662c-1.86 0-3.718-.495-4.902-1.157v-5.952h6.592c3.212 0 4.394 1.653 4.394 3.14 0 2.15-1.692 3.97-6.084 3.97zm19.433 6.945h11.83v-2.15h-9.295V54.492h-2.535zm-41.91 0h2.537V54.492h-2.536v15.874zm107.309-15.874v15.874h13.013V68.05h-10.477v-4.96h9.123v-2.15h-9.123v-4.299h10.138v-2.15h-12.674zm-44.275 15.874h2.537V54.492h-2.537zM114.97 37.164h7.874L110.58 13.522c-.643-1.164-1.279-1.608-2.747-1.608h-6.77l-12.905 25.25h7.866l2.29-4.655h14.46l2.195 4.655zm64.528 0h7.778l-12.268-23.642c-.636-1.164-1.276-1.608-2.739-1.608h-6.773l-12.906 25.25h7.871l2.287-4.655h14.462zm27.728-6.177c.279.895 1.375 1.522 2.565 1.522h7.414l5.491-14.86 5.215 19.515h6.955l-5.764-22.383c-.543-2.239-1.829-2.867-3.933-2.867h-7.232l-5.214 14.777-4.122-12.543c-.545-1.606-1.557-2.234-3.203-2.234h-8.143l-6.684 25.25h7.052l5.118-19.515zm-32.574-3.584h-9.615l4.856-10.117zm-64.44 0h-9.608l4.854-10.117 4.755 10.117zm-27.545 9.761l2.927-5.822h-17.3V11.914h-7.412v25.25zm51.437 0h7.133v-19.43l12.453-.806v-5.014h-32.036v5.014l12.45-.805zM10.655 62.807l6.316-2.249c1.316-.468 1.316.568 1.316 2.113v2.844c0 2.3-.79 2.58-1.842 2.955l-5.79 2.062zm0-12.616l16.053-5.717c1.315-.468 1.315.567 1.315 2.112v2.832c0 2.312-.79 2.593-1.842 2.968l-15.526 5.53V50.19M9.34 32.214l-8.158-2.905C.13 28.934.13 27.533.13 27.019c0 0 0 1.688 1.578 1.126L41.707 13.9c3.158-1.125 3.158-1.992 1.842-2.46 1.316.468 1.316.468 1.316 4.25 0 3.604 0 4.81-1.579 5.372L11.971 32.214c-1.316.469-1.316.469-2.631 0" fill="#1b0088"/>
+                        <path d="M228.193 54.161c-4.395 0-7.267 1.82-7.267 4.63 0 2.646 2.196 3.639 5.745 4.3l1.69.33c2.535.496 3.886 1.323 3.886 2.646 0 1.322-1.35 2.316-4.731 2.316-3.041 0-5.408-.994-6.084-1.49l-.677 2.316c.677.33 3.043 1.323 6.591 1.323 4.734 0 7.438-1.82 7.438-4.63 0-2.645-2.367-3.968-6.085-4.63l-1.69-.331c-2.704-.496-3.549-.992-3.549-2.315 0-1.322 1.522-2.314 4.562-2.314 2.536 0 4.395.495 5.24.826l.509-1.984c-1.015-.33-2.875-.993-5.578-.993zM75.596 70.366h2.533l-7.604-15.212c-.337-.497-.676-.662-1.182-.662h-1.859l-7.942 15.874h2.534l2.029-4.133h9.462l2.03 4.133zm31.261 0v-5.787c1.184.66 2.874.992 4.734.992 1.013 0 1.69 0 2.533-.165l3.38 4.96h2.704l-3.718-5.622c2.368-.992 3.887-2.976 3.887-5.291 0-2.976-2.534-5.126-7.097-5.126h-8.956v16.039zm62.866 0V57.304l11.152 12.4c.338.497.845.662 1.52.662h1.523V54.492h-2.367V67.06l-10.985-11.905c-.337-.497-.673-.662-1.519-.662h-1.691v15.874h2.367zm-97.17-6.283h-7.434l3.717-7.44zm39.206-.662c-1.86 0-3.718-.495-4.902-1.157v-5.952h6.592c3.212 0 4.394 1.653 4.394 3.14 0 2.15-1.692 3.97-6.084 3.97zm19.433 6.945h11.83v-2.15h-9.295V54.492h-2.535zm-41.91 0h2.537V54.492h-2.537v15.874zm107.309-15.874v15.874h13.013V68.05h-10.477v-4.96h9.123v-2.15h-9.123v-4.299h10.138v-2.15h-12.674zm-44.275 15.874h2.537V54.492h-2.537zM114.97 37.164h7.874L110.58 13.522c-.643-1.164-1.279-1.608-2.747-1.608h-6.77l-12.905 25.25h7.866l2.29-4.655h14.46l2.195 4.655zm64.528 0h7.778l-12.268-23.642c-.636-1.164-1.276-1.608-2.739-1.608h-6.773l-12.906 25.25h7.871l2.287-4.655h14.462zm27.728-6.177c.279.895 1.375 1.522 2.565 1.522h7.414l5.491-14.86 5.215 19.515h6.955l-5.764-22.383c-.543-2.239-1.829-2.867-3.933-2.867h-7.232l-5.214 14.777-4.122-12.543c-.545-1.606-1.557-2.234-3.203-2.234h-8.143l-6.684 25.25h7.052l5.118-19.515zm-32.574-3.584h-9.615l4.856-10.117zm-64.44 0h-9.608l4.854-10.117 4.755 10.117zm-27.545 9.761l2.927-5.822h-17.3V11.914h-7.412v25.25zm51.437 0h7.133v-19.43l12.453-.806v-5.014h-32.036v5.014l12.45-.805zM10.655 62.807l6.316-2.249c1.316-.468 1.316.568 1.316 2.113v2.844c0 2.3-.79 2.58-1.842 2.955l-5.79 2.062zm0-12.616l16.053-5.717c1.315-.468 1.315.567 1.315 2.112v2.832c0 2.312-.79 2.593-1.842 2.968l-15.526 5.53V50.19M9.34 32.214l-8.158-2.905C.13 28.934.13 27.533.13 27.019c0 0 0 1.688 1.578 1.126L41.707 13.9c3.158-1.125 3.158-1.992 1.842-2.46 1.316.468 1.316.468 1.316 4.25 0 3.604 0 4.81-1.579 5.372L11.971 32.214c-1.316.469-1.316.469-2.631 0" fill="#1b0088"/>
                         <path d="M3.55 17.536l13.974 4.976 10.845-3.862L2.235 9.343C.393 8.687.13 8.593.13 9.881v3.347c0 3.09 2.368 3.933 3.42 4.308m40 6.52l-4.336-1.544-10.845 3.862 6.868 2.446 6.47-2.304c3.158-1.124 3.158-1.991 1.842-2.46" fill="#ed1650"/>
                         <path d="M43.55 24.056c1.315.469 1.315 1.336-1.843 2.46L10.655 37.575v7.724l32.631-11.62c1.579-.563 1.579-1.769 1.579-5.374 0-3.78 0-3.78-1.316-4.249" fill="#1b0088"/>
                         <path d="M43.55 11.44L12.76.475c-1.841-.656-2.105-.75-2.105.538V4.36c0 3.09 2.368 3.933 3.42 4.308l21.162 7.536 6.47-2.304c3.158-1.125 3.158-1.992 1.842-2.46M1.708 28.145l8.948-3.187-8.421-2.999C.393 21.303.13 21.21.13 22.497v4.521s0 1.689 1.578 1.127" fill="#ed1650"/>
@@ -507,6 +510,24 @@
     </div>
 </div>
 
+<div id="manage-techs-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="color: var(--leader-color);">👥 BASE GLOBAL DE TÉCNICOS</div>
+        <div style="font-size:11px; color:var(--comment); margin-bottom:15px;">
+            Agrega o elimina nombres del menú desplegable global de tu estación.
+        </div>
+        <div style="display:flex; gap:10px; margin-bottom:15px;">
+            <input type="text" id="new-global-tech" placeholder="NOMBRE DEL TÉCNICO" onkeypress="if(event.key === 'Enter') addGlobalTech()">
+            <button class="btn-leader" onclick="addGlobalTech()" style="width:100px;">AGREGAR</button>
+        </div>
+        <div id="global-techs-container" class="tech-grid" style="border: 1px dashed var(--border); padding: 10px; border-radius: 6px; background: var(--bg);">
+        </div>
+        <div class="modal-footer">
+            <button class="btn-outline btn-modal-action" onclick="closeModal('manage-techs-modal')">CERRAR</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
     import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
@@ -540,6 +561,7 @@
 
     let avionesData = [];
     let shiftTechs = []; 
+    let globalTechs = []; // Nueva base de datos global
     let isTeamLeader = false;
     let editCurrentAvionId = null;
     let editCurrentTaskId = null;
@@ -552,6 +574,13 @@
     let activeTurno = localStorage.getItem('latam_active_turno') || 'Turno Día';
     document.getElementById('global-turno-select').value = activeTurno;
     document.getElementById('view-mode-select').value = currentViewMode;
+
+    // Conexión a la base de datos Global de Técnicos
+    const globalTechsRef = ref(db, 'mantenimiento/global_techs');
+    onValue(globalTechsRef, (snapshot) => {
+        globalTechs = snapshot.val() || [];
+        updateGlobalTechsUI();
+    });
 
     // Validación de sesión local al iniciar la página
     checkSession();
@@ -601,19 +630,28 @@
 
     function toggleMode() {
         if (isTeamLeader) {
+            // Regresa a modo técnico, pero conserva el token de sesión en localStorage
             deactivateLeaderUI();
         } else {
-            const email = prompt("🔒 ACCESO TEAM LEADER\nIngrese su correo corporativo autorizado:");
-            if (!email) return; 
+            // Revisa si existe sesión válida y recupera acceso inmediatamente
+            const savedEmail = localStorage.getItem('tl_email');
+            const loginTime = localStorage.getItem('tl_login_time');
 
-            const emailLower = email.trim().toLowerCase();
-            
-            if (correosAutorizados.includes(emailLower)) {
-                localStorage.setItem('tl_email', emailLower);
-                localStorage.setItem('tl_login_time', Date.now().toString());
+            if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS && correosAutorizados.includes(savedEmail)) {
                 activateLeaderUI();
             } else {
-                showConfirm(`ACCESO DENEGADO.\nEl correo ${emailLower} no está autorizado.`, null);
+                const email = prompt("🔒 ACCESO TEAM LEADER\nIngrese su correo corporativo autorizado:");
+                if (!email) return; 
+
+                const emailLower = email.trim().toLowerCase();
+                
+                if (correosAutorizados.includes(emailLower)) {
+                    localStorage.setItem('tl_email', emailLower);
+                    localStorage.setItem('tl_login_time', Date.now().toString());
+                    activateLeaderUI();
+                } else {
+                    showConfirm(`ACCESO DENEGADO.\nEl correo ${emailLower} no está autorizado.`, null);
+                }
             }
         }
     }
@@ -718,11 +756,62 @@
         closePromptModal();
     };
 
+    // FUNCIONES GLOBALES DE TÉCNICOS
+    function updateGlobalTechsUI() {
+        const datalist = document.getElementById('global-techs-list');
+        datalist.innerHTML = '';
+        globalTechs.forEach(tech => {
+            const option = document.createElement('option');
+            option.value = tech;
+            datalist.appendChild(option);
+        });
+
+        const container = document.getElementById('global-techs-container');
+        if (container) {
+            container.innerHTML = '';
+            if(globalTechs.length === 0){
+                container.innerHTML = '<span style="font-size:11px; color:var(--comment); font-style:italic;">No hay técnicos en la base global.</span>';
+                return;
+            }
+            globalTechs.forEach((tech, index) => {
+                container.innerHTML += `
+                    <div class="tech-pill">
+                        <span class="tech-name">${tech}</span>
+                        <span class="tech-remove" onclick="removeGlobalTech(${index})" title="Eliminar de la Base">✖</span>
+                    </div>
+                `;
+            });
+        }
+    }
+
+    function addGlobalTech() {
+        const input = document.getElementById('new-global-tech');
+        const name = input.value.trim().toUpperCase();
+        if (!name) return;
+        if (globalTechs.includes(name)) return showConfirm("EL TÉCNICO YA EXISTE EN LA BASE GLOBAL.", null);
+        globalTechs.push(name);
+        globalTechs.sort();
+        set(globalTechsRef, globalTechs);
+        input.value = '';
+    }
+
+    function removeGlobalTech(index) {
+        showConfirm(`¿CONFIRMAS ELIMINAR A ${globalTechs[index]} DE LA BASE DE DATOS GLOBAL?`, () => {
+            globalTechs.splice(index, 1);
+            set(globalTechsRef, globalTechs);
+        });
+    }
+
+    function openManageTechsModal() {
+        document.getElementById('manage-techs-modal').style.display = 'block';
+        updateGlobalTechsUI();
+    }
+
     function addTech() {
         const input = document.getElementById('in-new-tech');
         const name = input.value.trim().toUpperCase();
         if (!name) return;
-        if (shiftTechs.includes(name)) return showConfirm("ESTE TÉCNICO YA ESTÁ EN LA LISTA.", null);
+        if (shiftTechs.includes(name)) return showConfirm("ESTE TÉCNICO YA ESTÁ EN EL TURNO.", null);
         shiftTechs.push(name);
         shiftTechs.sort(); input.value = '';
         saveTechs();
@@ -736,7 +825,7 @@
 
     function removeAllTechs() {
         if (shiftTechs.length === 0) return showConfirm("NO HAY TÉCNICOS PARA BORRAR.", null);
-        showConfirm("⚠️ ¿ESTÁS SEGURO DE BORRAR TODOS LOS TÉCNICOS DE LA LISTA?", () => {
+        showConfirm("⚠️ ¿ESTÁS SEGURO DE BORRAR TODOS LOS TÉCNICOS DE LA LISTA DEL TURNO?", () => {
             shiftTechs = [];
             saveTechs();
         });
@@ -1261,7 +1350,8 @@
         openAddTaskModal, saveAddTask, openEditTaskModal, saveEditTask, confirmDeleteTask,
         editAvionComment, editTaskComment, closeConfirmModal, closePromptModal,
         changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput,
-        formatTime, changeTurno
+        formatTime, changeTurno,
+        openManageTechsModal, addGlobalTech, removeGlobalTech // Nuevas funciones expuestas
     });
 
 </script>
