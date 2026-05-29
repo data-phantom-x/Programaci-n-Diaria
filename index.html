@@ -56,6 +56,9 @@
 
         .leader-wrapper { display: contents; } 
         body:not(.team-leader-mode) .leader-only { display: none !important; }
+        
+        /* Ocultar elementos para el Team Leader */
+        body.team-leader-mode .hide-from-leader { display: none !important; }
 
         /* Controles de vista y filtros locales */
         .view-controls {
@@ -209,7 +212,7 @@
         }
 
         .task-item.completed .status-toggle { background-color: #10b981; border-color: #10b981; color: white; }
-        .task-item.completed { border-left: none; background-color: #f8fafc !important; opacity: 0.7;}
+        .task-item.completed { border-left: none; background-color: #f8fafc !important; opacity: 0.45; filter: grayscale(100%); transition: all 0.3s ease; }
         
         .task-main { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
         .task-info { flex: 1; transition: all 0.3s ease; }
@@ -1043,7 +1046,7 @@
                             <button class="action-btn ${t.priority ? 'active-danger' : ''}" onclick="togglePriority(${avion.id}, ${t.id})">🔥 URGENTE</button>
                         </div>
                         <button class="action-btn ${t.help ? 'active-help' : ''}" onclick="toggleHelp(${avion.id}, ${t.id})">🆘 APOYO</button>
-                        <button class="action-btn" onclick="editTaskComment(${avion.id}, ${t.id})">💬 NOTA</button>
+                        <button class="action-btn hide-from-leader" onclick="editTaskComment(${avion.id}, ${t.id})">💬 NOTA</button>
                         <div class="leader-only leader-wrapper">
                             <button class="action-btn" onclick="openEditTaskModal(${avion.id}, ${t.id})">✏️ EDITAR</button>
                         </div>
@@ -1086,7 +1089,10 @@
                 </div>
                 <div class="task-container">
             `;
-            tasks.forEach(({avion, task}) => { html += generateTaskHTML(avion, task, true); });
+            const pendingTasks = tasks.filter(x => !x.task.done);
+            const completedTasks = tasks.filter(x => x.task.done);
+            pendingTasks.forEach(({avion, task}) => { html += generateTaskHTML(avion, task, true); });
+            completedTasks.forEach(({avion, task}) => { html += generateTaskHTML(avion, task, true); });
             html += `</div>`;
             
             div.innerHTML = html; container.appendChild(div);
@@ -1125,7 +1131,10 @@
                 </div>
                 <div class="task-container">
             `;
-            tasks.forEach(({avion, task}) => { html += generateTaskHTML(avion, task, true); });
+            const pendingTasks = tasks.filter(x => !x.task.done);
+            const completedTasks = tasks.filter(x => x.task.done);
+            pendingTasks.forEach(({avion, task}) => { html += generateTaskHTML(avion, task, true); });
+            completedTasks.forEach(({avion, task}) => { html += generateTaskHTML(avion, task, true); });
             html += `</div>`;
             
             div.innerHTML = html; container.appendChild(div);
@@ -1175,14 +1184,14 @@
             let avionActionBtns = '';
             if (avion.isActivity) {
                 avionActionBtns = `
-                    <button class="action-btn" onclick="editAvionComment(${avion.id})">💬 NOTA</button>
+                    <button class="action-btn hide-from-leader" onclick="editAvionComment(${avion.id})">💬 NOTA</button>
                     <div class="leader-only leader-wrapper">
                         <button class="action-btn" onclick="openEditAvionModal(${avion.id})">🕒 EDITAR HORA</button>
                     </div>
                 `;
             } else {
                 avionActionBtns = `
-                    <button class="action-btn" onclick="editAvionComment(${avion.id})">💬 NOTA</button>
+                    <button class="action-btn hide-from-leader" onclick="editAvionComment(${avion.id})">💬 NOTA</button>
                     <div class="leader-only leader-wrapper">
                         <button class="action-btn btn-highlight" onclick="openAddTaskModal(${avion.id})">➕ TAREA</button>
                         <button class="action-btn btn-highlight" onclick="openPredefModal(${avion.id})" style="background-color: #ffffff; border-color: #cbd5e0;" title="Agregar Tareas Predefinidas / Preventivas">📑 PREDEF.</button>
@@ -1205,7 +1214,10 @@
             `;
 
             if(avion.tareas) {
-                avion.tareas.forEach(t => { html += generateTaskHTML(avion, t, false); });
+                const pendingTasks = avion.tareas.filter(t => !t.done);
+                const completedTasks = avion.tareas.filter(t => t.done);
+                pendingTasks.forEach(t => { html += generateTaskHTML(avion, t, false); });
+                completedTasks.forEach(t => { html += generateTaskHTML(avion, t, false); });
             }
 
             html += `</div>`;
