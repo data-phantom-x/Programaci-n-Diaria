@@ -6,16 +6,30 @@
     <title>Programación Diaria - LATAM</title>
     <style>
         :root {
-            /* Colores Corporativos LATAM */
+            /* Variables Dinámicas */
             --primary: #1b0088; 
             --accent: #ed1650; 
             --bg: #f4f7f9;
             --light-gray: #eef2f5;
             --border: #d1d9e0;
-            --leader-color: #0066cc; /* Azul distintivo para Leader */
+            --leader-color: #0066cc; 
             --danger: #e53e3e;
             --help: #dd6b20; 
             --comment: #64748b;
+        }
+
+        /* TEMA ROJO LATAM */
+        body.theme-red { --primary: #c01240; --accent: #1b0088; --leader-color: #e53e3e; }
+        
+        /* TEMA NÚCLEO BYTE */
+        body.theme-nucleo { --primary: #2F3E46; --accent: #38B2AC; --leader-color: #38B2AC; }
+
+        /* MODO OSCURO (Overrides) */
+        body.dark-mode {
+            --bg: #0f172a;
+            --light-gray: #1e293b;
+            --border: #334155;
+            --comment: #94a3b8;
         }
 
         body, input, select, button, textarea {
@@ -28,19 +42,22 @@
             color: var(--primary);
             margin: 0;
             padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); transition: background-color 0.3s; }
 
         /* Barra superior general */
         .top-bar {
             display: flex; justify-content: space-between; margin-bottom: 15px;
             background-color: var(--light-gray); padding: 12px 15px;
-            border-radius: 6px; align-items: center;
+            border-radius: 6px; align-items: center; flex-wrap: wrap; gap: 10px;
         }
+        
+        .top-bar-group { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
 
         .btn-top {
-            width: 160px; height: 34px; font-size: 11px; padding: 0; font-weight: bold;
+            width: 150px; height: 34px; font-size: 11px; padding: 0; font-weight: bold;
             display: flex; align-items: center; justify-content: center; box-sizing: border-box;
             border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s;
         }
@@ -58,28 +75,38 @@
 
         /* PANEL DE CONTROL TEAM LEADER */
         .header-controls {
-            background-color: #f0f7ff; border: 1px solid #93c5fd;
+            background-color: var(--bg); border: 1px solid var(--border);
             border-left: 6px solid var(--leader-color); padding: 18px;
             border-radius: 6px; margin-bottom: 25px;
         }
 
         .leader-panel-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #bfdbfe; padding-bottom: 10px; margin-bottom: 15px;
+            border-bottom: 1px solid var(--border); padding-bottom: 10px; margin-bottom: 15px;
         }
 
         .leader-title { font-size: 1.1em; font-weight: 800; color: var(--leader-color); display: flex; align-items: center; gap: 8px; }
         .leader-grid { display: flex; flex-direction: column; gap: 12px; }
         .control-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
+        /* Estilos base de inputs unificados */
         input, select, button {
             padding: 8px 12px; border: 1px solid var(--border);
             border-radius: 4px; font-size: 11px; outline: none; box-sizing: border-box;
+            height: 34px; /* Altura unificada estricta */
         }
         
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(27, 0, 136, 0.1); }
         input { flex: 1; min-width: 130px; }
         input.time-input { min-width: auto; width: 75px; text-align: center; font-weight: bold; }
+        
+        /* Ajuste específico para el input DATE */
+        input[type="date"] {
+            -webkit-appearance: none; appearance: none;
+            color: var(--primary); font-family: inherit;
+            background-color: white; min-width: 130px;
+            justify-content: center;
+        }
         
         button { background-color: var(--primary); color: white; border: none; cursor: pointer; font-weight: 700; transition: all 0.2s; }
         button:hover { opacity: 0.9; }
@@ -118,7 +145,7 @@
             margin-bottom: 25px; border-bottom: 3px solid var(--primary); padding-bottom: 15px;
         }
         
-        .logo-container svg { width: 140px; height: auto; }
+        .logo-container svg { width: 140px; height: auto; transition: background 0.3s; }
         
         .document-header { 
             font-size: 1.3em; font-weight: 800; color: var(--primary); margin: 0; 
@@ -212,11 +239,31 @@
         .action-btn:hover { background: var(--light-gray); border-color: #a0aec0; }
         .action-btn.active-danger { background: var(--accent); color: white; border-color: var(--accent); }
         .action-btn.active-help { background: var(--help); color: white; border-color: var(--help); }
-        .btn-highlight { color: var(--primary); border-color: var(--primary); background-color: #f0f4f8; }
+        .btn-highlight { color: var(--primary); border-color: var(--primary); background-color: transparent; }
         .btn-highlight:hover { background-color: var(--primary); color: white; }
 
+        /* REGLAS MODO OSCURO UI (Aplicadas por Javascript) */
+        body.dark-mode .container, 
+        body.dark-mode .view-controls, 
+        body.dark-mode .task-container, 
+        body.dark-mode #tech-pills-container, 
+        body.dark-mode .modal-content,
+        body.dark-mode .tech-checkbox-label { background-color: #1e293b; color: #f1f5f9; }
+        
+        body.dark-mode input, body.dark-mode select { background-color: #0f172a; border-color: #334155; color: #f1f5f9; }
+        body.dark-mode input[type="date"] { color: #f1f5f9; color-scheme: dark; } /* Permite que el selector nativo sea oscuro */
+        
+        body.dark-mode .task-item:nth-child(even) { background-color: #0f172a; }
+        body.dark-mode .task-item.completed { background-color: #1e293b !important; opacity: 0.6; }
+        body.dark-mode .task-desc, body.dark-mode .document-header, body.dark-mode .task-techs { color: #f8fafc; }
+        body.dark-mode .logo-container svg { background: rgba(255, 255, 255, 0.9); border-radius: 8px; padding: 4px; }
+        body.dark-mode .tech-pill { background-color: #0f172a; color: #f1f5f9; }
+        body.dark-mode .action-btn { background-color: #0f172a; color: #f1f5f9; border-color: #334155; }
+        body.dark-mode .action-btn:hover { background-color: #334155; }
+        body.dark-mode .btn-highlight { border-color: var(--primary); color: #f8fafc; }
+
         /* MODALS */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(30, 41, 59, 0.6); backdrop-filter: blur(4px); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(30, 41, 59, 0.7); backdrop-filter: blur(4px); }
         
         .modal-content {
             background-color: white; margin: 6% auto; padding: 25px;
@@ -244,7 +291,7 @@
         .tech-checkbox-label:hover { border-color: var(--primary); color: var(--primary); background: var(--light-gray); }
         .tech-checkbox-label:has(input:checked) { 
             border-color: var(--primary); background: var(--primary); color: white; 
-            box-shadow: 0 2px 6px rgba(27, 0, 136, 0.2);
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
         }
         .tech-checkbox-label input { display: none; }
         .tech-checkbox-label span { word-wrap: break-word; white-space: normal; line-height: 1.2; }
@@ -252,41 +299,16 @@
         .modal-footer { display: flex; gap: 10px; margin-top: 10px; padding-top: 20px; border-top: 1px solid var(--border); }
         .btn-modal-action { flex: 1; padding: 12px 0; font-size: 11px; text-align: center; display: flex; justify-content: center; align-items: center; border-radius: 4px;}
 
-        @media print {
-            @page { size: letter; margin: 1cm; } .no-print { display: none !important; }
-            body { padding: 0; background-color: white; font-size: 11px; }
-            .container { padding: 0; box-shadow: none; max-width: 100%; }
-            .main-header-wrapper { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--primary); }
-            
-            .avion-section { margin-bottom: 20px; box-shadow: none; border: 1px solid var(--border); border-radius: 0; }
-            .avion-title { 
-                background: #f4f7f9 !important; color: var(--primary) !important; 
-                padding: 8px 12px; border-bottom: 1px solid var(--border); border-radius: 0;
-                -webkit-print-color-adjust: exact; print-color-adjust: exact;
-            }
-            .avion-pos, .avion-times { background: transparent; color: var(--primary); padding: 0; font-weight: bold; }
-            .avion-comment { color: #4a5568; }
-            .tango-link, .avion-title .tango-link { color: var(--primary); text-decoration: none; }
-            
-            .task-container { border: none; }
-            .task-item { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: transparent !important; }
-            .task-item.priority { border-left: 3px solid var(--accent) !important; }
-            .task-item.help-needed { border-left: 3px solid var(--help) !important; }
-            
-            .task-item.completed .task-info { opacity: 0.85 !important; text-decoration: line-through; color: #333; }
-            .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #10b981 !important; border-color: #10b981 !important; color: white !important; }
-            .status-toggle { margin-top: 0px; width: 16px; min-width: 16px; height: 16px; min-height: 16px; font-size: 10px; border-width: 1px; }
-            .task-desc { font-size: 1em; }
-        }
-
-        /* AJUSTES PROFESIONALES PARA CELULARES (Pantallas menores a 600px) */
+        /* AJUSTES PROFESIONALES PARA MÓVILES (Pantallas menores a 600px) */
         @media (max-width: 600px) {
             body { padding: 8px; }
             .container { padding: 12px; }
             
-            /* Top Bar */
-            .top-bar { flex-direction: column; gap: 8px; }
+            /* Top Bar Plegado */
+            .top-bar { flex-direction: column; align-items: stretch; gap: 10px; }
+            .top-bar-group { width: 100%; flex-direction: column; align-items: stretch; gap: 6px; }
             .btn-top { width: 100%; }
+            .top-bar select { width: 100%; height: 34px; margin: 0; }
             
             /* Controles de Vista */
             .view-controls { flex-direction: column; align-items: stretch; gap: 12px; }
@@ -299,9 +321,19 @@
             .header-controls { padding: 15px 12px; }
             .leader-panel-header { flex-direction: column; gap: 12px; text-align: center; }
             .leader-panel-header button { width: 100%; }
-            .control-group { flex-direction: column; align-items: stretch; gap: 8px; }
+            
+            /* Arreglo Crítico del Input DATE y Inputs del TL */
+            .control-group { flex-direction: column; align-items: stretch; gap: 8px; width: 100%; }
             .control-group span { width: auto !important; text-align: left; margin-bottom: -4px; }
-            .control-group input, .control-group button { width: 100% !important; max-width: none !important; margin: 0 !important; }
+            
+            /* Fuerza a los inputs a usar todo el bloque sin romper el grid */
+            .control-group input[type="date"], 
+            .control-group input[type="text"], 
+            .control-group button { 
+                width: 100% !important; 
+                max-width: none !important; 
+                margin: 0 !important; 
+            }
             
             /* Header & Logo */
             .main-header-wrapper { flex-direction: column; text-align: center; gap: 12px; }
@@ -317,7 +349,7 @@
             .task-main { flex-direction: column; align-items: stretch; gap: 12px; }
             
             /* Botoneras Tácticas - Grid perfecto de 2 columnas */
-            .action-bar { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 6px; }
+            .action-bar { display: grid !important; grid-template-columns: 1fr 1fr; width: 100%; gap: 6px; }
             .action-bar .action-btn { width: 100%; box-sizing: border-box; }
             .leader-wrapper { display: contents; } 
             
@@ -325,17 +357,62 @@
             .modal-content { width: 92%; padding: 16px; margin: 10% auto; }
             .modal-row { flex-direction: column; gap: 12px; }
         }
+
+        /* REGLAS DE IMPRESIÓN - Forzamos modo claro y eliminamos no-print */
+        @media print {
+            @page { size: letter; margin: 1cm; } .no-print { display: none !important; }
+            body { padding: 0; background-color: white !important; color: black !important; font-size: 11px; }
+            .container { padding: 0; box-shadow: none; max-width: 100%; background: transparent !important; }
+            .main-header-wrapper { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid #1b0088; }
+            
+            .avion-section { margin-bottom: 20px; box-shadow: none; border: 1px solid #d1d9e0; border-radius: 0; }
+            .avion-title { 
+                background: #f4f7f9 !important; color: #1b0088 !important; 
+                padding: 8px 12px; border-bottom: 1px solid #d1d9e0; border-radius: 0;
+                -webkit-print-color-adjust: exact; print-color-adjust: exact;
+            }
+            .avion-pos, .avion-times { background: transparent; color: #1b0088; padding: 0; font-weight: bold; }
+            .avion-comment { color: #4a5568; }
+            .tango-link, .avion-title .tango-link { color: #1b0088; text-decoration: none; }
+            .logo-container svg { background: transparent !important; }
+            
+            .task-container { border: none; background: transparent !important; }
+            .task-item { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: transparent !important; }
+            .task-item.priority { border-left: 3px solid #ed1650 !important; }
+            .task-item.help-needed { border-left: 3px solid #dd6b20 !important; }
+            
+            .task-item.completed .task-info { opacity: 0.85 !important; text-decoration: line-through; color: #333 !important; }
+            .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #10b981 !important; border-color: #10b981 !important; color: white !important; }
+            .status-toggle { margin-top: 0px; width: 16px; min-width: 16px; height: 16px; min-height: 16px; font-size: 10px; border-width: 1px; }
+            .task-desc { font-size: 1em; color: black !important;}
+        }
     </style>
 </head>
 <body>
 
+<!-- Datalist inteligente para sugerencias de nombres -->
 <datalist id="global-techs-list"></datalist>
 
 <div class="container">
     <div class="top-bar no-print">
-        <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">MODO TÉCNICO</button>
-        <button type="button" id="btn-logout" class="btn-top btn-danger-outline" onclick="logoutLeader()" style="display:none; background-color: var(--danger); color:white; border:none;">CERRAR SESIÓN</button>
-        <button class="btn-top" onclick="window.print()" style="background-color: #64748b; color:white;">🖨️ IMPRIMIR HOJA</button>
+        <div class="top-bar-group">
+            <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">MODO TÉCNICO</button>
+            <button type="button" id="btn-logout" class="btn-top btn-danger-outline" onclick="logoutLeader()" style="display:none; background-color: var(--danger); color:white; border:none;">CERRAR SESIÓN</button>
+        </div>
+        
+        <div class="top-bar-group">
+            <select id="theme-color-select" onchange="applySettings()" style="height: 34px; padding: 0 8px; font-size: 10px; font-weight: bold;">
+                <option value="theme-latam">🎨 TEMA AZUL</option>
+                <option value="theme-red">🎨 TEMA ROJO</option>
+                <option value="theme-nucleo">💻 TEMA NÚCLEO</option>
+            </select>
+            <select id="dark-mode-select" onchange="applySettings()" style="height: 34px; padding: 0 8px; font-size: 10px; font-weight: bold;">
+                <option value="auto">🌗 AUTO</option>
+                <option value="light">☀️ CLARO</option>
+                <option value="dark">🌙 OSCURO</option>
+            </select>
+            <button class="btn-top" onclick="window.print()" style="background-color: #64748b; color:white;">🖨️ IMPRIMIR HOJA</button>
+        </div>
     </div>
 
     <div class="view-controls no-print">
@@ -396,10 +473,10 @@
             <div class="logo-container">
                 <svg viewBox="0.13 -0.275 234.736 70.807" xmlns="http://www.w3.org/2000/svg">
                     <g fill="none" fill-rule="evenodd">
-                        <path d="M228.193 54.161c-4.395 0-7.267 1.82-7.267 4.63 0 2.646 2.196 3.639 5.745 4.3l1.69.33c2.535.496 3.886 1.323 3.886 2.646 0 1.322-1.35 2.316-4.731 2.316-3.041 0-5.408-.994-6.084-1.49l-.677 2.316c.677.33 3.043 1.323 6.591 1.323 4.734 0 7.438-1.82 7.438-4.63 0-2.645-2.367-3.968-6.085-4.63l-1.69-.331c-2.704-.496-3.549-.992-3.549-2.315 0-1.322 1.522-2.314 4.562-2.314 2.536 0 4.395.495 5.24.826l.509-1.984c-1.015-.33-2.875-.993-5.578-.993zM75.596 70.366h2.533l-7.604-15.212c-.337-.497-.676-.662-1.182-.662h-1.859l-7.942 15.874h2.534l2.029-4.133h9.462l2.03 4.133zm31.261 0v-5.787c1.184.66 2.874.992 4.734.992 1.013 0 1.69 0 2.533-.165l3.38 4.96h2.704l-3.718-5.622c2.368-.992 3.887-2.976 3.887-5.291 0-2.976-2.534-5.126-7.097-5.126h-8.956v16.039zm62.866 0V57.304l11.152 12.4c.338.497.845.662 1.52.662h1.523V54.492h-2.367V67.06l-10.985-11.905c-.337-.497-.673-.662-1.519-.662h-1.691v15.874h2.367zm-97.17-6.283h-7.434l3.717-7.44zm39.206-.662c-1.86 0-3.718-.495-4.902-1.157v-5.952h6.592c3.212 0 4.394 1.653 4.394 3.14 0 2.15-1.692 3.97-6.084 3.97zm19.433 6.945h11.83v-2.15h-9.295V54.492h-2.535zm-41.91 0h2.537V54.492h-2.537v15.874zm107.309-15.874v15.874h13.013V68.05h-10.477v-4.96h9.123v-2.15h-9.123v-4.299h10.138v-2.15h-12.674zm-44.275 15.874h2.537V54.492h-2.537zM114.97 37.164h7.874L110.58 13.522c-.643-1.164-1.279-1.608-2.747-1.608h-6.77l-12.905 25.25h7.866l2.29-4.655h14.46l2.195 4.655zm64.528 0h7.778l-12.268-23.642c-.636-1.164-1.276-1.608-2.739-1.608h-6.773l-12.906 25.25h7.871l2.287-4.655h14.462zm27.728-6.177c.279.895 1.375 1.522 2.565 1.522h7.414l5.491-14.86 5.215 19.515h6.955l-5.764-22.383c-.543-2.239-1.829-2.867-3.933-2.867h-7.232l-5.214 14.777-4.122-12.543c-.545-1.606-1.557-2.234-3.203-2.234h-8.143l-6.684 25.25h7.052l5.118-19.515zm-32.574-3.584h-9.615l4.856-10.117zm-64.44 0h-9.608l4.854-10.117 4.755 10.117zm-27.545 9.761l2.927-5.822h-17.3V11.914h-7.412v25.25zm51.437 0h7.133v-19.43l12.453-.806v-5.014h-32.036v5.014l12.45-.805zM10.655 62.807l6.316-2.249c1.316-.468 1.316.568 1.316 2.113v2.844c0 2.3-.79 2.58-1.842 2.955l-5.79 2.062zm0-12.616l16.053-5.717c1.315-.468 1.315.567 1.315 2.112v2.832c0 2.312-.79 2.593-1.842 2.968l-15.526 5.53V50.19M9.34 32.214l-8.158-2.905C.13 28.934.13 27.533.13 27.019c0 0 0 1.688 1.578 1.126L41.707 13.9c3.158-1.125 3.158-1.992 1.842-2.46 1.316.468 1.316.468 1.316 4.25 0 3.604 0 4.81-1.579 5.372L11.971 32.214c-1.316.469-1.316.469-2.631 0" fill="#1b0088"/>
-                        <path d="M3.55 17.536l13.974 4.976 10.845-3.862L2.235 9.343C.393 8.687.13 8.593.13 9.881v3.347c0 3.09 2.368 3.933 3.42 4.308m40 6.52l-4.336-1.544-10.845 3.862 6.868 2.446 6.47-2.304c3.158-1.124 3.158-1.991 1.842-2.46" fill="#ed1650"/>
-                        <path d="M43.55 24.056c1.315.469 1.315 1.336-1.843 2.46L10.655 37.575v7.724l32.631-11.62c1.579-.563 1.579-1.769 1.579-5.374 0-3.78 0-3.78-1.316-4.249" fill="#1b0088"/>
-                        <path d="M43.55 11.44L12.76.475c-1.841-.656-2.105-.75-2.105.538V4.36c0 3.09 2.368 3.933 3.42 4.308l21.162 7.536 6.47-2.304c3.158-1.125 3.158-1.992 1.842-2.46M1.708 28.145l8.948-3.187-8.421-2.999C.393 21.303.13 21.21.13 22.497v4.521s0 1.689 1.578 1.127" fill="#ed1650"/>
+                        <path d="M228.193 54.161c-4.395 0-7.267 1.82-7.267 4.63 0 2.646 2.196 3.639 5.745 4.3l1.69.33c2.535.496 3.886 1.323 3.886 2.646 0 1.322-1.35 2.316-4.731 2.316-3.041 0-5.408-.994-6.084-1.49l-.677 2.316c.677.33 3.043 1.323 6.591 1.323 4.734 0 7.438-1.82 7.438-4.63 0-2.645-2.367-3.968-6.085-4.63l-1.69-.331c-2.704-.496-3.549-.992-3.549-2.315 0-1.322 1.522-2.314 4.562-2.314 2.536 0 4.395.495 5.24.826l.509-1.984c-1.015-.33-2.875-.993-5.578-.993zM75.596 70.366h2.533l-7.604-15.212c-.337-.497-.676-.662-1.182-.662h-1.859l-7.942 15.874h2.534l2.029-4.133h9.462l2.03 4.133zm31.261 0v-5.787c1.184.66 2.874.992 4.734.992 1.013 0 1.69 0 2.533-.165l3.38 4.96h2.704l-3.718-5.622c2.368-.992 3.887-2.976 3.887-5.291 0-2.976-2.534-5.126-7.097-5.126h-8.956v16.039zm62.866 0V57.304l11.152 12.4c.338.497.845.662 1.52.662h1.523V54.492h-2.367V67.06l-10.985-11.905c-.337-.497-.673-.662-1.519-.662h-1.691v15.874h2.367zm-97.17-6.283h-7.434l3.717-7.44zm39.206-.662c-1.86 0-3.718-.495-4.902-1.157v-5.952h6.592c3.212 0 4.394 1.653 4.394 3.14 0 2.15-1.692 3.97-6.084 3.97zm19.433 6.945h11.83v-2.15h-9.295V54.492h-2.535zm-41.91 0h2.537V54.492h-2.537v15.874zm107.309-15.874v15.874h13.013V68.05h-10.477v-4.96h9.123v-2.15h-9.123v-4.299h10.138v-2.15h-12.674zm-44.275 15.874h2.537V54.492h-2.537zM114.97 37.164h7.874L110.58 13.522c-.643-1.164-1.279-1.608-2.747-1.608h-6.77l-12.905 25.25h7.866l2.29-4.655h14.46l2.195 4.655zm64.528 0h7.778l-12.268-23.642c-.636-1.164-1.276-1.608-2.739-1.608h-6.773l-12.906 25.25h7.871l2.287-4.655h14.462zm27.728-6.177c.279.895 1.375 1.522 2.565 1.522h7.414l5.491-14.86 5.215 19.515h6.955l-5.764-22.383c-.543-2.239-1.829-2.867-3.933-2.867h-7.232l-5.214 14.777-4.122-12.543c-.545-1.606-1.557-2.234-3.203-2.234h-8.143l-6.684 25.25h7.052l5.118-19.515zm-32.574-3.584h-9.615l4.856-10.117zm-64.44 0h-9.608l4.854-10.117 4.755 10.117zm-27.545 9.761l2.927-5.822h-17.3V11.914h-7.412v25.25zm51.437 0h7.133v-19.43l12.453-.806v-5.014h-32.036v5.014l12.45-.805zM10.655 62.807l6.316-2.249c1.316-.468 1.316.568 1.316 2.113v2.844c0 2.3-.79 2.58-1.842 2.955l-5.79 2.062zm0-12.616l16.053-5.717c1.315-.468 1.315.567 1.315 2.112v2.832c0 2.312-.79 2.593-1.842 2.968l-15.526 5.53V50.19M9.34 32.214l-8.158-2.905C.13 28.934.13 27.533.13 27.019c0 0 0 1.688 1.578 1.126L41.707 13.9c3.158-1.125 3.158-1.992 1.842-2.46 1.316.468 1.316.468 1.316 4.25 0 3.604 0 4.81-1.579 5.372L11.971 32.214c-1.316.469-1.316.469-2.631 0" fill="var(--primary)"/>
+                        <path d="M3.55 17.536l13.974 4.976 10.845-3.862L2.235 9.343C.393 8.687.13 8.593.13 9.881v3.347c0 3.09 2.368 3.933 3.42 4.308m40 6.52l-4.336-1.544-10.845 3.862 6.868 2.446 6.47-2.304c3.158-1.124 3.158-1.991 1.842-2.46" fill="var(--accent)"/>
+                        <path d="M43.55 24.056c1.315.469 1.315 1.336-1.843 2.46L10.655 37.575v7.724l32.631-11.62c1.579-.563 1.579-1.769 1.579-5.374 0-3.78 0-3.78-1.316-4.249" fill="var(--primary)"/>
+                        <path d="M43.55 11.44L12.76.475c-1.841-.656-2.105-.75-2.105.538V4.36c0 3.09 2.368 3.933 3.42 4.308l21.162 7.536 6.47-2.304c3.158-1.125 3.158-1.992 1.842-2.46M1.708 28.145l8.948-3.187-8.421-2.999C.393 21.303.13 21.21.13 22.497v4.521s0 1.689 1.578 1.127" fill="var(--accent)"/>
                     </g>
                 </svg>
             </div>
@@ -530,6 +607,7 @@
     </div>
 </div>
 
+<!-- Modal GESTIÓN DE BASE GLOBAL DE TÉCNICOS -->
 <div id="manage-techs-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="color: var(--leader-color);">👥 BASE GLOBAL DE TÉCNICOS</div>
@@ -540,7 +618,7 @@
             <input type="text" id="new-global-tech" placeholder="NOMBRE DEL TÉCNICO" onkeypress="if(event.key === 'Enter') addGlobalTech()">
             <button class="btn-leader" onclick="addGlobalTech()" style="width:100px;">AGREGAR</button>
         </div>
-        <div id="global-techs-container" class="tech-grid" style="border: 1px dashed var(--border); padding: 10px; border-radius: 6px; background: var(--bg);">
+        <div id="global-techs-container" class="tech-grid" style="border: 1px dashed var(--border); padding: 10px; border-radius: 6px; background: transparent;">
         </div>
         <div class="modal-footer">
             <button class="btn-outline btn-modal-action" onclick="closeModal('manage-techs-modal')">CERRAR</button>
@@ -581,12 +659,12 @@
 
     let avionesData = [];
     let shiftTechs = []; 
-    let globalTechs = []; // Nueva base de datos global
+    let globalTechs = []; 
     let isTeamLeader = false;
     let editCurrentAvionId = null;
     let editCurrentTaskId = null;
     const MAINTENIX_URL = "https://maintenix.lan.com/maintenix/common/ToDoList.jsp";
-    const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000; // 12 horas
+    const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000; 
 
     let currentViewMode = 'default';
     let currentTechFilter = ''; 
@@ -595,6 +673,9 @@
     document.getElementById('global-turno-select').value = activeTurno;
     document.getElementById('view-mode-select').value = currentViewMode;
 
+    // Inicialización del Motor de Temas
+    initSettings();
+
     // Conexión a la base de datos Global de Técnicos
     const globalTechsRef = ref(db, 'mantenimiento/global_techs');
     onValue(globalTechsRef, (snapshot) => {
@@ -602,8 +683,53 @@
         updateGlobalTechsUI();
     });
 
-    // Validación de sesión local al iniciar la página
+    // Validación de sesión local
     checkSession();
+
+    function initSettings() {
+        const savedTheme = localStorage.getItem('latam_theme') || 'theme-latam';
+        const savedDark = localStorage.getItem('latam_dark_mode') || 'auto';
+        
+        document.getElementById('theme-color-select').value = savedTheme;
+        document.getElementById('dark-mode-select').value = savedDark;
+        
+        applySettings();
+    }
+
+    function applySettings() {
+        const theme = document.getElementById('theme-color-select').value;
+        const darkModeSetting = document.getElementById('dark-mode-select').value;
+        
+        localStorage.setItem('latam_theme', theme);
+        localStorage.setItem('latam_dark_mode', darkModeSetting);
+        
+        // Aplicar Color Primario
+        document.body.classList.remove('theme-latam', 'theme-red', 'theme-nucleo');
+        if (theme !== 'theme-latam') {
+            document.body.classList.add(theme);
+        }
+        
+        // Aplicar Modo Oscuro
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        if (darkModeSetting === 'dark' || (darkModeSetting === 'auto' && prefersDark)) {
+            document.body.classList.add('dark-mode');
+        } else {
+            document.body.classList.remove('dark-mode');
+        }
+        
+        // Actualizar colores del SVG mediante variables CSS para que fluya natural
+        const svgLogo = document.querySelector('.logo-container svg');
+        if (svgLogo) {
+             // El SVG ya utiliza var(--primary) y var(--accent) en los estilos inyectados
+        }
+    }
+
+    // Escuchar cambios de sistema para Modo Oscuro Auto
+    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', () => {
+        if (document.getElementById('dark-mode-select').value === 'auto') {
+            applySettings();
+        }
+    });
 
     function checkSession() {
         const savedEmail = localStorage.getItem('tl_email');
@@ -650,10 +776,8 @@
 
     function toggleMode() {
         if (isTeamLeader) {
-            // Regresa a modo técnico, pero conserva el token de sesión en localStorage
             deactivateLeaderUI();
         } else {
-            // Revisa si existe sesión válida y recupera acceso inmediatamente
             const savedEmail = localStorage.getItem('tl_email');
             const loginTime = localStorage.getItem('tl_login_time');
 
@@ -776,7 +900,6 @@
         closePromptModal();
     };
 
-    // FUNCIONES GLOBALES DE TÉCNICOS
     function updateGlobalTechsUI() {
         const datalist = document.getElementById('global-techs-list');
         datalist.innerHTML = '';
@@ -1360,7 +1483,7 @@
         });
     }
 
-    // Exponer funciones necesarias al entorno global (window)
+    // Exponer funciones necesarias al entorno global
     Object.assign(window, {
         updateHeader, addTech, removeTech, removeAllTechs, toggleMode, clearAllData, logoutLeader,
         formatMatricula, autoFormatTango, handleTangoClick, closeModal,
@@ -1370,8 +1493,8 @@
         openAddTaskModal, saveAddTask, openEditTaskModal, saveEditTask, confirmDeleteTask,
         editAvionComment, editTaskComment, closeConfirmModal, closePromptModal,
         changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput,
-        formatTime, changeTurno,
-        openManageTechsModal, addGlobalTech, removeGlobalTech // Nuevas funciones expuestas
+        formatTime, changeTurno, applySettings,
+        openManageTechsModal, addGlobalTech, removeGlobalTech 
     });
 
 </script>
