@@ -392,8 +392,8 @@
             <select id="view-mode-select" onchange="changeViewMode()" style="min-width: 130px;">
                 <option value="default">✈️ POR AVIÓN</option>
                 <option value="time">🕒 POR HORA DE INICIO</option>
-                <option value="tech">👨‍🔧 AGRUPAR POR TÉCNICO</option>
-                <option value="tech-group">👥 AGRUPAR POR GRUPO</option>
+                <option value="tech">👨‍🔧 POR TÉCNICO</option>
+                <option value="tech-group">👥 POR GRUPO</option>
             </select>
         </div>
         <div style="display: flex; gap: 8px; align-items: center;">
@@ -422,7 +422,7 @@
                 <span style="font-size: 11px; font-weight: bold; color: var(--primary); width: 65px;">TÉCNICOS:</span>
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()">
                 <button class="btn-leader" onclick="addTech()" style="padding: 0 12px;">+ AGREGAR AL TURNO</button>
-                <button class="btn-outline" onclick="openManageTechsModal()" style="padding: 0 12px; font-size: 10px;" title="Editar Base Global de Técnicos">👥 BASE GLOBAL</button>
+                <button class="btn-outline" onclick="openManageTechsModal()" style="padding: 0 12px; font-size: 10px;" title="Editar Base Global de Técnicos">👥 LISTADO DE TECNICOS</button>
                 <button class="btn-danger-outline" onclick="removeAllTechs()" style="padding: 0 12px; font-size: 10px; margin-left: auto;">🗑️ BORRAR TÉCNICOS</button>
             </div>
 
@@ -488,7 +488,7 @@
             <input type="text" class="time-input" id="add-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
             <input type="text" class="time-input" id="add-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
         </div>
-        <input type="text" id="add-ac-comment" placeholder="NOTA DEL AVIÓN (OPCIONAL)">
+        <input type="text" id="add-ac-comment" placeholder="NOTA DEL AVIÓN">
         
         <div class="modal-footer">
             <button class="btn-outline btn-modal-action" onclick="closeModal('add-avion-modal')">CANCELAR</button>
@@ -526,7 +526,7 @@
             <input type="text" class="time-input" id="edit-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
             <input type="text" class="time-input" id="edit-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
         </div>
-        <input type="text" id="edit-ac-comment" placeholder="NOTA (OPCIONAL)">
+        <input type="text" id="edit-ac-comment" placeholder="NOTA">
         
         <div class="modal-footer">
             <button class="btn-danger-outline btn-modal-action" onclick="confirmDeleteAvion()">ELIMINAR</button>
@@ -545,7 +545,7 @@
         <div style="font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">ASIGNAR TÉCNICOS:</div>
         <div class="tech-grid" id="add-task-techs"></div>
         
-        <input type="text" id="add-task-comment" placeholder="NOTA DE LA TAREA (OPCIONAL)">
+        <input type="text" id="add-task-comment" placeholder="NOTA DE LA TAREA">
         
         <div class="modal-footer">
             <button class="btn-outline btn-modal-action" onclick="closeModal('add-task-modal')">CANCELAR</button>
@@ -583,7 +583,7 @@
         <div style="font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">TÉCNICOS ASIGNADOS:</div>
         <div class="tech-grid" id="edit-task-techs"></div>
         
-        <input type="text" id="edit-task-comment" placeholder="NOTA DE LA TAREA (OPCIONAL)">
+        <input type="text" id="edit-task-comment" placeholder="NOTA DE LA TAREA">
         
         <div class="modal-footer">
             <button class="btn-danger-outline btn-modal-action" onclick="confirmDeleteTask()">ELIMINAR</button>
@@ -597,7 +597,7 @@
     <div class="modal-content">
         <div class="modal-header" style="color: var(--leader-color);">👥 BASE GLOBAL DE TÉCNICOS</div>
         <div style="font-size:11px; color:var(--comment); margin-bottom:15px;">
-            Agrega o elimina nombres del menú desplegable global de tu estación.
+            Agrega o elimina nombres del listado de tecnicos.
         </div>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <input type="text" id="new-global-tech" placeholder="NOMBRE DEL TÉCNICO" onkeypress="if(event.key === 'Enter') addGlobalTech()">
