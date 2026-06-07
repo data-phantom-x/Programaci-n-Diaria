@@ -35,21 +35,21 @@
         /* Barra superior general */
         .top-bar {
             display: flex; justify-content: space-between; margin-bottom: 15px;
-            background-color: var(--light-gray); padding: 12px 15px;
+            background-color: var(--light-gray); padding: 10px 15px;
             border-radius: 6px; align-items: center;
         }
 
         .top-bar-left { display: flex; gap: 10px; }
 
-        /* Reloj Inteligente */
+        /* Reloj Inteligente (Mejorado) */
         .live-clock {
-            display: flex; gap: 12px; font-size: 11px; font-weight: bold;
-            background: white; padding: 0 15px; border-radius: 4px; border: 1px solid var(--border);
-            align-items: center; justify-content: center; height: 34px; box-sizing: border-box;
+            display: flex; gap: 8px; font-size: 11px; font-weight: normal;
+            background: white; padding: 0 12px; border-radius: 4px; border: 1px solid var(--border);
+            align-items: center; justify-content: center; height: 28px; box-sizing: border-box;
         }
 
         .btn-top {
-            width: 160px; height: 34px; font-size: 11px; padding: 0; font-weight: bold;
+            width: 140px; height: 28px; font-size: 10px; padding: 0; font-weight: bold;
             border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s;
         }
         .btn-top:hover { opacity: 0.9; }
@@ -63,31 +63,31 @@
         /* Controles de vista y filtros locales */
         .view-controls {
             display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 25px; 
-            background: #ffffff; padding: 12px 15px; border-radius: 6px; 
+            background: #ffffff; padding: 10px 15px; border-radius: 6px; 
             border: 1px solid var(--border); align-items: center; justify-content: space-between;
         }
 
         /* PANEL DE CONTROL TEAM LEADER */
         .header-controls {
             background-color: #f0f7ff; border: 1px solid #93c5fd;
-            border-left: 6px solid var(--leader-color); padding: 18px;
+            border-left: 6px solid var(--leader-color); padding: 16px;
             border-radius: 6px; margin-bottom: 25px; transition: opacity 0.3s;
         }
 
         .leader-panel-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #bfdbfe; padding-bottom: 10px; margin-bottom: 15px;
+            border-bottom: 1px solid #bfdbfe; padding-bottom: 10px; margin-bottom: 12px;
         }
 
         .leader-title { font-size: 1.1em; font-weight: 800; color: var(--leader-color); display: flex; align-items: center; gap: 8px; }
-        .leader-grid { display: flex; flex-direction: column; gap: 12px; }
+        .leader-grid { display: flex; flex-direction: column; gap: 10px; }
         .control-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
-        /* Estilos generales corregidos para altura uniforme de controles */
+        /* Estilos generales corregidos para altura uniforme de controles (Más estéticos) */
         input[type="text"], input[type="date"], select, button, textarea {
-            padding: 8px 12px; border: 1px solid var(--border);
-            border-radius: 4px; font-size: 11px; outline: none; box-sizing: border-box;
-            height: 34px; 
+            padding: 6px 10px; border: 1px solid var(--border);
+            border-radius: 4px; font-size: 10px; outline: none; box-sizing: border-box;
+            height: 28px; 
         }
         
         input[type="date"] {
@@ -101,7 +101,7 @@
         
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(27, 0, 136, 0.1); }
         input[type="text"], input[type="date"] { flex: 1; min-width: 130px; }
-        input.time-input { min-width: auto; width: 75px; text-align: center; font-weight: bold; flex: none; }
+        input.time-input { min-width: auto; width: 70px; text-align: center; font-weight: bold; flex: none; }
         
         button { 
             background-color: var(--primary); color: white; border: none; cursor: pointer; 
@@ -121,13 +121,13 @@
         .btn-danger-outline:hover:not(:disabled) { background: var(--danger); color: white; }
 
         #tech-pills-container {
-            display: flex; flex-wrap: wrap; gap: 8px; width: auto;
-            padding: 12px; background: white; border-radius: 6px; border: 1px dashed var(--border);
+            display: flex; flex-wrap: wrap; gap: 6px; width: auto;
+            padding: 10px; background: white; border-radius: 6px; border: 1px dashed var(--border);
         }
 
         .tech-pill {
             background-color: var(--light-gray); color: var(--primary); border: 1px solid var(--border);
-            padding: 6px 14px; border-radius: 20px; font-size: 11px;
+            padding: 4px 10px; border-radius: 20px; font-size: 10px;
             display: inline-flex; align-items: center; gap: 8px; font-weight: bold;
         }
         
@@ -135,41 +135,48 @@
         .tech-pill span.tech-remove { 
             cursor: pointer; color: var(--accent); background: transparent; 
             display: flex; align-items: center; justify-content: center; 
-            font-size: 12px; transition: 0.2s; font-weight: bold;
+            font-size: 11px; transition: 0.2s; font-weight: bold;
         }
         .tech-pill span.tech-remove:hover { transform: scale(1.2); }
 
+        /* Título de documento mejorado y centrado matemáticamente */
         .main-header-wrapper {
-            display: flex; align-items: center; gap: 20px;
-            margin-bottom: 25px; border-bottom: 3px solid var(--primary); padding-bottom: 15px;
+            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            margin-bottom: 20px; border-bottom: 3px solid var(--primary); padding-bottom: 12px;
+            min-height: 40px;
         }
         
-        .logo-container img { width: 140px; height: auto; }
+        .logo-container {
+            position: absolute; left: 0; top: 50%; transform: translateY(-50%);
+        }
+        .logo-container img { width: 100px; height: auto; } /* Logo más pequeño */
         
         .document-header { 
-            font-size: 1.3em; font-weight: 800; color: var(--primary); margin: 0; 
-            flex: 1; text-align: center; display: flex; flex-direction: column; 
-            align-items: center; justify-content: center;
+            font-size: 1.2em; font-weight: 800; color: var(--primary); margin: 0; 
+            text-align: center; display: flex; flex-direction: column; 
+            align-items: center; justify-content: center; width: 100%;
+            padding: 0 110px; box-sizing: border-box;
         }
         
-        .avion-section { margin-bottom: 30px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .avion-section { margin-bottom: 25px; border-radius: 6px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
 
         .avion-title {
-            font-size: 1.1em; font-weight: bold; display: flex; align-items: center; justify-content: space-between;
-            background: var(--primary); color: white; padding: 12px 16px; border-radius: 6px 6px 0 0; 
-            flex-wrap: wrap; gap: 12px;
+            font-size: 1.05em; font-weight: bold; display: flex; align-items: center; justify-content: space-between;
+            background: var(--primary); color: white; padding: 10px 14px; border-radius: 6px 6px 0 0; 
+            flex-wrap: wrap; gap: 10px;
         }
         
         .avion-title.activity-header { background: var(--leader-color); }
 
-        .avion-info-main { flex: 1; min-width: 250px; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; }
+        .avion-info-main { flex: 1; min-width: 250px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
         
         .avion-pos, .avion-times { 
             background: rgba(255,255,255,0.2); color: white; 
-            padding: 4px 10px; border-radius: 4px; font-size: 0.9em; 
+            padding: 3px 8px; border-radius: 4px; font-size: 0.85em; 
         }
         
-        .avion-comment { width: 100%; font-size: 0.85em; color: #cbd5e0; margin-top: 6px; font-weight: normal; font-style: italic; }
+        .avion-comment { width: 100%; font-size: 0.85em; color: #cbd5e0; margin-top: 5px; font-weight: normal; font-style: italic; }
 
         .tango-link { color: #ffb3c6; text-decoration: underline; cursor: pointer; font-weight: bold; transition: color 0.2s; }
         .tango-link:hover { color: white; }
@@ -182,7 +189,7 @@
         }
 
         .task-item {
-            display: flex; padding: 12px 16px; align-items: flex-start;
+            display: flex; padding: 10px 14px; align-items: flex-start;
             border-bottom: 1px solid var(--light-gray); transition: background-color 0.2s;
             background-color: transparent;
         }
@@ -194,15 +201,15 @@
         .task-item.help-needed { background-color: #fffaf0; border-left: 4px solid var(--help); }
         .task-item.priority.help-needed { background: linear-gradient(90deg, #fff5f7 0%, #fffaf0 100%); border-left: 4px solid var(--danger); }
 
-        .priority-badge { color: var(--accent); font-weight: 800; font-size: 0.85em; margin-left: 8px; background: rgba(237, 22, 80, 0.1); padding: 2px 6px; border-radius: 4px;}
-        .help-badge { color: var(--help); font-weight: 800; font-size: 0.85em; margin-left: 8px; background: rgba(221, 107, 32, 0.1); padding: 2px 6px; border-radius: 4px;}
+        .priority-badge { color: var(--accent); font-weight: 800; font-size: 0.8em; margin-left: 6px; background: rgba(237, 22, 80, 0.1); padding: 2px 6px; border-radius: 4px;}
+        .help-badge { color: var(--help); font-weight: 800; font-size: 0.8em; margin-left: 6px; background: rgba(221, 107, 32, 0.1); padding: 2px 6px; border-radius: 4px;}
 
         .status-toggle {
-            width: 24px; height: 24px; min-width: 24px; min-height: 24px;
+            width: 20px; height: 20px; min-width: 20px; min-height: 20px;
             box-sizing: border-box; border: 2px solid var(--primary);
-            background-color: white; margin-right: 15px; margin-top: 0;
+            background-color: white; margin-right: 12px; margin-top: 0;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: transparent; font-size: 14px; transition: all 0.2s; user-select: none; border-radius: 50%;
+            font-weight: bold; color: transparent; font-size: 12px; transition: all 0.2s; user-select: none; border-radius: 50%;
         }
 
         .task-item.completed .action-bar { display: none !important; }
@@ -210,15 +217,15 @@
         .task-item.completed .status-toggle { background-color: #10b981; border-color: #10b981; color: white; }
         .task-item.completed { border-left: none; background-color: #f8fafc !important; opacity: 0.45; filter: grayscale(100%); transition: all 0.3s ease; }
         
-        .task-main { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        .task-main { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .task-info { flex: 1; transition: all 0.3s ease; }
         
         .task-item.completed .task-info, .task-item.completed .tango-link { text-decoration: line-through; color: var(--comment); }
-        .task-desc { font-weight: 600; font-size: 1.05em; line-height: 1.4; color: var(--primary); }
-        .task-techs { font-size: 0.85em; font-weight: 700; color: #4a5568; margin-top: 4px; }
-        .task-comment { font-size: 0.85em; color: var(--comment); margin-top: 4px; font-style: italic; font-weight: 600; }
+        .task-desc { font-weight: 600; font-size: 1em; line-height: 1.3; color: var(--primary); }
+        .task-techs { font-size: 0.85em; font-weight: 700; color: #4a5568; margin-top: 3px; }
+        .task-comment { font-size: 0.85em; color: var(--comment); margin-top: 3px; font-style: italic; font-weight: 600; }
 
-        .action-bar { display: flex; flex-wrap: wrap; gap: 6px; align-items: stretch; }
+        .action-bar { display: flex; flex-wrap: wrap; gap: 5px; align-items: stretch; }
         
         .action-bar.avion-bar .action-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); }
         .action-bar.avion-bar .action-btn:hover { background: rgba(255,255,255,0.25); }
@@ -226,7 +233,7 @@
         .action-bar.avion-bar .btn-highlight:hover { background: var(--light-gray); }
 
         .action-btn {
-            padding: 0 10px; font-size: 10px; font-weight: 700; height: 30px; 
+            padding: 0 8px; font-size: 9px; font-weight: 700; height: 24px; 
             border-radius: 4px; border: 1px solid var(--border);
             background: #ffffff; color: var(--primary); gap: 4px;
         }
@@ -240,25 +247,25 @@
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(30, 41, 59, 0.6); backdrop-filter: blur(4px); }
         
         .modal-content {
-            background-color: white; margin: 6% auto; padding: 25px;
-            border: none; width: 90%; max-width: 500px; border-radius: 8px;
+            background-color: white; margin: 6% auto; padding: 20px;
+            border: none; width: 90%; max-width: 450px; border-radius: 8px;
             box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-height: 85vh; overflow-y: auto;
         }
         
-        .modal-header { font-weight: 800; font-size: 1.2em; margin-bottom: 20px; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 10px; }
-        .modal-content input[type="text"], .modal-content select { width: 100%; margin-bottom: 15px; box-sizing: border-box; }
-        .modal-row { display: flex; gap: 15px; margin-bottom: 15px; }
-        .modal-row > input { flex: 1; margin-bottom: 0 !important; }
+        .modal-header { font-weight: 800; font-size: 1.1em; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
+        .modal-content input[type="text"], .modal-content select { width: 100%; margin-bottom: 12px; box-sizing: border-box; }
+        .modal-row { display: flex; gap: 12px; margin-bottom: 12px; }
+        .modal-row > input { margin-bottom: 0 !important; }
 
         .tech-grid {
             display: flex; flex-wrap: wrap;
-            gap: 10px; max-height: 180px; overflow-y: auto; margin-bottom: 20px; padding: 4px;
+            gap: 8px; max-height: 180px; overflow-y: auto; margin-bottom: 15px; padding: 4px;
         }
 
         .tech-checkbox-label {
             display: flex; align-items: center; justify-content: center;
-            background: white; border: 1px solid var(--border); padding: 8px 16px;
-            border-radius: 20px; cursor: pointer; font-size: 11px; font-weight: 700;
+            background: white; border: 1px solid var(--border); padding: 6px 12px;
+            border-radius: 20px; cursor: pointer; font-size: 10px; font-weight: 700;
             transition: all 0.2s; user-select: none; color: var(--comment); text-align: center;
         }
 
@@ -270,34 +277,41 @@
         .tech-checkbox-label input { display: none; }
         .tech-checkbox-label span { word-wrap: break-word; white-space: normal; line-height: 1.2; }
 
-        .modal-footer { display: flex; gap: 10px; margin-top: 10px; padding-top: 20px; border-top: 1px solid var(--border); }
-        .btn-modal-action { flex: 1; padding: 0; height: 34px; font-size: 11px; border-radius: 4px;}
+        .modal-footer { display: flex; gap: 10px; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border); }
+        .btn-modal-action { flex: 1; padding: 0; height: 30px; font-size: 10px; border-radius: 4px;}
 
+        /* Ultra-Comprimido para Imprimir en una sola hoja carta */
         @media print {
-            @page { size: letter; margin: 1cm; } .no-print { display: none !important; }
-            body { padding: 0; background-color: white; font-size: 11px; }
+            @page { size: letter; margin: 0.8cm; } 
+            .no-print { display: none !important; }
+            body { padding: 0; background-color: white; font-size: 10px; line-height: 1.15; }
             .container { padding: 0; box-shadow: none; max-width: 100%; }
-            .main-header-wrapper { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--primary); }
             
-            .avion-section { margin-bottom: 20px; box-shadow: none; border: 1px solid var(--border); border-radius: 0; }
+            .main-header-wrapper { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid var(--primary); min-height: auto; }
+            .logo-container img { width: 80px !important; }
+            .document-header { font-size: 1.1em; padding: 0 85px; } /* Centrado también en papel */
+            
+            .avion-section { margin-bottom: 6px; box-shadow: none; border: 1px solid var(--border); border-radius: 0; }
             .avion-title { 
                 background: #f4f7f9 !important; color: var(--primary) !important; 
-                padding: 8px 12px; border-bottom: 1px solid var(--border); border-radius: 0;
+                padding: 4px 8px; border-bottom: 1px solid var(--border); border-radius: 0; gap: 6px;
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
-            .avion-pos, .avion-times { background: transparent; color: var(--primary); padding: 0; font-weight: bold; }
-            .avion-comment { color: #4a5568; }
+            .avion-pos, .avion-times { background: transparent; color: var(--primary); padding: 0; font-weight: bold; font-size: 0.9em; }
+            .avion-comment { color: #4a5568; margin-top: 2px; font-size: 0.8em; }
             .tango-link, .avion-title .tango-link { color: var(--primary); text-decoration: none; }
             
             .task-container { border: none; }
-            .task-item { padding: 8px 12px; border-bottom: 1px solid #e2e8f0; background: transparent !important; }
+            .task-item { padding: 3px 6px; border-bottom: 1px solid #e2e8f0; background: transparent !important; page-break-inside: avoid; }
             .task-item.priority { border-left: 3px solid var(--accent) !important; }
             .task-item.help-needed { border-left: 3px solid var(--help) !important; }
             
             .task-item.completed .task-info { opacity: 0.85 !important; text-decoration: line-through; color: #333; }
             .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #10b981 !important; border-color: #10b981 !important; color: white !important; }
-            .status-toggle { margin-top: 0px; width: 16px; min-width: 16px; height: 16px; min-height: 16px; font-size: 10px; border-width: 1px; }
-            .task-desc { font-size: 1em; }
+            .status-toggle { margin-top: 0px; margin-right: 6px; width: 12px; min-width: 12px; height: 12px; min-height: 12px; font-size: 8px; border-width: 1px; }
+            .task-desc { font-size: 0.95em; }
+            .task-techs, .task-comment { font-size: 0.8em; margin-top: 1px; }
+            .priority-badge, .help-badge { padding: 1px 4px; font-size: 0.75em; }
         }
 
         /* AJUSTES PARA CELULARES */
@@ -308,16 +322,16 @@
             .top-bar { flex-direction: column; gap: 8px; }
             .top-bar-left { width: 100%; flex-direction: column; }
             .btn-top { width: 100%; }
-            .live-clock { width: 100%; justify-content: space-between; }
+            .live-clock { width: 100%; justify-content: center; height: auto; padding: 6px; }
             
-            .view-controls { flex-direction: column; align-items: stretch; gap: 12px; }
+            .view-controls { flex-direction: column; align-items: stretch; gap: 10px; }
             .view-controls > div { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
             .view-controls > div > span { margin-bottom: 2px; }
             .view-controls select, .view-controls input[type="date"] { width: 100%; min-width: 0; }
             .view-controls button.btn-outline { width: 100%; order: 99; margin-top: 4px; }
             
-            .header-controls { padding: 15px 12px; }
-            .leader-panel-header { flex-direction: column; gap: 12px; text-align: center; }
+            .header-controls { padding: 12px; }
+            .leader-panel-header { flex-direction: column; gap: 10px; text-align: center; }
             .leader-panel-header div, .leader-panel-header button { width: 100%; }
             
             .control-group { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
@@ -327,15 +341,17 @@
             .control-group input[list] { flex: 1 !important; min-width: 130px !important; width: auto !important; }
             .control-group button { width: 100% !important; max-width: none !important; margin: 0 !important; }
             
-            .main-header-wrapper { flex-direction: column; text-align: center; gap: 12px; }
+            .main-header-wrapper { flex-direction: column; text-align: center; gap: 12px; padding-bottom: 15px; }
+            .logo-container { position: relative; transform: none; top: auto; left: auto; }
+            .document-header { padding: 0; }
             
-            .avion-title { flex-direction: column; text-align: center; gap: 12px; }
-            .avion-info-main { flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+            .avion-title { flex-direction: column; text-align: center; gap: 8px; }
+            .avion-info-main { flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
             .action-bar.avion-bar { justify-content: center; width: 100%; margin-top: 4px; }
             
-            .task-item { position: relative; padding: 12px 12px 12px 45px; }
-            .status-toggle { position: absolute; left: 12px; top: 12px; margin: 0; }
-            .task-main { flex-direction: column; align-items: stretch; gap: 12px; }
+            .task-item { position: relative; padding: 10px 10px 10px 35px; }
+            .status-toggle { position: absolute; left: 8px; top: 10px; margin: 0; }
+            .task-main { flex-direction: column; align-items: stretch; gap: 10px; }
             
             .action-bar { display: grid; grid-template-columns: 1fr 1fr; width: 100%; gap: 6px; }
             .action-bar .action-btn { width: 100%; box-sizing: border-box; }
@@ -362,13 +378,13 @@
 
     <div class="view-controls no-print">
         <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 11px; font-weight: bold; color: var(--accent);">FECHA:</span>
+            <span style="font-size: 10px; font-weight: bold; color: var(--accent);">FECHA:</span>
             <input type="date" id="global-date-select" onchange="changeDate()" style="font-weight: bold; border: 2px solid var(--accent); color: var(--accent); min-width: 130px;" title="Ver programación de otro día">
-            <button class="btn-outline" onclick="goToToday()" style="padding: 0 12px; font-size: 10px; border-color: var(--accent); color: var(--accent);" title="Ir al día de hoy">📅 HOY</button>
+            <button class="btn-outline" onclick="goToToday()" style="padding: 0 10px; font-size: 9px; border-color: var(--accent); color: var(--accent);" title="Ir al día de hoy">📅 HOY</button>
         </div>
 
         <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 11px; font-weight: bold; color: var(--accent);">TURNO:</span>
+            <span style="font-size: 10px; font-weight: bold; color: var(--accent);">TURNO:</span>
             <select id="global-turno-select" onchange="changeTurno()" style="min-width: 100px; font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
                 <option value="Turno Día">DÍA</option>
                 <option value="Turno Tarde">TARDE</option>
@@ -377,7 +393,7 @@
         </div>
         
         <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 11px; font-weight: bold; color: var(--comment);">MODO DE VISTA:</span>
+            <span style="font-size: 10px; font-weight: bold; color: var(--comment);">MODO DE VISTA:</span>
             <select id="view-mode-select" onchange="changeViewMode()" style="min-width: 130px;">
                 <option value="default">✈️ POR AVIÓN</option>
                 <option value="time">🕒 POR HORA DE INICIO</option>
@@ -386,11 +402,11 @@
             </select>
         </div>
         <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 11px; font-weight: bold; color: var(--comment);">FILTRO:</span>
-            <select id="local-tech-filter" onchange="applyLocalFilter()" style="min-width: 170px;">
+            <span style="font-size: 10px; font-weight: bold; color: var(--comment);">FILTRO:</span>
+            <select id="local-tech-filter" onchange="applyLocalFilter()" style="min-width: 150px;">
                 <option value="">TODOS LOS TÉCNICOS</option>
             </select>
-            <button class="btn-outline" onclick="resetLocalFilter()" style="padding: 0 12px; font-size: 10px;">RESTABLECER</button>
+            <button class="btn-outline" onclick="resetLocalFilter()" style="padding: 0 10px; font-size: 9px;">RESTABLECER</button>
         </div>
     </div>
 
@@ -398,23 +414,23 @@
         <div class="leader-panel-header">
             <div class="leader-title">⚙️ PANEL DE CONTROL TEAM LEADER</div>
             <div style="display: flex; gap: 10px;">
-                <button id="btn-lock-shift" class="btn-danger-outline" onclick="toggleLockShift()" style="padding: 0 12px; font-size: 10px; display: none;">🔒 CERRAR TURNO</button>
-                <button class="btn-danger-outline" onclick="clearAllData()" style="padding: 0 12px; font-size: 10px;">⚠️ BORRAR PROGRAMACIÓN</button>
+                <button id="btn-lock-shift" class="btn-danger-outline" onclick="toggleLockShift()" style="padding: 0 10px; font-size: 9px; display: none;">🔒 CERRAR TURNO</button>
+                <button class="btn-danger-outline" onclick="clearAllData()" style="padding: 0 10px; font-size: 9px;">⚠️ BORRAR PROGRAMACIÓN</button>
             </div>
         </div>
 
         <div class="leader-grid" id="leader-controls-grid">
             <div class="control-group">
-                <span style="font-size: 11px; font-weight: bold; color: var(--primary); width: 65px;">TEAM LEADER:</span>
+                <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">TEAM LEADER:</span>
                 <input type="text" id="in-jefe" placeholder="NOMBRE DEL TEAM LEADER" oninput="updateHeader()">
             </div>
             
             <div class="control-group" style="margin-bottom: 5px;">
-                <span style="font-size: 11px; font-weight: bold; color: var(--primary); width: 65px;">TÉCNICOS:</span>
+                <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">TÉCNICOS:</span>
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()">
-                <button class="btn-leader" onclick="addTech()" style="padding: 0 12px;">+ AGREGAR AL TURNO</button>
-                <button class="btn-outline" onclick="openManageTechsModal()" style="padding: 0 12px; font-size: 10px;" title="Editar Base Global de Técnicos">👥 LISTADO DE TECNICOS</button>
-                <button class="btn-danger-outline" onclick="removeAllTechs()" style="padding: 0 12px; font-size: 10px; margin-left: auto;">🗑️ BORRAR TÉCNICOS</button>
+                <button class="btn-leader" onclick="addTech()" style="padding: 0 10px;">+ AGREGAR AL TURNO</button>
+                <button class="btn-outline" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px;" title="Editar Base Global de Técnicos">👥 LISTADO DE TECNICOS</button>
+                <button class="btn-danger-outline" onclick="removeAllTechs()" style="padding: 0 10px; font-size: 9px; margin-left: auto;">🗑️ BORRAR TÉCNICOS</button>
             </div>
 
             <div id="tech-pills-container"></div>
@@ -424,16 +440,16 @@
     <div id="print-area">
         <div class="main-header-wrapper">
             <div class="logo-container">
-                <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines" style="width: 140px; height: auto;">
+                <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines">
             </div>
             <h1 class="document-header" id="display-header">CARGANDO DATOS...</h1>
         </div>
         
         <div id="aviones-container"></div>
         
-        <div id="leader-add-buttons" class="leader-only no-print" style="margin-top: 30px; display: flex; gap: 15px; flex-wrap: wrap;">
-            <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 14px; font-size: 12px; border-radius: 6px; height: auto;">+ AGREGAR AVIÓN</button>
-            <button class="btn-accent" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 14px; font-size: 12px; border-radius: 6px; height: auto;">⭐ AGREGAR ACTIVIDAD EXTRA</button>
+        <div id="leader-add-buttons" class="leader-only no-print" style="margin-top: 25px; display: flex; gap: 15px; flex-wrap: wrap;">
+            <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">+ AGREGAR AVIÓN</button>
+            <button class="btn-accent" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">⭐ AGREGAR ACTIVIDAD EXTRA</button>
         </div>
     </div>
 </div>
@@ -441,7 +457,7 @@
 <div id="confirm-modal" class="modal">
     <div class="modal-content" style="max-width: 380px; text-align: center;">
         <div class="modal-header" style="border:none; margin-bottom:10px; color:var(--leader-color);">⚠️ CONFIRMACIÓN</div>
-        <div id="confirm-message" style="margin-bottom: 25px; font-size: 13px; font-weight: bold; color: var(--primary);">¿ESTÁS SEGURO?</div>
+        <div id="confirm-message" style="margin-bottom: 25px; font-size: 12px; font-weight: bold; color: var(--primary);">¿ESTÁS SEGURO?</div>
         <div class="modal-footer" style="border:none; padding-top:0;">
             <button class="btn-outline btn-modal-action" onclick="closeConfirmModal()">CANCELAR</button>
             <button class="btn-leader btn-modal-action" id="confirm-yes-btn">CONFIRMAR</button>
@@ -489,7 +505,7 @@
             <input type="text" class="time-input" id="add-act-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
             <input type="text" class="time-input" id="add-act-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
         </div>
-        <div style="font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">ASIGNAR TÉCNICOS:</div>
+        <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">ASIGNAR TÉCNICOS:</div>
         <div class="tech-grid" id="add-act-techs"></div>
         <div class="modal-footer">
             <button class="btn-outline btn-modal-action" onclick="closeModal('add-activity-modal')">CANCELAR</button>
@@ -526,7 +542,7 @@
         <input type="text" id="add-task-desc" placeholder="TÍTULO DE LA TAREA" oninput="handleTaskDescInput(this, 'add-task-tango')">
         <input type="text" id="add-task-tango" placeholder="T00..." maxlength="8" oninput="autoFormatTango(this)">
         
-        <div style="font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">ASIGNAR TÉCNICOS:</div>
+        <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">ASIGNAR TÉCNICOS:</div>
         <div class="tech-grid" id="add-task-techs"></div>
         
         <input type="text" id="add-task-comment" placeholder="NOTA DE LA TAREA">
@@ -542,14 +558,14 @@
     <div class="modal-content">
         <div class="modal-header">📑 TAREAS PREDEFINIDAS / PREVENTIVOS</div>
         
-        <div style="font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">CREAR NUEVA TAREA:</div>
+        <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">CREAR NUEVA TAREA:</div>
         <div class="modal-row" style="margin-bottom: 5px;">
             <input type="text" id="new-predef-desc" placeholder="DESCRIPCIÓN DE LA TAREA..." onkeypress="if(event.key === 'Enter') createAndAddPredef()">
-            <button class="btn-leader" onclick="createAndAddPredef()" style="width:140px; font-size: 10px;">CREAR Y AÑADIR</button>
+            <button class="btn-leader" onclick="createAndAddPredef()" style="width:130px; font-size: 9px;">CREAR Y AÑADIR</button>
         </div>
         
-        <div style="font-size: 11px; font-weight: bold; color: var(--primary); margin: 20px 0 8px;">SELECCIONAR EXISTENTE (CLIC PARA AÑADIR):</div>
-        <div id="predef-tasks-container" class="tech-grid" style="border: 1px dashed var(--border); padding: 10px; border-radius: 6px; background: var(--bg); max-height: 250px; overflow-y: auto;">
+        <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin: 20px 0 8px;">SELECCIONAR EXISTENTE (CLIC PARA AÑADIR):</div>
+        <div id="predef-tasks-container" class="tech-grid" style="border: 1px dashed var(--border); padding: 8px; border-radius: 6px; background: var(--bg); max-height: 250px; overflow-y: auto;">
             </div>
         
         <div class="modal-footer">
@@ -564,7 +580,7 @@
         <input type="text" id="edit-task-desc" placeholder="TÍTULO DE LA TAREA" oninput="handleTaskDescInput(this, 'edit-task-tango')">
         <input type="text" id="edit-task-tango" placeholder="T00..." maxlength="8" oninput="autoFormatTango(this)">
         
-        <div style="font-size: 11px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">TÉCNICOS ASIGNADOS:</div>
+        <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">TÉCNICOS ASIGNADOS:</div>
         <div class="tech-grid" id="edit-task-techs"></div>
         
         <input type="text" id="edit-task-comment" placeholder="NOTA DE LA TAREA">
@@ -580,14 +596,14 @@
 <div id="manage-techs-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="color: var(--leader-color);">👥 BASE GLOBAL DE TÉCNICOS</div>
-        <div style="font-size:11px; color:var(--comment); margin-bottom:15px;">
+        <div style="font-size:10px; color:var(--comment); margin-bottom:12px;">
             Agrega o elimina nombres del listado de tecnicos.
         </div>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
             <input type="text" id="new-global-tech" placeholder="NOMBRE DEL TÉCNICO" onkeypress="if(event.key === 'Enter') addGlobalTech()">
-            <button class="btn-leader" onclick="addGlobalTech()" style="width:100px;">AGREGAR</button>
+            <button class="btn-leader" onclick="addGlobalTech()" style="width:90px;">AGREGAR</button>
         </div>
-        <div id="global-techs-container" class="tech-grid" style="border: 1px dashed var(--border); padding: 10px; border-radius: 6px; background: var(--bg);">
+        <div id="global-techs-container" class="tech-grid" style="border: 1px dashed var(--border); padding: 8px; border-radius: 6px; background: var(--bg);">
         </div>
         <div class="modal-footer">
             <button class="btn-outline btn-modal-action" onclick="closeModal('manage-techs-modal')">CERRAR</button>
@@ -659,15 +675,29 @@
     document.getElementById('view-mode-select').value = currentViewMode;
     document.getElementById('global-date-select').value = viewingDate;
 
-    // Reloj Dinámico
+    // Reloj Dinámico Mejorado (Local y UTC con fechas y diseño limpio)
     function updateClock() {
         const now = new Date();
-        const local = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        const utc = now.toLocaleTimeString('es-ES', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        // Generación Local
+        const localDate = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
+        const localTime = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        
+        // Generación UTC
+        const utcDate = now.toLocaleDateString('es-ES', { timeZone: 'UTC', day: '2-digit', month: '2-digit', year: 'numeric' });
+        const utcTime = now.toLocaleTimeString('es-ES', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit' });
         
         const clockEl = document.getElementById('live-clock');
         if (clockEl) {
-            clockEl.innerHTML = `<span style="color:var(--accent)">🌍 LOCAL: ${local}</span> <span style="color:var(--comment)">✈️ UTC: ${utc}</span>`;
+            clockEl.innerHTML = `
+                <span style="color:var(--primary); display:flex; gap: 4px; align-items:center;">
+                    <span style="font-size: 13px;">🌍</span> <span style="font-weight:bold;">LOC:</span> ${localDate} ${localTime}
+                </span>
+                <div style="width: 1px; height: 16px; background: var(--border); margin: 0 4px;"></div>
+                <span style="color:var(--comment); display:flex; gap: 4px; align-items:center;">
+                    <span style="font-size: 13px;">✈️</span> <span style="font-weight:bold;">UTC:</span> ${utcDate} ${utcTime}
+                </span>
+            `;
         }
     }
     setInterval(updateClock, 1000);
@@ -845,7 +875,12 @@
             const jefeInfo = data.jefe ? `TL: ${data.jefe}` : '';
             const lockInfo = shiftState.estado === 'cerrado' ? `<span style="color:var(--danger); font-weight:bold;">🔒 TURNO CERRADO POR ${shiftState.cerradoPor.toUpperCase()}</span>` : '';
 
-            document.getElementById('display-header').innerHTML = `<span>${turnoInfo}</span>${jefeInfo ? `<span style="margin-top: 4px;">${jefeInfo}</span>` : ''}${lockInfo ? `<span style="margin-top: 4px;">${lockInfo}</span>` : ''}`;
+            // Renderizado modificado para mejor estructura visual centrada
+            document.getElementById('display-header').innerHTML = `
+                <span>${turnoInfo}</span>
+                ${jefeInfo ? `<span style="margin-top: 4px; font-size: 0.85em; color: var(--leader-color);">${jefeInfo}</span>` : ''}
+                ${lockInfo ? `<span style="margin-top: 4px; font-size: 0.8em;">${lockInfo}</span>` : ''}
+            `;
             
             updateLockUI();
             render();
@@ -951,7 +986,7 @@
         if (container) {
             container.innerHTML = '';
             if(globalTechs.length === 0){
-                container.innerHTML = '<span style="font-size:11px; color:var(--comment); font-style:italic;">No hay técnicos en la base global.</span>';
+                container.innerHTML = '<span style="font-size:10px; color:var(--comment); font-style:italic;">No hay técnicos en la base global.</span>';
                 return;
             }
             globalTechs.forEach((tech, index) => {
@@ -1018,7 +1053,7 @@
     function renderTechPills() {
         const container = document.getElementById('tech-pills-container'); container.innerHTML = '';
         if(shiftTechs.length === 0) {
-            container.innerHTML = '<span style="font-size:11px; color:var(--comment); font-style:italic;">No hay técnicos registrados.</span>';
+            container.innerHTML = '<span style="font-size:10px; color:var(--comment); font-style:italic;">No hay técnicos registrados.</span>';
             return;
         }
         shiftTechs.forEach((tech, index) => {
@@ -1473,7 +1508,7 @@
         const container = document.getElementById(containerId); container.innerHTML = '';
         const currentTechs = selectedTechsString ? selectedTechsString.split(' - ') : [];
         if (shiftTechs.length === 0) {
-            container.innerHTML = '<div style="font-size:11px; color:var(--comment); padding:8px;">NO HAY TÉCNICOS AGREGADOS AL TURNO</div>';
+            container.innerHTML = '<div style="font-size:10px; color:var(--comment); padding:8px;">NO HAY TÉCNICOS AGREGADOS AL TURNO</div>';
         } else {
             shiftTechs.forEach(tech => {
                 const isChecked = currentTechs.includes(tech) ? "checked" : "";
@@ -1525,7 +1560,7 @@
         if (!container) return;
         container.innerHTML = '';
         if (predefTasks.length === 0) {
-            container.innerHTML = '<span style="font-size:11px; color:var(--comment); font-style:italic;">No hay tareas predefinidas. Crea una nueva arriba.</span>';
+            container.innerHTML = '<span style="font-size:10px; color:var(--comment); font-style:italic;">No hay tareas predefinidas. Crea una nueva arriba.</span>';
             return;
         }
         predefTasks.forEach((desc, index) => {
