@@ -83,7 +83,7 @@
         .leader-grid { display: flex; flex-direction: column; gap: 10px; }
         .control-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
 
-        /* Estilos generales corregidos para altura uniforme de controles (Más estéticos) */
+        /* Estilos generales corregidos para altura uniforme de controles */
         input[type="text"], input[type="date"], select, button, textarea {
             padding: 6px 10px; border: 1px solid var(--border);
             border-radius: 4px; font-size: 10px; outline: none; box-sizing: border-box;
@@ -101,7 +101,7 @@
         
         input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(27, 0, 136, 0.1); }
         input[type="text"], input[type="date"] { flex: 1; min-width: 130px; }
-        input.time-input { min-width: auto; width: 70px; text-align: center; font-weight: bold; flex: none; }
+        input.time-input { min-width: auto; width: 85px; text-align: center; font-weight: bold; flex: none; }
         
         button { 
             background-color: var(--primary); color: white; border: none; cursor: pointer; 
@@ -289,7 +289,7 @@
             
             .main-header-wrapper { margin-bottom: 8px; padding-bottom: 6px; border-bottom: 2px solid var(--primary); min-height: auto; }
             .logo-container img { width: 80px !important; }
-            .document-header { font-size: 1.1em; padding: 0 85px; } /* Centrado también en papel */
+            .document-header { font-size: 1.1em; padding: 0 85px; } 
             
             .avion-section { margin-bottom: 6px; box-shadow: none; border: 1px solid var(--border); border-radius: 0; }
             .avion-title { 
@@ -415,7 +415,7 @@
             <div class="leader-title">⚙️ PANEL DE CONTROL TEAM LEADER</div>
             <div style="display: flex; gap: 10px;">
                 <button id="btn-lock-shift" class="btn-danger-outline" onclick="toggleLockShift()" style="padding: 0 10px; font-size: 9px; display: none;">🔒 CERRAR TURNO</button>
-                <button class="btn-danger-outline" onclick="clearAllData()" style="padding: 0 10px; font-size: 9px;">⚠️ BORRAR PROGRAMACIÓN</button>
+                <button class="btn-danger-outline" onclick="openManageShiftModal()" style="padding: 0 10px; font-size: 9px;">⚠️ GESTIONAR TURNO</button>
             </div>
         </div>
 
@@ -430,7 +430,6 @@
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()">
                 <button class="btn-leader" onclick="addTech()" style="padding: 0 10px;">+ AGREGAR AL TURNO</button>
                 <button class="btn-outline" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px;" title="Editar Base Global de Técnicos">👥 LISTADO DE TECNICOS</button>
-                <button class="btn-danger-outline" onclick="removeAllTechs()" style="padding: 0 10px; font-size: 9px; margin-left: auto;">🗑️ BORRAR TÉCNICOS</button>
             </div>
 
             <div id="tech-pills-container"></div>
@@ -476,6 +475,37 @@
     </div>
 </div>
 
+<div id="manage-shift-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="color: var(--danger);">⚠️ ADMINISTRAR TURNO</div>
+        <div style="font-size: 11px; margin-bottom: 15px; color: var(--primary);">
+            Puedes borrar por completo el turno actual (aviones, técnicos, y líder) o trasladar toda la programación a otra fecha y turno.
+        </div>
+
+        <div style="border: 1px solid var(--border); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
+            <strong style="font-size: 10px; color: var(--primary);">TRASLADAR PROGRAMACIÓN A:</strong>
+            <div class="modal-row" style="margin-top: 8px;">
+                <input type="date" id="manage-shift-date" style="font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
+                <select id="manage-shift-turno" style="font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
+                    <option value="Turno Día">DÍA</option>
+                    <option value="Turno Tarde">TARDE</option>
+                    <option value="Turno Noche">NOCHE</option>
+                </select>
+            </div>
+            <button class="btn-leader" style="width: 100%; margin-top: 8px;" onclick="moveShift()">➡️ TRASLADAR TODO</button>
+        </div>
+
+        <div style="border: 1px solid var(--danger); padding: 10px; border-radius: 6px; background-color: #fff5f5;">
+            <strong style="font-size: 10px; color: var(--danger);">BORRAR PROGRAMACIÓN:</strong>
+            <button class="btn-danger-outline" style="width: 100%; margin-top: 8px; background: var(--danger); color: white;" onclick="deleteEntireShift()">🗑️ BORRAR TURNO COMPLETO</button>
+        </div>
+
+        <div class="modal-footer">
+            <button class="btn-outline btn-modal-action" onclick="closeModal('manage-shift-modal')">CANCELAR</button>
+        </div>
+    </div>
+</div>
+
 <div id="add-avion-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header">✈️ AGREGAR NUEVO AVIÓN</div>
@@ -484,9 +514,15 @@
             <input type="text" id="add-ac-wp" placeholder="WP (T00...)" maxlength="8">
             <input type="text" id="add-ac-pos" placeholder="POSICIÓN">
         </div>
-        <div class="modal-row">
-            <input type="text" class="time-input" id="add-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
-            <input type="text" class="time-input" id="add-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
+        <div class="modal-row" style="display: flex; gap: 15px;">
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA DESDE:</label>
+                <input type="text" class="time-input" id="add-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA HASTA:</label>
+                <input type="text" class="time-input" id="add-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+            </div>
         </div>
         <input type="text" id="add-ac-comment" placeholder="NOTA DEL AVIÓN">
         
@@ -501,9 +537,15 @@
     <div class="modal-content">
         <div class="modal-header" style="color: var(--leader-color);">⭐ AGREGAR ACTIVIDAD EXTRA</div>
         <input type="text" id="add-act-title" placeholder="TÍTULO (EJ: REUNIÓN, CURSO, INVENTARIO)">
-        <div class="modal-row">
-            <input type="text" class="time-input" id="add-act-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
-            <input type="text" class="time-input" id="add-act-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
+        <div class="modal-row" style="display: flex; gap: 15px;">
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA DESDE:</label>
+                <input type="text" class="time-input" id="add-act-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA HASTA:</label>
+                <input type="text" class="time-input" id="add-act-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+            </div>
         </div>
         <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">ASIGNAR TÉCNICOS:</div>
         <div class="tech-grid" id="add-act-techs"></div>
@@ -522,9 +564,15 @@
             <input type="text" id="edit-ac-wp" placeholder="WP (T00...)" maxlength="8">
             <input type="text" id="edit-ac-pos" placeholder="POSICIÓN">
         </div>
-        <div class="modal-row">
-            <input type="text" class="time-input" id="edit-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Inicio">
-            <input type="text" class="time-input" id="edit-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" title="Término">
+        <div class="modal-row" style="display: flex; gap: 15px;">
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA DESDE:</label>
+                <input type="text" class="time-input" id="edit-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+            </div>
+            <div style="flex: 1; display: flex; flex-direction: column;">
+                <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA HASTA:</label>
+                <input type="text" class="time-input" id="edit-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+            </div>
         </div>
         <input type="text" id="edit-ac-comment" placeholder="NOTA">
         
@@ -656,14 +704,19 @@
     let currentViewMode = 'default';
     let currentTechFilter = ''; 
     
-    // Función central para fecha lógica (Noche dura hasta las 07:00 del día siguiente)
+    // Función central para fecha lógica (Extracción usando Fecha Local)
     function getLogicalTodayDate() {
         const now = new Date();
         const hours = now.getHours();
         if (hours >= 0 && hours < 7) {
             now.setDate(now.getDate() - 1);
         }
-        return now.toISOString().split('T')[0];
+        
+        // Uso de Date.prototype métodos locales en lugar de toISOString()
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0');
+        const day = String(now.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
     }
 
     let activeTurno = localStorage.getItem('latam_active_turno') || 'Turno Día';
@@ -675,15 +728,11 @@
     document.getElementById('view-mode-select').value = currentViewMode;
     document.getElementById('global-date-select').value = viewingDate;
 
-    // Reloj Dinámico Mejorado (Local y UTC con fechas y diseño limpio)
+    // Reloj Dinámico Mejorado
     function updateClock() {
         const now = new Date();
-        
-        // Generación Local
         const localDate = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
         const localTime = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-        
-        // Generación UTC
         const utcDate = now.toLocaleDateString('es-ES', { timeZone: 'UTC', day: '2-digit', month: '2-digit', year: 'numeric' });
         const utcTime = now.toLocaleTimeString('es-ES', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit' });
         
@@ -869,13 +918,15 @@
 
             if (document.activeElement.id !== 'in-jefe') document.getElementById('in-jefe').value = data.jefe || '';
             
-            let fechaDisplay = new Date(viewingDate + 'T00:00:00').toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+            // Reconstituimos de forma segura la zona horaria dividiendo el string para que se renderice localmente sin desplazarse por defecto al UTC
+            const partesFecha = viewingDate.split('-');
+            const displayDateObj = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
+            let fechaDisplay = displayDateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
             
             const turnoInfo = `${turno.toUpperCase()} | ${fechaDisplay}`;
             const jefeInfo = data.jefe ? `TL: ${data.jefe}` : '';
             const lockInfo = shiftState.estado === 'cerrado' ? `<span style="color:var(--danger); font-weight:bold;">🔒 TURNO CERRADO POR ${shiftState.cerradoPor.toUpperCase()}</span>` : '';
 
-            // Renderizado modificado para mejor estructura visual centrada
             document.getElementById('display-header').innerHTML = `
                 <span>${turnoInfo}</span>
                 ${jefeInfo ? `<span style="margin-top: 4px; font-size: 0.85em; color: var(--leader-color);">${jefeInfo}</span>` : ''}
@@ -1041,12 +1092,59 @@
         });
     }
 
-    function removeAllTechs() {
+    // Funciones de Administrar Turno (Borrar o Mover)
+    function openManageShiftModal() {
         if(checkLock()) return;
-        if (shiftTechs.length === 0) return showConfirm("NO HAY TÉCNICOS PARA BORRAR.", null);
-        showConfirm("⚠️ ¿ESTÁS SEGURO DE BORRAR TODOS LOS TÉCNICOS DE LA LISTA DEL TURNO?", () => {
+        document.getElementById('manage-shift-date').value = viewingDate;
+        document.getElementById('manage-shift-turno').value = activeTurno;
+        document.getElementById('manage-shift-modal').style.display = 'block';
+    }
+
+    function deleteEntireShift() {
+        if(checkLock()) return;
+        showConfirm("⚠️ ¿ESTÁS SEGURO DE BORRAR TODO EL TURNO?\n(Se eliminarán aviones, técnicos y el Team Leader)", () => {
+            avionesData = [];
             shiftTechs = [];
-            saveTechs();
+            set(dbRefs.aviones, avionesData);
+            set(dbRefs.techs, shiftTechs);
+            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "" });
+            closeModal('manage-shift-modal');
+        });
+    }
+
+    function moveShift() {
+        if(checkLock()) return;
+        const newDate = document.getElementById('manage-shift-date').value;
+        const newTurno = document.getElementById('manage-shift-turno').value;
+
+        if (newDate === viewingDate && newTurno === activeTurno) {
+            return showConfirm("SELECCIONA UNA FECHA O TURNO DIFERENTE PARA TRASLADAR.", null);
+        }
+
+        showConfirm(`⚠️ ¿CONFIRMAS TRASLADAR TODO A:\n${newTurno.toUpperCase()} DEL ${newDate}?`, () => {
+            const safeNewTurno = newTurno.replace(/\s+/g, '_');
+            const newPath = `mantenimiento/historial/${newDate}/${safeNewTurno}`;
+
+            // Escribir en la nueva fecha/turno
+            set(ref(db, `${newPath}/aviones`), avionesData);
+            set(ref(db, `${newPath}/techs`), shiftTechs);
+            const currentJefe = document.getElementById('in-jefe').value.toUpperCase();
+            set(ref(db, `${newPath}/header`), { turno: newTurno, jefe: currentJefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor });
+
+            // Borrar datos actuales
+            set(dbRefs.aviones, []);
+            set(dbRefs.techs, []);
+            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "" });
+
+            closeModal('manage-shift-modal');
+            
+            // Redirigir al destino nuevo
+            document.getElementById('global-date-select').value = newDate;
+            document.getElementById('global-turno-select').value = newTurno;
+            activeTurno = newTurno;
+            viewingDate = newDate;
+            localStorage.setItem('latam_active_turno', activeTurno);
+            listenToTurno(activeTurno);
         });
     }
 
@@ -1116,13 +1214,6 @@
             if (m > 59) val = val.substring(0, 3) + '59'; 
         }
         input.value = val;
-    }
-
-    function clearAllData() {
-        if(checkLock()) return;
-        showConfirm("⚠️ ¿ESTÁS SEGURO DE BORRAR TODA LA HOJA DE ESTE TURNO? (Los técnicos se mantendrán)", () => {
-            avionesData = []; saveData(); 
-        });
     }
 
     function formatMatricula(input) {
@@ -1315,6 +1406,7 @@
             const div = document.createElement('div'); div.className = 'avion-section';
             const wpDisplay = avion.wp ? `<span class="tango-link" onclick="handleTangoClick('${avion.wp}')">(${avion.wp})</span>` : '';
             const posDisplay = avion.pos ? `<span class="avion-pos">POS: ${avion.pos}</span>` : '';
+            // Se actualizó para mostrar un formato mucho más explícito y sin malentendidos
             const timesDisplay = (avion.start || avion.end) ? `<span class="avion-times">🕒 ${avion.start || '--:--'} - ${avion.end || '--:--'}</span>` : '';
             
             const headerClass = avion.isActivity ? 'activity-header' : '';
@@ -1459,6 +1551,9 @@
         if(checkLock()) return;
         const avion = avionesData.find(a => a.id == id); if (!avion) return; editCurrentAvionId = id;
         
+        // Pequeño extra visual para que diga si editas Avión o Actividad
+        document.getElementById('edit-avion-header').innerHTML = avion.isActivity ? '⭐ EDITAR ACTIVIDAD' : '✈️ EDITAR AVIÓN';
+
         document.getElementById('edit-ac-reg').value = avion.reg;
         document.getElementById('edit-ac-reg').disabled = avion.isActivity;
         
@@ -1683,7 +1778,7 @@
 
     // Exportar variables y funciones al entorno global
     Object.assign(window, {
-        updateHeader, addTech, removeTech, removeAllTechs, toggleMode, clearAllData, logoutLeader,
+        updateHeader, addTech, removeTech, toggleMode, logoutLeader,
         formatMatricula, autoFormatTango, handleTangoClick, closeModal,
         toggleTask, togglePriority, toggleHelp,
         openAddAvionModal, saveAddAvion, openAddActivityModal, saveAddActivity, 
@@ -1693,7 +1788,8 @@
         changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput,
         formatTime, changeTurno, changeDate, goToToday, toggleLockShift,
         openManageTechsModal, addGlobalTech, removeGlobalTech,
-        openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask
+        openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
+        openManageShiftModal, deleteEntireShift, moveShift
     });
 
 </script>
