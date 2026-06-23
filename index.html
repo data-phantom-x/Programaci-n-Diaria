@@ -66,6 +66,7 @@
         
         /* Ocultar elementos para el Team Leader */
         body.team-leader-mode .hide-from-leader { display: none !important; }
+        .hide-desktop { display: none; }
 
         /* Controles de vista y filtros locales */
         .view-controls {
@@ -297,33 +298,46 @@
             .container { padding: 12px; }
             
             .top-bar { flex-direction: column; gap: 8px; }
-            .top-bar-left { width: 100%; flex-direction: column; }
-            .btn-top { width: 100%; }
+            .top-bar-left { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 5px; }
+            .top-bar-left > * { flex: 1; min-width: 0; }
             .live-clock { width: 100%; justify-content: center; height: auto; padding: 6px; position: static; transform: none; }
             
-            .view-controls { flex-direction: column; align-items: stretch; gap: 10px; }
-            .view-controls > div { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
-            .view-controls > div > span { margin-bottom: 2px; }
-            .view-controls select, .view-controls input[type="date"] { width: 100%; min-width: 0; }
-            .view-controls button.btn-outline { width: 100%; order: 99; margin-top: 4px; }
+            .view-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
+            .view-controls > div { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; }
+            .view-controls > div > span { width: auto; white-space: nowrap; margin-bottom: 0; }
+            .view-controls select, .view-controls input[type="date"] { width: 130px; flex: 1; min-width: 0; }
+            .view-controls button.btn-outline { width: auto; order: 0; margin-top: 0; }
+            .view-filters-wrap { grid-column: 1 / -1; display: grid !important; grid-template-columns: 1fr 1fr; gap: 4px; align-items: start; }
+            .view-filters-wrap > button { grid-column: 1 / -1; justify-self: center; margin-top: 2px; }
             
             .header-controls { padding: 12px; }
             .leader-panel-header { flex-direction: column; gap: 10px; text-align: center; }
             .leader-panel-header div, .leader-panel-header button { width: 100%; }
             
-            .control-group { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
-            .control-group span { width: 100% !important; text-align: left; margin-bottom: 0px; }
+            .control-group { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; }
+            .control-group span { width: auto !important; white-space: nowrap; text-align: left; margin-bottom: 0px; }
             .control-group input[type="date"] { width: 130px !important; flex: none !important; max-width: none !important; }
             .control-group input[type="text"], 
-            .control-group input[list] { flex: 1 !important; min-width: 130px !important; width: auto !important; }
-            .control-group button { width: 100% !important; max-width: none !important; margin: 0 !important; }
+            .control-group input[list] { flex: 1 !important; min-width: 100px !important; width: auto !important; }
+            .control-group button { width: auto !important; flex: 1; min-width: 0; margin: 0 !important; }
+            .btn-agregar { flex: 0 1 auto; max-width: 85px; height: auto; padding: 4px 6px !important; white-space: normal; display: inline-flex; align-items: center; gap: 2px; }
+            .btn-agregar .btn-ico { font-size: 11px; line-height: 1; }
+            .btn-agregar .btn-lbl { font-size: 8px; line-height: 1.15; white-space: normal !important; }
+            .btn-listado { flex: 0 1 auto; max-width: 85px; height: auto; padding: 4px 6px !important; white-space: normal; display: inline-flex; align-items: center; gap: 2px; }
+            .btn-listado .btn-ico { font-size: 11px; line-height: 1; }
+            .btn-listado .btn-lbl { font-size: 7px; line-height: 1.15; white-space: normal !important; }
+            .hide-mobile { display: none !important; }
+            .hide-desktop { display: flex !important; }
+            .btn-shift { flex: 0 1 auto; max-width: 80px; height: auto; padding: 4px 4px !important; white-space: normal; display: inline-flex; align-items: center; gap: 1px; }
+            .btn-shift .btn-ico { font-size: 10px; line-height: 1; }
+            .btn-shift .btn-lbl { font-size: 7px; line-height: 1.15; white-space: normal !important; }
             
             .main-header-wrapper { flex-direction: column; text-align: center; gap: 12px; padding-bottom: 15px; }
             .logo-container { position: relative; transform: none; top: auto; left: auto; }
             .document-header { padding: 0; }
             
             .avion-title { flex-direction: column; text-align: center; gap: 8px; }
-            .avion-info-main { flex-direction: column; align-items: center; justify-content: center; gap: 4px; }
+            .avion-info-main { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; }
             .action-bar.avion-bar { justify-content: center; width: 100%; margin-top: 4px; }
             
             .task-item { position: relative; padding: 10px 10px 10px 35px; }
@@ -416,20 +430,22 @@
             </select>
         </div>
         
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 10px; font-weight: bold; color: var(--comment);">ORGANIZAR POR:</span>
-            <select id="view-mode-select" onchange="changeViewMode()" style="min-width: 130px;">
-                <option value="default">✈️ AVIÓN</option>
-                <option value="time">🕒 HORA DE INICIO</option>
-                <option value="tech">👨‍🔧 TÉCNICO</option>
-                <option value="tech-group">👥 GRUPO</option>
-            </select>
-        </div>
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 10px; font-weight: bold; color: var(--comment);">VER:</span>
-            <select id="local-tech-filter" onchange="applyLocalFilter()" style="min-width: 150px;">
-                <option value="">TODOS LOS TÉCNICOS</option>
-            </select>
+        <div class="view-filters-wrap" style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <span style="font-size: 10px; font-weight: bold; color: var(--comment);">ORGANIZAR POR:</span>
+                <select id="view-mode-select" onchange="changeViewMode()" style="min-width: 130px;">
+                    <option value="default">✈️ AVIÓN</option>
+                    <option value="time">🕒 HORA DE INICIO</option>
+                    <option value="tech">👨‍🔧 TÉCNICO</option>
+                    <option value="tech-group">👥 GRUPO</option>
+                </select>
+            </div>
+            <div style="display: flex; gap: 8px; align-items: center;">
+                <span style="font-size: 10px; font-weight: bold; color: var(--comment);">VER A:</span>
+                <select id="local-tech-filter" onchange="applyLocalFilter()" style="min-width: 150px;">
+                    <option value="">TODOS LOS TÉCNICOS</option>
+                </select>
+            </div>
             <button class="btn-outline" onclick="resetLocalFilter()" style="padding: 0 10px; font-size: 9px;">RESTABLECER</button>
         </div>
     </div>
@@ -437,9 +453,9 @@
     <div class="header-controls leader-only no-print">
         <div class="leader-panel-header">
             <div class="leader-title">⚙️ PANEL DE CONTROL TEAM LEADER</div>
-            <div style="display: flex; gap: 10px;">
-                <button id="btn-lock-shift" class="btn-danger-outline" onclick="toggleLockShift()" style="padding: 0 10px; font-size: 9px; display: none;">🔒 CERRAR TURNO</button>
-                <button class="btn-danger-outline" onclick="openManageShiftModal()" style="padding: 0 10px; font-size: 9px;">⚠️ GESTIONAR TURNO</button>
+            <div class="hide-mobile" style="display: flex; gap: 10px;">
+                <button id="btn-lock-shift" class="btn-danger-outline btn-shift" onclick="toggleLockShift()" style="padding: 0 10px; font-size: 9px; display: none;"><span class="btn-ico">🔒</span><span class="btn-lbl">CERRAR TURNO</span></button>
+                <button class="btn-danger-outline btn-shift" onclick="openManageShiftModal()" style="padding: 0 10px; font-size: 9px;"><span class="btn-ico">⚠️</span><span class="btn-lbl">GESTIONAR TURNO</span></button>
             </div>
         </div>
 
@@ -447,13 +463,17 @@
             <div class="control-group">
                 <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">TEAM LEADER:</span>
                 <input type="text" id="in-jefe" placeholder="NOMBRE DEL TEAM LEADER" oninput="updateHeader()">
+                <div class="shift-mobile-btns hide-desktop" style="display:flex; gap:4px;">
+                    <button id="btn-lock-shift-mobile" class="btn-danger-outline btn-shift" onclick="toggleLockShift()" style="padding: 0 6px; font-size:8px; display:none;"><span class="btn-ico">🔒</span><span class="btn-lbl">CERRAR TURNO</span></button>
+                    <button class="btn-danger-outline btn-shift" onclick="openManageShiftModal()" style="padding: 0 6px; font-size:8px;"><span class="btn-ico">⚠️</span><span class="btn-lbl">GESTIONAR TURNO</span></button>
+                </div>
             </div>
             
             <div class="control-group" style="margin-bottom: 5px;">
                 <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">TÉCNICOS:</span>
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()" onchange="addTech()">
-                <button class="btn-leader" onclick="addTech()" style="padding: 0 10px;">+ AGREGAR AL TURNO</button>
-                <button class="btn-outline" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px;" title="Editar Base Global de Técnicos">👥 LISTADO DE TECNICOS</button>
+                <button class="btn-leader btn-agregar" onclick="addTech()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">+</span><span class="btn-lbl">AGREGAR AL TURNO</span></button>
+                <button class="btn-outline btn-listado" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px;" title="Editar Base Global de Técnicos"><span class="btn-ico">👥</span><span class="btn-lbl">LISTADO DE TECNICOS</span></button>
             </div>
 
             <div id="tech-pills-container"></div>
@@ -763,13 +783,21 @@
         const clockEl = document.getElementById('live-clock');
         if (clockEl) {
             clockEl.innerHTML = `
-                <span style="color:var(--primary); display:flex; gap: 4px; align-items:center;">
-                    <span style="font-size: 13px;">🌍</span> <span style="font-weight:bold;">LOC:</span> ${localDate} ${localTime}
-                </span>
-                <div style="width: 1px; height: 16px; background: var(--border); margin: 0 4px;"></div>
-                <span style="color:var(--comment); display:flex; gap: 4px; align-items:center;">
-                    <span style="font-size: 13px;">✈️</span> <span style="font-weight:bold;">UTC:</span> ${utcDate} ${utcTime}
-                </span>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:13px;">🌍</span>
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:0; line-height:1.3;">
+                        <span style="color:var(--primary); font-weight:bold; white-space:nowrap;">LOC: ${localDate}</span>
+                        <span style="color:var(--primary); font-weight:600; white-space:nowrap;">${localTime}</span>
+                    </div>
+                </div>
+                <div style="width:1px; height:28px; background:var(--border); margin:0 6px;"></div>
+                <div style="display:flex; align-items:center; gap:4px;">
+                    <span style="font-size:13px;">✈️</span>
+                    <div style="display:flex; flex-direction:column; align-items:center; gap:0; line-height:1.3;">
+                        <span style="color:var(--comment); font-weight:bold; white-space:nowrap;">UTC: ${utcDate}</span>
+                        <span style="color:var(--comment); font-weight:600; white-space:nowrap;">${utcTime}</span>
+                    </div>
+                </div>
             `;
         }
     }
@@ -978,29 +1006,31 @@
     listenToTurno(activeTurno);
 
     function updateLockUI() {
-        const btnLock = document.getElementById('btn-lock-shift');
+        const btns = ['btn-lock-shift', 'btn-lock-shift-mobile'].map(id => document.getElementById(id)).filter(Boolean);
         const leaderControls = document.getElementById('leader-controls-grid');
         const addButtons = document.getElementById('leader-add-buttons');
         
-        if (btnLock) {
-            if (shiftState.estado === 'cerrado') {
-                if (shiftState.cerradoPor === myEmail) {
-                    btnLock.innerText = "🔓 ABRIR TURNO";
-                    btnLock.style.backgroundColor = "var(--help)";
-                    btnLock.style.color = "white";
-                    btnLock.style.border = "none";
-                    btnLock.style.display = "inline-flex";
+        btns.forEach(btnLock => {
+            if (btnLock) {
+                if (shiftState.estado === 'cerrado') {
+                    if (shiftState.cerradoPor === myEmail) {
+                        btnLock.querySelector('.btn-lbl').innerText = "ABRIR TURNO";
+                        btnLock.style.backgroundColor = "var(--help)";
+                        btnLock.style.color = "white";
+                        btnLock.style.border = "none";
+                        btnLock.style.display = "inline-flex";
+                    } else {
+                        btnLock.style.display = "none";
+                    }
                 } else {
-                    btnLock.style.display = "none";
+                    btnLock.querySelector('.btn-lbl').innerText = "CERRAR TURNO";
+                    btnLock.style.backgroundColor = "transparent";
+                    btnLock.style.color = "var(--danger)";
+                    btnLock.style.border = "1px solid var(--danger)";
+                    btnLock.style.display = isTeamLeader ? "inline-flex" : "none";
                 }
-            } else {
-                btnLock.innerText = "🔒 CERRAR TURNO";
-                btnLock.style.backgroundColor = "transparent";
-                btnLock.style.color = "var(--danger)";
-                btnLock.style.border = "1px solid var(--danger)";
-                btnLock.style.display = isTeamLeader ? "inline-flex" : "none";
             }
-        }
+        });
         
         const locked = isShiftLockedForMe();
         if (leaderControls) {
