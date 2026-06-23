@@ -53,7 +53,6 @@
             display: flex; gap: 8px; font-size: 11px; font-weight: normal;
             background: white; padding: 0 12px; border-radius: 4px; border: 1px solid var(--border);
             align-items: center; justify-content: center; height: 28px; box-sizing: border-box;
-            position: absolute; left: 50%; transform: translateX(-50%);
         }
 
         .btn-top {
@@ -396,9 +395,9 @@
             <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">MODO TÉCNICO</button>
             <span id="logged-user" class="leader-only" style="font-size: 10px; font-weight: bold; color: var(--primary); border: 1px solid var(--primary); padding: 0 10px; border-radius: 4px; background: #e0f2fe; display: none; align-items: center; height: 28px; box-sizing: border-box; margin: 0;"></span>
             <button type="button" id="btn-logout" class="btn-danger-outline" onclick="logoutLeader()" style="display:none;">✖</button>
+            <button class="btn-outline" onclick="window.print()" title="Imprimir">🖨️</button>
         </div>
         <div id="live-clock" class="live-clock"></div>
-        <button class="btn-outline" onclick="window.print()" title="Imprimir">🖨️</button>
     </div>
 
     <div class="view-controls no-print">
