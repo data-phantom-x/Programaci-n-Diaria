@@ -123,6 +123,11 @@
         .btn-accent { background: var(--gradient-primary); }
         .btn-leader { background: var(--gradient-primary); color: #fff; }
         .btn-clear { background-color: var(--danger); color: white; }
+        .btn-accent.btn-top, .btn-mode-leader,
+        .btn-leader.btn-agregar { border: 1px solid transparent; }
+        .btn-accent.btn-top:hover, .btn-mode-leader.btn-top:hover,
+        .btn-leader.btn-agregar:hover { background: transparent; color: var(--primary); border-color: var(--primary); opacity: 1; }
+        .btn-mode-leader { background: var(--gradient-primary); color: #fff; }
         .btn-outline { background-color: transparent; border: 1px solid var(--comment); color: var(--comment); }
         .btn-outline:hover:not(:disabled) { background-color: var(--comment); color: white; }
         .btn-danger-outline { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
@@ -419,8 +424,8 @@
         <div class="top-bar-left">
             <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">MODO TÉCNICO</button>
             <span id="logged-user" class="leader-only" style="font-size: 10px; font-weight: bold; color: var(--primary); border: 1px solid var(--primary); padding: 0 10px; border-radius: 4px; background: #e0f2fe; display: none; align-items: center; height: 28px; box-sizing: border-box; margin: 0;"></span>
-            <button type="button" id="btn-logout" class="btn-danger-outline" onclick="logoutLeader()" style="display:none;">✖</button>
-            <button class="btn-outline" onclick="window.print()" title="Imprimir">🖨️</button>
+            <button type="button" id="btn-logout" class="btn-danger-outline" onclick="logoutLeader()" style="width:28px; min-width:28px; padding:0; display:none; font-size:14px; flex:none;">✖</button>
+            <button class="btn-outline" onclick="window.print()" title="Imprimir" style="width:28px; min-width:28px; padding:0; font-size:14px; flex:none;">🖨️</button>
         </div>
         <div id="live-clock" class="live-clock"></div>
     </div>
@@ -429,7 +434,7 @@
         <div style="display: flex; gap: 8px; align-items: center;">
             <span style="font-size: 10px; font-weight: bold; color: var(--accent);">FECHA:</span>
             <input type="date" id="global-date-select" onchange="changeDate()" style="font-weight: bold; border: 2px solid var(--accent); color: var(--accent); min-width: 130px;" title="Ver programación de otro día">
-            <button class="btn-outline" onclick="goToToday()" style="padding: 0 10px; font-size: 9px; border-color: var(--accent); color: var(--accent);" title="Ir al día de hoy">📅 HOY</button>
+            <button class="btn-danger-outline" onclick="goToToday()" style="padding: 0 10px; font-size: 9px;" title="Ir al día de hoy">📅 HOY</button>
         </div>
 
         <div style="display: flex; gap: 8px; align-items: center;">
@@ -470,14 +475,14 @@
             <div class="control-group">
                 <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">TEAM LEADER:</span>
                 <input type="text" id="in-jefe" placeholder="NOMBRE DEL TEAM LEADER" oninput="updateHeader()">
-                <button id="btn-lock-shift-mobile" class="btn-outline btn-shift" onclick="toggleLockShift()" style="padding: 0 10px; display:none; align-items:center; gap:2px;"><span class="btn-ico">🔒</span><span class="btn-lbl">CERRAR TURNO</span></button>
+                <button id="btn-lock-shift-mobile" class="btn-danger-outline btn-shift" onclick="toggleLockShift()" style="padding: 0 10px; display:none; align-items:center; gap:2px;"><span class="btn-ico">🔒</span><span class="btn-lbl">CERRAR TURNO</span></button>
                 <button class="btn-outline btn-shift" onclick="openManageShiftModal()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">⚠️</span><span class="btn-lbl">GESTIONAR TURNO</span></button>
             </div>
             
             <div class="control-group" style="margin-bottom: 5px;">
                 <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">TÉCNICOS:</span>
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()" onchange="addTech()">
-                <button class="btn-leader btn-agregar" onclick="addTech()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">+</span><span class="btn-lbl">AGREGAR AL TURNO</span></button>
+                <button class="btn-leader btn-agregar" onclick="addTech()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">+</span><span class="btn-lbl">AGREGAR <span style="white-space:nowrap">AL TURNO</span></span></button>
                 <button class="btn-outline btn-listado" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px; display:inline-flex; align-items:center; gap:2px;" title="Editar Base Global de Técnicos"><span class="btn-ico">👥</span><span class="btn-lbl">LISTADO DE TECNICOS</span></button>
             </div>
 
@@ -753,7 +758,7 @@
     let currentViewMode = 'default';
     let currentTechFilter = ''; 
     
-    // Función central para fecha lógica (Extracción usando Fecha Local)
+    // Función central para fecha lógica (usa fecha local)
     function getLogicalTodayDate() {
         const now = new Date();
         const hours = now.getHours();
@@ -761,7 +766,6 @@
             now.setDate(now.getDate() - 1);
         }
         
-        // Uso de Date.prototype métodos locales en lugar de toISOString()
         const year = now.getFullYear();
         const month = String(now.getMonth() + 1).padStart(2, '0');
         const day = String(now.getDate()).padStart(2, '0');
@@ -848,9 +852,10 @@
         
         const btnToggle = document.getElementById('btn-mode-toggle');
         btnToggle.innerText = `👤 ${userAlias}`;
-        btnToggle.style.background = "#e0f2fe";
-        btnToggle.style.color = "var(--primary)";
-        btnToggle.style.border = "1px solid var(--primary)";
+        btnToggle.style.background = "";
+        btnToggle.style.color = "";
+        btnToggle.style.border = "";
+        btnToggle.classList.add('btn-mode-leader');
         
         const btnLogout = document.getElementById('btn-logout');
         if (btnLogout) btnLogout.style.display = 'inline-flex';
@@ -872,6 +877,7 @@
         btnToggle.style.background = "";
         btnToggle.style.color = "";
         btnToggle.style.border = "";
+        btnToggle.classList.remove('btn-mode-leader');
         
         const btnLogout = document.getElementById('btn-logout');
         if (btnLogout) btnLogout.style.display = 'none';
@@ -1029,9 +1035,9 @@
                     }
                 } else {
                     btnLock.querySelector('.btn-lbl').innerText = "CERRAR TURNO";
-                    btnLock.style.backgroundColor = "transparent";
-                    btnLock.style.color = "var(--danger)";
-                    btnLock.style.border = "1px solid var(--danger)";
+                    btnLock.style.backgroundColor = "";
+                    btnLock.style.color = "";
+                    btnLock.style.border = "";
                     btnLock.style.display = isTeamLeader ? "inline-flex" : "none";
                 }
             }
