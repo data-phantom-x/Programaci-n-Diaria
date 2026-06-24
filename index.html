@@ -1809,8 +1809,9 @@
         const avion = avionesData.find(a => a.id == editCurrentAvionId);
         if (!avion.tareas) avion.tareas = [];
         
+        const taskId = Date.now();
         avion.tareas.push({ 
-            id: Date.now(), 
+            id: taskId, 
             desc: desc, 
             tango: "", 
             techs: "", 
@@ -1820,6 +1821,7 @@
         });
         saveData();
         closeModal('predef-task-modal');
+        openEditTaskModal(editCurrentAvionId, taskId);
     }
 
     function removePredefTask(index) {
