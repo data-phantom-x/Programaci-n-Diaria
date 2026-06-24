@@ -1112,8 +1112,10 @@
         promptCallback = null;
     }
     document.getElementById('prompt-save-btn').onclick = function() {
-        if(promptCallback) promptCallback(document.getElementById('prompt-input').value.trim().toUpperCase());
+        const val = document.getElementById('prompt-input').value.trim().toUpperCase();
+        const cb = promptCallback;
         closePromptModal();
+        if(cb) setTimeout(() => cb(val), 0);
     };
 
     function updateGlobalTechsUI() {
@@ -1337,7 +1339,7 @@
             tangoDisplay = ` <span class="tango-link" onclick="handleTangoClick('${t.tango}')">[${t.tango}]</span>`;
         }
 
-        const atencionLabel = t.atencion ? `<span class="atencion-badge ${t.alertaByTL ? 'alerta-tl' : 'alerta-tech'}">⚠️ ${t.alerta || 'ALERTA'}</span>` : '';
+        const atencionLabel = t.atencion ? `<span class="atencion-badge ${t.alertaByTL ? 'alerta-tl' : 'alerta-tech'}">⚠️ ${t.alerta || 'ALERTA'}${t.alertaNombre ? ' (' + t.alertaNombre + ')' : ''}</span>` : '';
         const planePrefix = showPlaneReg ? `<strong style="color:var(--accent);">[${avion.reg}]</strong> ` : '';
         
         const locked = isShiftLockedForMe();
@@ -1561,7 +1563,7 @@
         const avion = avionesData.find(a => a.id == aId); const tarea = avion.tareas.find(t => t.id == tId);
         if (tarea.done) return showConfirm("LA TAREA ESTÁ COMPLETADA.", null);
         if (tarea.atencion) {
-            showConfirm("¿DESACTIVAR ALERTA?", () => { tarea.atencion = false; saveData(); });
+            showConfirm("¿DESACTIVAR ALERTA?", () => { tarea.atencion = false; tarea.alertaNombre = ''; saveData(); });
         } else {
             showAlertaPrompt(aId, tId);
         }
@@ -1577,7 +1579,25 @@
                 showConfirm("DEBES INGRESAR UN TEXTO.", () => { showAlertaPrompt(aId, tId); });
                 return;
             }
-            tarea.atencion = true; tarea.alerta = val; tarea.alertaByTL = isTeamLeader; saveData();
+            if (isTeamLeader) {
+                tarea.atencion = true; tarea.alerta = val; tarea.alertaByTL = true; tarea.alertaNombre = ''; saveData();
+            } else {
+                showNamePrompt(aId, tId, val);
+            }
+        });
+    }
+
+    function showNamePrompt(aId, tId, alertaVal) {
+        const avion = avionesData.find(a => a.id == aId); const tarea = avion.tareas.find(t => t.id == tId);
+        document.getElementById('prompt-save-btn').innerText = 'CONFIRMAR';
+        document.getElementById('prompt-input').placeholder = 'Tu nombre...';
+        showPromptModal("NOMBRE DEL TÉCNICO", "", (name) => {
+            if (!name) {
+                document.getElementById('confirm-yes-btn').innerText = 'VOLVER';
+                showConfirm("DEBES INGRESAR TU NOMBRE.", () => { showNamePrompt(aId, tId, alertaVal); });
+                return;
+            }
+            tarea.atencion = true; tarea.alerta = alertaVal; tarea.alertaNombre = name; tarea.alertaByTL = false; saveData();
         });
     }
 
