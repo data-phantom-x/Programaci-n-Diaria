@@ -293,7 +293,7 @@
         .btn-modal-action { flex: 1; padding: 0; height: 30px; font-size: 10px; border-radius: 4px;}
 
         /* AJUSTES PARA CELULARES */
-        @media (max-width: 600px) {
+        @media (max-width: 900px) {
             body { padding: 8px; }
             .container { padding: 12px; }
             
@@ -352,8 +352,14 @@
             .modal-row { flex-direction: row; gap: 10px; } 
         }
 
+        /* Pantalla muy pequeña: FECHA y TURNO en columnas individuales */
+        @media (max-width: 500px) {
+            .view-controls { grid-template-columns: 1fr; }
+            .view-filters-wrap { grid-template-columns: 1fr !important; }
+        }
+
                 /* Ancho uniforme para botones de acción en desktop */
-        @media (min-width: 601px) {
+        @media (min-width: 901px) {
             .btn-shift, .btn-agregar, .btn-listado { min-width: 150px; }
         }
 
