@@ -384,7 +384,7 @@
             .logo-container { position: absolute !important; left: 0 !important; top: 50% !important; transform: translateY(-50%) !important; }
             .document-header { font-size: 1.1em; padding: 0 85px !important; } 
             
-            .avion-section { margin-bottom: 20px; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .avion-section { margin-bottom: 15px; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .avion-title { 
                 background: var(--gradient-primary) !important; color: white !important; 
                 padding: 10px 14px; border-bottom: 1px solid var(--border); gap: 10px !important;
@@ -1893,40 +1893,45 @@
         });
     }
 
-    // Smart Print - ajusta font-size para que quepa en 1 página
-    function measurePrintHeight(fontSize) {
-        const measurer = document.createElement('div');
-        measurer.style.cssText = 'position:absolute;top:-99999px;left:0;width:21.59cm;visibility:hidden;z-index:-1;';
-        measurer.style.fontSize = fontSize + 'px';
-        measurer.style.lineHeight = '1.15';
-
-        const content = document.getElementById('print-area').cloneNode(true);
-        content.querySelectorAll('.no-print, .leader-only').forEach(el => el.remove());
-        measurer.appendChild(content);
-        document.body.appendChild(measurer);
-
-        const height = measurer.scrollHeight;
-        document.body.removeChild(measurer);
-        return height;
-    }
-
-    function calcPrintFontSize() {
+    // Smart Print - escala todo para que quepa en 1 página (mínimo 10px)
+    function getPrintScale() {
         const cmToPx = 37.795;
-        const usableHeightPx = (27.94 - 2 * 1.2) * cmToPx; // ~965px
-        let size = 14;
-        while (size >= 10) {
-            if (measurePrintHeight(size) <= usableHeightPx) return size;
-            size -= 0.5;
-        }
-        return 10;
+        const usableHeightPx = (27.94 - 2.4) * cmToPx;
+        const usableWidthPx = (21.59 - 2.4) * cmToPx;
+
+        const m = document.createElement('div');
+        m.style.cssText = `position:absolute;top:-99999px;left:0;width:${usableWidthPx}px;visibility:hidden;`;
+        m.style.fontSize = '14px';
+        m.style.lineHeight = '1.15';
+
+        const c = document.getElementById('print-area').cloneNode(true);
+        c.querySelectorAll('.no-print, .leader-only').forEach(el => el.remove());
+        m.appendChild(c);
+        document.body.appendChild(m);
+
+        const h = m.scrollHeight;
+        document.body.removeChild(m);
+
+        if (h <= usableHeightPx) return 1;
+        return Math.max(usableHeightPx / h, 10 / 14);
     }
 
     window.addEventListener('beforeprint', () => {
-        const size = calcPrintFontSize();
-        document.documentElement.style.setProperty('--print-font-size', size + 'px');
+        const s = getPrintScale();
+        document.documentElement.style.setProperty('--print-font-size', Math.round(Math.max(10, 14 * s)) + 'px');
+        if (s < 1) {
+            const el = document.getElementById('print-area');
+            el.style.setProperty('transform', `scale(${s})`, 'important');
+            el.style.setProperty('transform-origin', 'top left', 'important');
+            el.style.setProperty('width', `${100 / s}%`, 'important');
+        }
     });
 
     window.addEventListener('afterprint', () => {
+        const el = document.getElementById('print-area');
+        el.style.transform = '';
+        el.style.transformOrigin = '';
+        el.style.width = '';
         document.documentElement.style.removeProperty('--print-font-size');
     });
 
