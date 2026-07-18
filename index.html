@@ -1016,6 +1016,7 @@
             const partesFecha = viewingDate.split('-');
             const displayDateObj = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
             let fechaDisplay = displayDateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+            const fechaCorta = `${partesFecha[2]}/${partesFecha[1]}/${partesFecha[0].slice(2)}`;
             
             const turnoInfo = `${turno.toUpperCase()} | ${fechaDisplay}`;
             const jefeInfo = data.jefe ? `TL: ${data.jefe}` : '';
@@ -1026,6 +1027,7 @@
                 ${jefeInfo ? `<span style="margin-top: 4px; color: var(--leader-color);">${jefeInfo}</span>` : ''}
                 ${lockInfo ? `<span style="margin-top: 4px; font-size: 0.8em;">${lockInfo}</span>` : ''}
             `;
+            document.title = `${turno.toUpperCase()} - ${fechaCorta}`;
             
             updateLockUI();
             render();
@@ -1906,7 +1908,7 @@
         });
     }
 
-    // Smart Print - escala todo para que quepa en 1 página (mínimo 10px)
+    // Smart Print - escala todo para que quepa exactamente en 1 hoja carta
     function getPrintScale() {
         const cmToPx = 37.795;
         const usableHeightPx = (27.94 - 2.4) * cmToPx;
@@ -1914,7 +1916,7 @@
 
         const m = document.createElement('div');
         m.style.cssText = `position:absolute;top:-99999px;left:0;width:${usableWidthPx}px;visibility:hidden;`;
-        m.style.fontSize = '14px';
+        m.style.fontSize = '15px';
         m.style.lineHeight = '1.15';
 
         const c = document.getElementById('print-area').cloneNode(true);
@@ -1926,25 +1928,22 @@
         document.body.removeChild(m);
 
         if (h <= usableHeightPx) return 1;
-        return Math.max(usableHeightPx / h, 10 / 14);
+        return usableHeightPx / h;
     }
 
     window.addEventListener('beforeprint', () => {
         const s = getPrintScale();
-        document.documentElement.style.setProperty('--print-font-size', Math.round(Math.max(10, 14 * s)) + 'px');
+        document.documentElement.style.setProperty('--print-font-size', (15 * s) + 'px');
+
         if (s < 1) {
             const el = document.getElementById('print-area');
-            el.style.setProperty('transform', `scale(${s})`, 'important');
-            el.style.setProperty('transform-origin', 'top left', 'important');
-            el.style.setProperty('width', `${100 / s}%`, 'important');
+            el.style.setProperty('zoom', s, 'important');
         }
     });
 
     window.addEventListener('afterprint', () => {
         const el = document.getElementById('print-area');
-        el.style.transform = '';
-        el.style.transformOrigin = '';
-        el.style.width = '';
+        el.style.zoom = '';
         document.documentElement.style.removeProperty('--print-font-size');
     });
 
