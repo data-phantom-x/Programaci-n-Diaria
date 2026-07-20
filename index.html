@@ -183,6 +183,8 @@
         }
         
         .avion-title.activity-header { background: var(--gradient-accent); }
+        .avion-title.all-done { background: linear-gradient(135deg, #6b7280, #4b5563) !important; }
+        .avion-title.all-done.activity-header { background: linear-gradient(135deg, #6b7280, #4b5563) !important; }
 
         .avion-info-main { flex: 1; min-width: 250px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
         
@@ -191,7 +193,8 @@
             padding: 3px 8px; border-radius: 4px; font-size: 0.85em; 
         }
         
-        .avion-comment { width: 100%; font-size: 0.85em; color: #C4B8D0; font-weight: normal; font-style: italic; }
+        .avion-comment { font-size: 0.85em; color: #C4B8D0; font-weight: normal; font-style: italic; white-space: nowrap; }
+        .avion-comment::before { content: "| "; color: rgba(255,255,255,0.35); font-weight: bold; }
 
         .tango-link { color: #F4729E; cursor: pointer; font-weight: bold; transition: color 0.2s; }
         .tango-link:hover { color: white; }
@@ -229,13 +232,18 @@
 
         .task-item.completed .action-bar { display: none !important; }
 
-        .task-item.completed .status-toggle { background-color: #10b981; border-color: #10b981; color: white; }
-        .task-item.completed { border-left: none; background-color: #f8fafc !important; opacity: 0.45; filter: grayscale(100%); transition: all 0.3s ease; }
+        .task-item.completed .status-toggle { background-color: #9ca3af; border-color: #9ca3af; color: white; }
+        .task-item.completed { border-left: none; opacity: 0.6; transition: all 0.3s ease; }
+        .task-item.completed:nth-child(even) { background-color: #f0f0f0; }
+        .task-item.completed:nth-child(odd) { background-color: #ffffff; }
         
         .task-main { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
         .task-info { flex: 1; transition: all 0.3s ease; }
         
-        .task-item.completed .task-info, .task-item.completed .tango-link { text-decoration: line-through; color: var(--comment); }
+        .task-item.completed .task-desc,
+        .task-item.completed .task-techs,
+        .task-item.completed .task-comment,
+        .task-item.completed .tango-link { text-decoration: line-through; color: #9ca3af; }
         .task-desc { font-weight: 400; font-size: 1em; line-height: 1.3; color: var(--primary); }
         .task-techs { font-size: 0.85em; font-weight: 700; color: #5C4D7A; margin-top: 6px; }
         .task-comment { font-size: 0.85em; color: var(--comment); margin-top: 3px; font-style: italic; font-weight: 600; }
@@ -377,7 +385,7 @@
             @page { size: letter; margin: 1.2cm; } 
             body .no-print { display: none !important; }
             body { padding: 0 !important; background-color: white; font-size: var(--print-font-size); line-height: 1.15; }
-            .container { padding: 0 !important; box-shadow: none; max-width: 100%; }
+            .container { padding: 0 3px 0 0 !important; box-shadow: none; max-width: 100%; }
             
             .main-header-wrapper { flex-direction: row !important; text-align: center !important; gap: normal !important; padding: 6px 0 8px 0 !important; margin-bottom: 8px; min-height: 36px; }
             .logo-container img { height: 28px !important; width: auto !important; }
@@ -392,8 +400,9 @@
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
             .avion-title.activity-header { background: var(--gradient-accent) !important; }
+            .avion-title.all-done { background: linear-gradient(135deg, #6b7280, #4b5563) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .avion-pos, .avion-times { background: rgba(255,255,255,0.2); color: white; padding: 3px 8px; font-weight: bold; font-size: 0.9em; border-radius: 4px; }
-            .avion-comment { color: #C4B8D0; font-size: 0.85em; }
+            .avion-comment { color: #C4B8D0; font-size: 0.85em; white-space: nowrap; }
             .avion-info-main { flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 8px !important; }
             .tango-link { color: #F4729E; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .avion-title .tango-link { color: #F4729E; }
@@ -402,12 +411,16 @@
             .task-container { padding-left: 0 !important; }
             .task-item { padding: 6px 10px !important; position: static !important; border-bottom: 1px solid var(--border); page-break-inside: avoid; }
             .task-item:nth-child(even) { background-color: var(--light-gray); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .task-item.completed:nth-child(even) { background-color: #f0f0f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .task-item.completed:nth-child(odd) { background-color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .task-item.alerta-tl { border-left: 3px solid #D32F2F !important; background-color: #FFEBEE !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .task-item.alerta-tech { border-left: 3px solid #F57C00 !important; background-color: #FFF3E0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             
-            .task-item.completed .task-info { opacity: 0.85 !important; text-decoration: line-through; color: #333; }
-            .task-item.completed .tango-link { text-decoration: line-through; color: var(--comment); }
-            .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #10b981 !important; border-color: #10b981 !important; color: white !important; }
+            .task-item.completed .task-desc,
+            .task-item.completed .task-techs,
+            .task-item.completed .task-comment { opacity: 0.85 !important; text-decoration: line-through; color: #9ca3af; }
+            .task-item.completed .tango-link { text-decoration: line-through; color: #9ca3af; }
+            .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #9ca3af !important; border-color: #9ca3af !important; color: white !important; }
             .status-toggle { margin-top: 0px; margin-right: 6px; width: 12px; min-width: 12px; height: 12px; min-height: 12px; font-size: 8px; border-width: 1px; position: static !important; margin: 0 6px 0 0 !important; }
             .task-desc { font-size: 1em; }
             .task-techs, .task-comment { font-size: 0.85em; margin-top: 6px; }
@@ -1486,6 +1499,11 @@
             displayData = displayData.filter(avion => avion.tareas && avion.tareas.length > 0);
         }
 
+        function isAvionAllDone(avion) {
+            if (!avion.tareas || avion.tareas.length === 0) return false;
+            return avion.tareas.every(t => t.done);
+        }
+
         if (currentViewMode === 'time') {
             displayData.sort((a, b) => {
                 if (!a.start && !b.start) return 0;
@@ -1494,6 +1512,14 @@
                 return a.start.localeCompare(b.start);
             });
         }
+
+        displayData.sort((a, b) => {
+            const aDone = isAvionAllDone(a);
+            const bDone = isAvionAllDone(b);
+            if (aDone && !bDone) return 1;
+            if (!aDone && bDone) return -1;
+            return 0;
+        });
 
         if (currentViewMode === 'tech') {
             renderGroupedByTech(displayData, container);
@@ -1512,7 +1538,7 @@
             // Se actualizó para mostrar un formato mucho más explícito y sin malentendidos
             const timesDisplay = (avion.start || avion.end) ? `<span class="avion-times">${avion.start || '--:--'} - ${avion.end || '--:--'}</span>` : '';
             
-            const headerClass = avion.isActivity ? 'activity-header' : '';
+            const headerClass = (avion.isActivity ? 'activity-header' : '') + (isAvionAllDone(avion) ? ' all-done' : '');
             
             let avionActionBtns = '';
             if (!locked) {
@@ -1537,7 +1563,7 @@
                 <div class="avion-title ${headerClass}">
                     <div class="avion-info-main">
                         <span>• ${avion.reg} ${wpDisplay}</span> ${posDisplay} ${timesDisplay}
-                        ${avion.comment ? `<div class="avion-comment">↳ NOTA: ${avion.comment}</div>` : ''}
+                        ${avion.comment ? `<span class="avion-comment">NOTA: ${avion.comment}</span>` : ''}
                     </div>
                     <div class="action-bar avion-bar no-print">
                         ${avionActionBtns}
