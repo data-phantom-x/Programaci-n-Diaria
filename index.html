@@ -403,6 +403,41 @@
             .btn-shift, .btn-agregar, .btn-listado { min-width: 150px; }
         }
 
+        /* Buscador universal */
+        .search-results-wrap { display: flex; flex-direction: column; gap: 0; }
+        .search-result-group { margin-bottom: 6px; }
+        .search-group-header {
+            font-weight: 800; color: white; font-size: 11px; padding: 6px 10px;
+            background: var(--gradient-primary); border-radius: 6px 6px 0 0;
+            display: flex; align-items: center; gap: 8px;
+        }
+        .search-group-header .sg-date { opacity: 0.85; }
+        .search-group-header .sg-turno { font-weight: 600; }
+        .search-result-item {
+            display: flex; flex-direction: column; gap: 3px;
+            padding: 8px 10px; border-bottom: 1px solid var(--light-gray);
+            font-size: 11px; line-height: 1.4; cursor: default;
+        }
+        .search-result-item:last-child { border-bottom: none; border-radius: 0 0 6px 6px; }
+        .search-result-item.alt { background: var(--light-gray); }
+        .search-result-avion { font-weight: 700; color: var(--primary); font-size: 11px; display: flex; align-items: center; gap: 4px; }
+        .search-result-avion .ra-icon { font-size: 12px; }
+        .search-result-match { color: var(--primary); font-size: 11px; padding-left: 18px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px; }
+        .srm-type {
+            font-size: 8px; font-weight: 800; color: white; padding: 1px 5px;
+            border-radius: 3px; letter-spacing: 0.5px; flex: none;
+        }
+        .srm-type.type-tarea { background: #2A0087; }
+        .srm-type.type-tango { background: #EE1750; }
+        .srm-type.type-wp { background: #EE1750; }
+        .srm-type.type-nota { background: #FF9900; }
+        .srm-type.type-tecnico { background: #6B5E8A; }
+        .srm-type.type-titulo { background: #4b5563; }
+        .srm-type.type-matricula { background: #10b981; }
+        .srm-tango { color: #EE1750; font-weight: 700; }
+        #search-loading { text-align: center; padding: 20px; color: var(--comment); font-size: 11px; }
+        #search-no-results { text-align: center; padding: 30px; color: var(--comment); font-size: 11px; }
+
         /* Ultra-Comprimido para Imprimir en una sola hoja carta (va DESPUÉS del móvil para que la impresión siempre gane) */
         @media print {
             @page { size: letter; margin: 1.2cm; } 
@@ -530,6 +565,13 @@
 
             <div id="tech-pills-container"></div>
         </div>
+
+        <div class="control-group" style="margin-top: 8px;">
+            <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">🔍 BUSCAR:</span>
+            <input type="text" id="global-search-input" placeholder="TAREA, TANGO, WP, COMENTARIO..." style="flex:1;">
+            <button class="btn-outline" onclick="clearSearch()" style="padding: 0 10px; font-size: 14px; display:none; height:28px;" id="btn-clear-search">✖</button>
+        </div>
+        <div id="search-results" style="display:none; margin-top: 8px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: white; padding: 10px;"></div>
     </div>
 
     <div id="print-area">
@@ -757,7 +799,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
     
     // 1. NUEVA LÍNEA: Importamos las herramientas del "Pase temporal" (Autenticación)
     import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
@@ -2077,7 +2119,204 @@
         document.documentElement.style.removeProperty('--print-font-size');
     });
 
-    // Exportar variables y funciones al entorno global
+    // Universal search across all dates and turns
+    let searchCache = null; // will be populated on first fetch
+
+    function escapeHtml(str) {
+        const d = document.createElement('div');
+        d.textContent = str;
+        return d.innerHTML;
+    }
+
+    function highlightText(text, query) {
+        return escapeHtml(text);
+    }
+
+    async function performSearch(forceRefresh = true) {
+        const input = document.getElementById('global-search-input');
+        const query = input.value.trim();
+        if (query.length < 1) return;
+
+        const resultsDiv = document.getElementById('search-results');
+        const btnClear = document.getElementById('btn-clear-search');
+        resultsDiv.style.display = 'block';
+        btnClear.style.display = 'inline-flex';
+        resultsDiv.innerHTML = '<div id="search-loading">🔍 BUSCANDO EN TODO EL HISTORIAL...</div>';
+
+        try {
+            let data;
+            if (forceRefresh || !searchCache) {
+                const snap = await get(ref(db, 'mantenimiento/historial'));
+                data = snap.val();
+                searchCache = data;
+            } else {
+                data = searchCache;
+            }
+            if (!data) {
+                resultsDiv.innerHTML = '<div id="search-no-results">📭 SIN DATOS EN EL HISTORIAL</div>';
+                return;
+            }
+
+            const q = query.toLowerCase();
+            const results = [];
+
+            for (const [date, turns] of Object.entries(data)) {
+                for (const [turnoRaw, turnData] of Object.entries(turns)) {
+                    if (!turnData.aviones) continue;
+                    const turnoLabel = turnoRaw.replace(/_/g, ' ');
+                    for (const avion of turnData.aviones) {
+                        const taskMatches = [];
+                        const exactWpMatch = avion.wp && avion.wp.toLowerCase() === q;
+                        if (avion.tareas) {
+                            for (const task of avion.tareas) {
+                                const tangoMatch = task.tango && task.tango.toLowerCase().includes(q);
+                                const descMatch = task.desc && task.desc.toLowerCase().includes(q);
+                                const commMatch = task.comment && task.comment.toLowerCase().includes(q);
+                                const techMatch = task.techs && task.techs.toLowerCase().includes(q);
+                                if (tangoMatch || descMatch || commMatch || techMatch || exactWpMatch) {
+                                    taskMatches.push(task);
+                                }
+                            }
+                        }
+                        const regMatch = avion.reg && avion.reg.toLowerCase().includes(q);
+                        const wpMatch = avion.wp && avion.wp.toLowerCase().includes(q) && !taskMatches.some(t => t.tango === avion.wp);
+                        const commMatch2 = avion.comment && avion.comment.toLowerCase().includes(q);
+                        if (regMatch || wpMatch || commMatch2) {
+                            results.push({ date, turno: turnoLabel, avion, task: null, type: 'AVIÓN', _reg: regMatch, _wp: wpMatch, _comm: commMatch2 });
+                        }
+                        for (const task of taskMatches) {
+                            results.push({ date, turno: turnoLabel, avion, task, type: 'TAREA' });
+                        }
+                    }
+                }
+            }
+
+            if (results.length === 0) {
+                resultsDiv.innerHTML = '<div id="search-no-results">📭 NO SE ENCONTRARON RESULTADOS PARA "<strong>' + escapeHtml(query) + '</strong>"</div>';
+                return;
+            }
+
+            const turnoOrder = { 'turno día': 1, 'turno tarde': 2, 'turno noche': 3 };
+            results.sort((a, b) => b.date.localeCompare(a.date) || ((turnoOrder[a.turno.toLowerCase()] || 9) - (turnoOrder[b.turno.toLowerCase()] || 9)) || (a.avion.id - b.avion.id));
+
+            // Group by (date|turno|avion)
+            const grouped = [];
+            let currDt = '', currAv = null, currGroup = null;
+            for (const r of results) {
+                const dtKey = `${r.date}|${r.turno}`;
+                const avKey = r.avion.id;
+                if (dtKey !== currDt || avKey !== currAv) {
+                    currDt = dtKey; currAv = avKey;
+                    currGroup = { date: r.date, turno: r.turno, avion: r.avion, avionResult: null, tasks: [] };
+                    grouped.push(currGroup);
+                }
+                if (r.type === 'AVIÓN') currGroup.avionResult = r;
+                else if (r.type === 'TAREA') currGroup.tasks.push(r);
+            }
+
+            let html = `<div style="font-size:10px;color:var(--comment);padding:8px 10px;border-bottom:1px solid var(--border);">🔍 ${results.length} resultado(s) para "<strong>${escapeHtml(query)}</strong>"</div><div class="search-results-wrap">`;
+            let lastDt = '';
+            let groupIdx = 0;
+            for (const g of grouped) {
+                const dtKey = `${g.date}|${g.turno}`;
+                if (dtKey !== lastDt) {
+                    if (lastDt !== '') html += '</div>';
+                    html += `<div class="search-result-group"><div class="search-group-header"><span>📅</span><span class="sg-date">${g.date}</span><span>|</span><span class="sg-turno">${g.turno}</span></div>`;
+                    lastDt = dtKey;
+                    groupIdx = 0;
+                }
+                const avionTitle = avionLabel(g.avion);
+                if (g.avionResult) {
+                    const r = g.avionResult;
+                    const altClass = groupIdx % 2 === 1 ? ' alt' : '';
+                    groupIdx++;
+                    html += `<div class="search-result-item${altClass}">
+                        <div class="search-result-avion"><span class="ra-icon">✈️</span> ${escapeHtml(avionTitle)}</div>
+                        <div class="search-result-match" style="flex-direction:column;gap:3px;">`;
+                    if (r.avion.wp) {
+                        html += `<div><span class="srm-type type-wp">WP</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(r.avion.wp)}')" style="color:#EE1750;">${r._wp ? highlightText(`[${escapeHtml(r.avion.wp)}]`, query) : `[${escapeHtml(r.avion.wp)}]`}</span></div>`;
+                    }
+                    if (r.avion.comment) {
+                        html += `<div><span class="srm-type type-nota">NOTA</span> ${r._comm ? highlightText(r.avion.comment, query) : `<span style="color:var(--comment);">${escapeHtml(r.avion.comment)}</span>`}</div>`;
+                    }
+                    html += `</div></div>`;
+                } else if (g.tasks.length > 0) {
+                    const altClass = groupIdx % 2 === 1 ? ' alt' : '';
+                    groupIdx++;
+                    html += `<div class="search-result-item${altClass}">
+                        <div class="search-result-avion"><span class="ra-icon">✈️</span> ${escapeHtml(avionTitle)}</div>
+                        <div class="search-result-match" style="flex-direction:column;gap:3px;">`;
+                    if (g.avion.wp) {
+                        html += `<div><span class="srm-type type-wp">WP</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(g.avion.wp)}')" style="color:#EE1750;">[${escapeHtml(g.avion.wp)}]</span></div>`;
+                    }
+                    if (g.avion.comment) {
+                        html += `<div><span class="srm-type type-nota">NOTA</span> <span style="color:var(--comment);">${escapeHtml(g.avion.comment)}</span></div>`;
+                    }
+                    html += `</div></div>`;
+                }
+                for (const r of g.tasks) {
+                    const task = r.task;
+                    const tTango = task.tango && task.tango.toLowerCase().includes(q);
+                    const tDesc = task.desc && task.desc.toLowerCase().includes(q);
+                    const tComm = task.comment && task.comment.toLowerCase().includes(q);
+                    const tTech = task.techs && task.techs.toLowerCase().includes(q);
+                    const altClass = groupIdx % 2 === 1 ? ' alt' : '';
+                    groupIdx++;
+                    html += `<div class="search-result-item${altClass}">
+                        <div class="search-result-match" style="flex-direction:column;gap:3px;padding-left:14px;">`;
+                    if (task.desc) {
+                        const tangoTag = task.tango ? `<span class="tango-link" onclick="handleTangoClick('${escapeHtml(task.tango)}')" style="${tTango ? 'color:#2A0087;' : 'color:var(--comment);'}">[${escapeHtml(task.tango)}]</span> ` : '';
+                        html += `<div><span class="srm-type type-tarea">TAREA</span> ${tangoTag}${tDesc ? highlightText(task.desc, query) : `<span style="color:var(--comment);">${escapeHtml(task.desc)}</span>`}</div>`;
+                    } else if (task.tango) {
+                        html += `<div><span class="srm-type type-tarea">TAREA</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(task.tango)}')" style="${tTango ? 'color:#2A0087;' : 'color:var(--comment);'}">[${escapeHtml(task.tango)}]</span></div>`;
+                    }
+                    if (task.comment) {
+                        html += `<div><span class="srm-type type-nota">NOTA</span> ${tComm ? highlightText(task.comment, query) : `<span style="color:var(--comment);">${escapeHtml(task.comment)}</span>`}</div>`;
+                    }
+                    if (task.techs) {
+                        html += `<div style="color:#6B5E8A;padding-left:0;">👨‍🔧 ${tTech ? highlightText(task.techs, query) : escapeHtml(task.techs)}</div>`;
+                    }
+                    html += `</div></div>`;
+                }
+            }
+            html += '</div></div>';
+            resultsDiv.innerHTML = html;
+        } catch (e) {
+            resultsDiv.innerHTML = '<div id="search-no-results">❌ ERROR: ' + escapeHtml(e.message) + '</div>';
+        }
+    }
+
+    function avionLabel(avion) {
+        let label = avion.reg || 'AVIÓN';
+        if (avion.start) label += ' (' + avion.start + (avion.end ? '-' + avion.end : '') + ')';
+        if (avion.pos) label += ' — POS: ' + avion.pos;
+        return label;
+    }
+
+    function clearSearch() {
+        document.getElementById('global-search-input').value = '';
+        document.getElementById('search-results').style.display = 'none';
+        document.getElementById('btn-clear-search').style.display = 'none';
+    }
+
+    // Auto-search with debounce
+    let searchTimer = null;
+    document.getElementById('global-search-input').addEventListener('input', function() {
+        clearTimeout(searchTimer);
+        searchTimer = setTimeout(() => {
+            if (this.value.trim().length >= 1) {
+                performSearch(false);
+            } else {
+                clearSearch();
+            }
+        }, 300);
+    });
+    document.getElementById('global-search-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter') {
+            clearTimeout(searchTimer);
+            performSearch(true);
+        }
+    });
     Object.assign(window, {
         updateHeader, addTech, removeTech, toggleMode, logoutLeader,
         formatMatricula, autoFormatTango, handleTangoClick, closeModal,
@@ -2090,7 +2329,7 @@
         formatTime, changeTurno, changeDate, goToToday, toggleLockShift,
         openManageTechsModal, addGlobalTech, removeGlobalTech,
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
-        openManageShiftModal, deleteEntireShift, moveShift
+        openManageShiftModal, deleteEntireShift, moveShift, performSearch, clearSearch
     });
 
 </script>
