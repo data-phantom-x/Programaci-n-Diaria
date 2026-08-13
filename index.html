@@ -466,6 +466,38 @@
             background: var(--primary);
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
         }
+
+        /* Mensajes para el grupo */
+        .group-message {
+            display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
+            background: #ECE6F7; border-left: 5px solid var(--primary);
+            padding: 10px 14px; margin-bottom: 10px; border-radius: 6px;
+            -webkit-print-color-adjust: exact; print-color-adjust: exact;
+        }
+        #group-messages-top .group-message { margin-top: 10px; }
+        #group-messages-bottom .group-message { margin-top: 15px; }
+        .group-message .gm-text {
+            font-weight: 800; font-size: 0.95em; color: var(--primary);
+            flex: 1; min-width: 0; word-wrap: break-word;
+        }
+        .group-message .gm-actions { display: inline-flex; gap: 4px; flex: none; }
+        .gm-btn {
+            width: 24px; min-width: 24px; height: 24px; padding: 0; font-size: 11px;
+            border-radius: 4px; background: transparent; border: 1px solid var(--border);
+            color: var(--primary); cursor: pointer;
+        }
+        .gm-btn:hover { background: var(--primary); color: white; }
+        .color-swatch { display: inline-flex; cursor: pointer; }
+        .color-swatch input { display: none; }
+        .color-swatch span {
+            width: 26px; height: 26px; border-radius: 50%;
+            background: var(--sw); box-sizing: border-box;
+            border: 3px solid transparent; transition: all 0.2s;
+        }
+        .color-swatch input:checked + span {
+            border-color: #fff;
+            box-shadow: 0 0 0 2px var(--primary);
+        }
         .drag-ghost {
             position: fixed; z-index: 99999; pointer-events: none;
             box-shadow: 0 10px 30px rgba(0,0,0,0.28); opacity: 0.95;
@@ -610,6 +642,7 @@
         <div id="leader-add-buttons" class="leader-only no-print" style="margin-top: 15px; display: flex; gap: 12px; flex-wrap: wrap;">
             <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">+ AGREGAR AVIÓN</button>
             <button class="btn-accent" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">⭐ AGREGAR ACTIVIDAD EXTRA</button>
+            <button class="btn-accent" onclick="openAddMessageModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">💬 AGREGAR MENSAJE</button>
         </div>
     </div>
 
@@ -621,7 +654,11 @@
             <h1 class="document-header" id="display-header">CARGANDO DATOS...</h1>
         </div>
         
+        <div id="group-messages-top"></div>
+        
         <div id="aviones-container"></div>
+        
+        <div id="group-messages-bottom"></div>
     </div>
 </div>
 
@@ -840,6 +877,48 @@
     </div>
 </div>
 
+<div id="message-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="color: var(--leader-color);">💬 MENSAJE PARA EL GRUPO</div>
+        <textarea id="message-text" placeholder="ESCRIBE EL MENSAJE..." style="width:100%; height:60px; resize:none; text-transform: uppercase;"></textarea>
+        <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">POSICIÓN:</div>
+        <select id="message-position" style="width:100%;">
+            <option value="arriba">⬆️ ARRIBA</option>
+            <option value="abajo">⬇️ ABAJO</option>
+        </select>
+        <div class="modal-row" style="display:flex; gap:12px; margin-bottom:12px;">
+            <div style="flex:1; display:flex; flex-direction:column;">
+                <label style="font-size:10px; font-weight:bold; color:var(--primary); margin-bottom:4px;">NEGRITA:</label>
+                <select id="message-bold">
+                    <option value="si">SÍ</option>
+                    <option value="no">NO</option>
+                </select>
+            </div>
+            <div style="flex:1; display:flex; flex-direction:column;">
+                <label style="font-size:10px; font-weight:bold; color:var(--primary); margin-bottom:4px;">TAMAÑO:</label>
+                <select id="message-size">
+                    <option value="normal">NORMAL</option>
+                    <option value="grande">GRANDE</option>
+                </select>
+            </div>
+        </div>
+        <div style="font-size:10px; font-weight:bold; color:var(--primary); margin-bottom:6px;">COLOR:</div>
+        <div id="message-color-select" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
+            <label class="color-swatch" style="--sw:#2A0087;"><input type="radio" name="msg-color" value="#2A0087"><span></span></label>
+            <label class="color-swatch" style="--sw:#D32F2F;"><input type="radio" name="msg-color" value="#D32F2F"><span></span></label>
+            <label class="color-swatch" style="--sw:#1976D2;"><input type="radio" name="msg-color" value="#1976D2"><span></span></label>
+            <label class="color-swatch" style="--sw:#2E7D32;"><input type="radio" name="msg-color" value="#2E7D32"><span></span></label>
+            <label class="color-swatch" style="--sw:#E65100;"><input type="radio" name="msg-color" value="#E65100"><span></span></label>
+            <label class="color-swatch" style="--sw:#6B5E8A;"><input type="radio" name="msg-color" value="#6B5E8A"><span></span></label>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-danger-outline btn-modal-action" id="message-delete-btn" onclick="deleteMessageFromModal()" style="display:none;">ELIMINAR</button>
+            <button class="btn-outline btn-modal-action" onclick="closeModal('message-modal')">CANCELAR</button>
+            <button class="btn-leader btn-modal-action" onclick="saveMessageFromModal()">GUARDAR MENSAJE</button>
+        </div>
+    </div>
+</div>
+
 <div id="manage-techs-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="color: var(--leader-color);">👥 BASE GLOBAL DE TÉCNICOS</div>
@@ -908,7 +987,9 @@
     let shiftTechs = []; 
     let globalTechs = [];
     let predefTasks = []; 
-    let actividadGrupoTitulo = '⭐ ACTIVIDADES EXTRA'; 
+    let actividadGrupoTitulo = '⭐ ACTIVIDADES EXTRA';
+    let groupMessages = [];
+    let editCurrentMessageId = null; 
     
     let isTeamLeader = false;
     let editCurrentAvionId = null;
@@ -1185,6 +1266,7 @@
             shiftState.estado = data.estado || 'abierto';
             shiftState.cerradoPor = data.cerradoPor || '';
             actividadGrupoTitulo = data.actividadTitulo || '⭐ ACTIVIDADES EXTRA';
+            groupMessages = data.mensajes || [];
 
             if (document.activeElement.id !== 'in-jefe') document.getElementById('in-jefe').value = data.jefe || '';
             
@@ -1207,6 +1289,7 @@
             
             updateLockUI();
             render();
+            renderGroupMessages();
         });
     }
 
@@ -1271,7 +1354,7 @@
     function updateHeader() {
         if(checkLock()) return;
         const jefe = document.getElementById('in-jefe').value.toUpperCase();
-        set(dbRefs.header, { turno: activeTurno, jefe: jefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo });
+        set(dbRefs.header, { turno: activeTurno, jefe: jefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo, mensajes: groupMessages });
     }
 
     let confirmCallback = null;
@@ -1393,7 +1476,7 @@
             shiftTechs = [];
             set(dbRefs.aviones, avionesData);
             set(dbRefs.techs, shiftTechs);
-            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA' });
+            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA', mensajes: [] });
         });
     }
 
@@ -1416,12 +1499,12 @@
             set(ref(db, `${newPath}/aviones`), avionesData);
             set(ref(db, `${newPath}/techs`), shiftTechs);
             const currentJefe = document.getElementById('in-jefe').value.toUpperCase();
-            set(ref(db, `${newPath}/header`), { turno: newTurno, jefe: currentJefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo });
+            set(ref(db, `${newPath}/header`), { turno: newTurno, jefe: currentJefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo, mensajes: groupMessages });
 
             // Borrar datos actuales
             set(dbRefs.aviones, []);
             set(dbRefs.techs, []);
-            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA' });
+            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA', mensajes: [] });
 
             // Redirigir al destino nuevo
             document.getElementById('global-date-select').value = newDate;
@@ -2017,6 +2100,97 @@
         showConfirm("⚠️ ¿CONFIRMAS BORRAR TODAS LAS ACTIVIDADES EXTRA?\n(Se eliminarán del turno todas las actividades del grupo)", () => {
             avionesData = avionesData.filter(a => !a.isActivity);
             saveData();
+        });
+    }
+
+    // ─── MENSAJES PARA EL GRUPO ───
+    function renderGroupMessages() {
+        const topEl = document.getElementById('group-messages-top');
+        const bottomEl = document.getElementById('group-messages-bottom');
+        if (!topEl) return;
+        topEl.innerHTML = groupMessages.map((m, i) => m.posicion === 'abajo' ? '' : groupMessageHTML(m, i)).join('');
+        bottomEl.innerHTML = groupMessages.map((m, i) => m.posicion === 'abajo' ? groupMessageHTML(m, i) : '').join('');
+    }
+
+    function groupMessageHTML(m, index) {
+        const color = m.color || '#2A0087';
+        const weight = m.negrita !== false ? '800' : '600';
+        const fontSize = m.tamano === 'grande' ? '1.15em' : '0.95em';
+        return `
+            <div class="group-message" style="border-left-color:${color};">
+                <span class="gm-text" style="color:${color}; font-weight:${weight}; font-size:${fontSize};">💬 ${escapeHtml(m.texto)}</span>
+                <span class="gm-actions leader-only no-print">
+                    <button class="gm-btn" onclick="openEditMessage(${index})" title="Editar mensaje">✏️ Editar</button>
+                </span>
+            </div>
+        `;
+    }
+
+    function setMessageColorInputs(color) {
+        document.querySelectorAll('#message-color-select input').forEach(r => {
+            r.checked = (r.value === (color || '#2A0087'));
+        });
+    }
+
+    function saveHeaderMessages() {
+        set(ref(db, `${getBasePath()}/header/mensajes`), groupMessages);
+    }
+
+    function openAddMessageModal() {
+        if(checkLock()) return;
+        editCurrentMessageId = null;
+        document.getElementById('message-text').value = '';
+        document.getElementById('message-position').value = 'arriba';
+        document.getElementById('message-bold').value = 'si';
+        document.getElementById('message-size').value = 'normal';
+        setMessageColorInputs('#2A0087');
+        document.getElementById('message-delete-btn').style.display = 'none';
+        document.getElementById('message-modal').style.display = 'block';
+    }
+
+    function openEditMessage(index) {
+        if(checkLock()) return;
+        const m = groupMessages[index];
+        if (!m) return;
+        editCurrentMessageId = index;
+        document.getElementById('message-text').value = m.texto;
+        document.getElementById('message-position').value = m.posicion === 'abajo' ? 'abajo' : 'arriba';
+        document.getElementById('message-bold').value = m.negrita !== false ? 'si' : 'no';
+        document.getElementById('message-size').value = m.tamano === 'grande' ? 'grande' : 'normal';
+        setMessageColorInputs(m.color || '#2A0087');
+        document.getElementById('message-delete-btn').style.display = 'inline-flex';
+        document.getElementById('message-modal').style.display = 'block';
+    }
+
+    function saveMessageFromModal() {
+        if(checkLock()) return;
+        const texto = document.getElementById('message-text').value.trim().toUpperCase();
+        if (!texto) return showConfirm("ESCRIBE EL MENSAJE.", null);
+        const posicion = document.getElementById('message-position').value;
+        const negrita = document.getElementById('message-bold').value === 'si';
+        const tamano = document.getElementById('message-size').value;
+        const color = (document.querySelector('#message-color-select input:checked') || {}).value || '#2A0087';
+        if (editCurrentMessageId !== null && groupMessages[editCurrentMessageId]) {
+            const m = groupMessages[editCurrentMessageId];
+            m.texto = texto;
+            m.posicion = posicion;
+            m.negrita = negrita;
+            m.tamano = tamano;
+            m.color = color;
+        } else {
+            groupMessages.push({ id: Date.now(), texto, posicion, negrita, tamano, color });
+        }
+        saveHeaderMessages();
+        closeModal('message-modal');
+    }
+
+    function deleteMessageFromModal() {
+        if(checkLock()) return;
+        if (editCurrentMessageId === null) return;
+        closeModal('message-modal');
+        showConfirm("¿ELIMINAR ESTE MENSAJE?", () => {
+            groupMessages.splice(editCurrentMessageId, 1);
+            saveHeaderMessages();
         });
     }
 
@@ -2705,6 +2879,7 @@
         toggleTask, toggleAtencion,
         openAddAvionModal, saveAddAvion, openAddActivityModal, saveAddActivity, 
         openEditActivityGroupModal, saveEditActivityGroup, confirmDeleteActivities,
+        openAddMessageModal, openEditMessage, saveMessageFromModal, deleteMessageFromModal,
         openEditAvionModal, saveEditAvion, confirmDeleteAvion,
         openAddTaskModal, saveAddTask, openEditTaskModal, saveEditTask, confirmDeleteTask,
         editAvionComment, editTaskComment, closeConfirmModal, closePromptModal,
