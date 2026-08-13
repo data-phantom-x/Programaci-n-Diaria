@@ -60,6 +60,10 @@
             border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s;
         }
         .btn-top:hover { opacity: 0.9; }
+        #btn-mode-toggle {
+            width: auto; min-width: 140px; max-width: 240px; padding: 0 10px;
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+        }
 
         .leader-wrapper { display: contents; } 
         body:not(.team-leader-mode) .leader-only { display: none !important; }
@@ -213,6 +217,12 @@
         .avion-pos, .avion-times { 
             background: rgba(255,255,255,0.2); color: white; 
             padding: 3px 8px; border-radius: 4px; font-size: 0.85em; 
+        }
+        
+        .activity-time-badge {
+            background: var(--primary); color: white; font-size: 0.8em; font-weight: 700;
+            padding: 2px 8px; border-radius: 4px; margin-right: 6px; white-space: nowrap;
+            -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
         
         .avion-comment { font-size: 0.85em; color: #C4B8D0; font-weight: normal; font-style: italic; white-space: nowrap; }
@@ -438,6 +448,30 @@
         #search-loading { text-align: center; padding: 20px; color: var(--comment); font-size: 11px; }
         #search-no-results { text-align: center; padding: 30px; color: var(--comment); font-size: 11px; }
 
+        /* Ordenar manualmente la programación (drag & drop Team Leader) */
+        .drag-handle {
+            cursor: grab; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+            display: inline-flex; align-items: center; justify-content: center; flex: none;
+            padding: 0 8px; font-size: 14px; font-weight: 800; line-height: 1; letter-spacing: -3px;
+            opacity: 0.75; transition: opacity 0.2s;
+        }
+        .drag-handle:hover, .drag-handle:active { opacity: 1; cursor: grabbing; }
+        .avion-title .drag-handle { color: rgba(255,255,255,0.9); }
+        .task-item .drag-handle { color: var(--primary); }
+        .dragging { opacity: 0.45; }
+        body.dragging-active { cursor: grabbing; }
+        .drop-line {
+            position: fixed; z-index: 99999; pointer-events: none;
+            height: 3px; border-radius: 2px;
+            background: var(--primary);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+        }
+        .drag-ghost {
+            position: fixed; z-index: 99999; pointer-events: none;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.28); opacity: 0.95;
+            border-radius: 12px 0 12px 0; overflow: hidden;
+        }
+
         /* Ultra-Comprimido para Imprimir en una sola hoja carta (va DESPUÉS del móvil para que la impresión siempre gane) */
         @media print {
             @page { size: letter; margin: 1.2cm; } 
@@ -572,6 +606,11 @@
             <button class="btn-outline" onclick="clearSearch()" style="padding: 0 10px; font-size: 14px; display:none; height:28px;" id="btn-clear-search">✖</button>
         </div>
         <div id="search-results" style="display:none; margin-top: 8px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: white; padding: 10px;"></div>
+        
+        <div id="leader-add-buttons" class="leader-only no-print" style="margin-top: 15px; display: flex; gap: 12px; flex-wrap: wrap;">
+            <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">+ AGREGAR AVIÓN</button>
+            <button class="btn-accent" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">⭐ AGREGAR ACTIVIDAD EXTRA</button>
+        </div>
     </div>
 
     <div id="print-area">
@@ -583,11 +622,6 @@
         </div>
         
         <div id="aviones-container"></div>
-        
-        <div id="leader-add-buttons" class="leader-only no-print" style="margin-top: 15px; display: flex; gap: 15px; flex-wrap: wrap;">
-            <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">+ AGREGAR AVIÓN</button>
-            <button class="btn-accent" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">⭐ AGREGAR ACTIVIDAD EXTRA</button>
-        </div>
     </div>
 </div>
 
@@ -655,11 +689,11 @@
         <div class="modal-row" style="display: flex; gap: 15px;">
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA DESDE:</label>
-                <input type="text" class="time-input" id="add-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+                <input type="text" class="time-input" id="add-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" onblur="finalizeTime(this)" onkeydown="onTimeKeyEnter(this, event, 'add-ac-end')" style="width: 100%; max-width: 100%; margin: 0;">
             </div>
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA HASTA:</label>
-                <input type="text" class="time-input" id="add-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+                <input type="text" class="time-input" id="add-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" onblur="finalizeTime(this)" onkeydown="onTimeKeyEnter(this, event)" style="width: 100%; max-width: 100%; margin: 0;">
             </div>
         </div>
         <input type="text" id="add-ac-comment" placeholder="NOTA DEL AVIÓN">
@@ -678,11 +712,11 @@
         <div class="modal-row" style="display: flex; gap: 15px;">
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA DESDE:</label>
-                <input type="text" class="time-input" id="add-act-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+                <input type="text" class="time-input" id="add-act-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" onblur="finalizeTime(this)" onkeydown="onTimeKeyEnter(this, event, 'add-act-end')" style="width: 100%; max-width: 100%; margin: 0;">
             </div>
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA HASTA:</label>
-                <input type="text" class="time-input" id="add-act-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+                <input type="text" class="time-input" id="add-act-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" onblur="finalizeTime(this)" onkeydown="onTimeKeyEnter(this, event)" style="width: 100%; max-width: 100%; margin: 0;">
             </div>
         </div>
         <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">ASIGNAR TÉCNICOS:</div>
@@ -705,11 +739,11 @@
         <div class="modal-row" style="display: flex; gap: 15px;">
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA DESDE:</label>
-                <input type="text" class="time-input" id="edit-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+                <input type="text" class="time-input" id="edit-ac-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" onblur="finalizeTime(this)" onkeydown="onTimeKeyEnter(this, event, 'edit-ac-end')" style="width: 100%; max-width: 100%; margin: 0;">
             </div>
             <div style="flex: 1; display: flex; flex-direction: column;">
                 <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA HASTA:</label>
-                <input type="text" class="time-input" id="edit-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" style="width: 100%; max-width: 100%; margin: 0;">
+                <input type="text" class="time-input" id="edit-ac-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" onblur="finalizeTime(this)" onkeydown="onTimeKeyEnter(this, event)" style="width: 100%; max-width: 100%; margin: 0;">
             </div>
         </div>
         <input type="text" id="edit-ac-comment" placeholder="NOTA">
@@ -766,6 +800,19 @@
         <input type="text" id="edit-task-desc" placeholder="TÍTULO DE LA TAREA" oninput="handleTaskDescInput(this, 'edit-task-tango')">
         <input type="text" id="edit-task-tango" placeholder="T00..." maxlength="8" oninput="autoFormatTango(this)">
         
+        <div id="edit-task-times" style="display:none;">
+            <div class="modal-row" style="display: flex; gap: 15px;">
+                <div style="flex: 1; display: flex; flex-direction: column;">
+                    <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA DESDE:</label>
+                    <input type="text" class="time-input" id="edit-task-start" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" onblur="finalizeTime(this)" onkeydown="onTimeKeyEnter(this, event, 'edit-task-end')" style="width: 100%; max-width: 100%; margin: 0;">
+                </div>
+                <div style="flex: 1; display: flex; flex-direction: column;">
+                    <label style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">HORA HASTA:</label>
+                    <input type="text" class="time-input" id="edit-task-end" placeholder="HH:MM" maxlength="5" oninput="formatTime(this)" onblur="finalizeTime(this)" onkeydown="onTimeKeyEnter(this, event)" style="width: 100%; max-width: 100%; margin: 0;">
+                </div>
+            </div>
+        </div>
+        
         <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 8px;">TÉCNICOS ASIGNADOS:</div>
         <div class="tech-grid" id="edit-task-techs"></div>
         
@@ -775,6 +822,20 @@
             <button class="btn-danger-outline btn-modal-action" onclick="confirmDeleteTask()">ELIMINAR</button>
             <button class="btn-outline btn-modal-action" onclick="closeModal('edit-task-modal')">CANCELAR</button>
             <button class="btn-leader btn-modal-action" onclick="saveEditTask()">GUARDAR</button>
+        </div>
+    </div>
+</div>
+
+<div id="edit-activity-group-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header" style="color: var(--leader-color);">⭐ EDITAR ACTIVIDADES EXTRA</div>
+        <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">TÍTULO DEL GRUPO:</div>
+        <input type="text" id="edit-act-group-title" placeholder="⭐ ACTIVIDADES EXTRA">
+        <div style="font-size: 10px; color: var(--comment); margin-bottom: 8px;">Se eliminarán todas las actividades extra del turno.</div>
+        <div class="modal-footer">
+            <button class="btn-danger-outline btn-modal-action" onclick="confirmDeleteActivities()">🗑️ ELIMINAR TODO</button>
+            <button class="btn-outline btn-modal-action" onclick="closeModal('edit-activity-group-modal')">CANCELAR</button>
+            <button class="btn-leader btn-modal-action" onclick="saveEditActivityGroup()">GUARDAR</button>
         </div>
     </div>
 </div>
@@ -847,6 +908,7 @@
     let shiftTechs = []; 
     let globalTechs = [];
     let predefTasks = []; 
+    let actividadGrupoTitulo = '⭐ ACTIVIDADES EXTRA'; 
     
     let isTeamLeader = false;
     let editCurrentAvionId = null;
@@ -884,29 +946,29 @@
     // Reloj Dinámico Mejorado
     function updateClock() {
         const now = new Date();
-        const localDate = now.toLocaleDateString('es-ES', { day: '2-digit', month: '2-digit', year: 'numeric' });
-        const localTime = now.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+        const localDate = now.toLocaleDateString('es-ES', { timeZone: 'America/Santiago', day: '2-digit', month: '2-digit', year: 'numeric' });
+        const localTime = now.toLocaleTimeString('es-ES', { timeZone: 'America/Santiago', hour: '2-digit', minute: '2-digit', second: '2-digit' });
         const utcDate = now.toLocaleDateString('es-ES', { timeZone: 'UTC', day: '2-digit', month: '2-digit', year: 'numeric' });
         const utcTime = now.toLocaleTimeString('es-ES', { timeZone: 'UTC', hour: '2-digit', minute: '2-digit', second: '2-digit' });
         
         const clockEl = document.getElementById('live-clock');
         if (clockEl) {
             clockEl.innerHTML = `
-                <div style="display:flex; align-items:center; gap:4px;">
-                    <span style="font-size:13px;">🌍</span>
-                    <div style="display:flex; flex-direction:column; align-items:center; gap:0; line-height:1.3;">
-                        <span style="color:var(--primary); font-weight:bold; white-space:nowrap;">LOC: ${localDate}</span>
-                        <span style="color:var(--primary); font-weight:600; white-space:nowrap;">${localTime}</span>
-                    </div>
+            <div style="display:flex; align-items:center; gap:4px;">
+                <span style="font-size:13px;">🇨🇱</span>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:0; line-height:1.3;">
+                    <span style="color:var(--primary); font-weight:bold; white-space:nowrap;">CLT: ${localDate}</span>
+                    <span style="color:var(--primary); font-weight:600; white-space:nowrap;">${localTime}</span>
                 </div>
-                <div style="width:1px; height:28px; background:var(--border); margin:0 6px;"></div>
-                <div style="display:flex; align-items:center; gap:4px;">
-                    <span style="font-size:13px;">✈️</span>
-                    <div style="display:flex; flex-direction:column; align-items:center; gap:0; line-height:1.3;">
-                        <span style="color:var(--comment); font-weight:bold; white-space:nowrap;">UTC: ${utcDate}</span>
-                        <span style="color:var(--comment); font-weight:600; white-space:nowrap;">${utcTime}</span>
-                    </div>
+            </div>
+            <div style="width:1px; height:28px; background:var(--border); margin:0 6px;"></div>
+            <div style="display:flex; align-items:center; gap:4px;">
+                <span style="font-size:13px;">🌎</span>
+                <div style="display:flex; flex-direction:column; align-items:center; gap:0; line-height:1.3;">
+                    <span style="color:var(--comment); font-weight:bold; white-space:nowrap;">UTC: ${utcDate}</span>
+                    <span style="color:var(--comment); font-weight:600; white-space:nowrap;">${utcTime}Z</span>
                 </div>
+            </div>
             `;
         }
     }
@@ -944,10 +1006,11 @@
         isTeamLeader = true;
         document.body.classList.add('team-leader-mode');
         
-        const userAlias = myEmail.toUpperCase();
-        
+        const userAlias = (myEmail || localStorage.getItem('tl_email') || '').toUpperCase();
+
         const btnToggle = document.getElementById('btn-mode-toggle');
         btnToggle.innerText = `👤 ${userAlias}`;
+        btnToggle.title = userAlias ? `TEAM LEADER: ${userAlias}` : '';
         btnToggle.style.background = "";
         btnToggle.style.color = "";
         btnToggle.style.border = "";
@@ -1003,6 +1066,7 @@
                 if (correosAutorizados.includes(username)) {
                     localStorage.setItem('tl_email', username);
                     localStorage.setItem('tl_login_time', Date.now().toString());
+                    myEmail = username;
                     activateLeaderUI();
                 } else {
                     showConfirm(`ACCESO DENEGADO.\n${email.trim().toLowerCase()} no está autorizado.`, null);
@@ -1120,6 +1184,7 @@
             const data = snapshot.val() || {};
             shiftState.estado = data.estado || 'abierto';
             shiftState.cerradoPor = data.cerradoPor || '';
+            actividadGrupoTitulo = data.actividadTitulo || '⭐ ACTIVIDADES EXTRA';
 
             if (document.activeElement.id !== 'in-jefe') document.getElementById('in-jefe').value = data.jefe || '';
             
@@ -1206,7 +1271,7 @@
     function updateHeader() {
         if(checkLock()) return;
         const jefe = document.getElementById('in-jefe').value.toUpperCase();
-        set(dbRefs.header, { turno: activeTurno, jefe: jefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor });
+        set(dbRefs.header, { turno: activeTurno, jefe: jefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo });
     }
 
     let confirmCallback = null;
@@ -1328,7 +1393,7 @@
             shiftTechs = [];
             set(dbRefs.aviones, avionesData);
             set(dbRefs.techs, shiftTechs);
-            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "" });
+            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA' });
         });
     }
 
@@ -1351,12 +1416,12 @@
             set(ref(db, `${newPath}/aviones`), avionesData);
             set(ref(db, `${newPath}/techs`), shiftTechs);
             const currentJefe = document.getElementById('in-jefe').value.toUpperCase();
-            set(ref(db, `${newPath}/header`), { turno: newTurno, jefe: currentJefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor });
+            set(ref(db, `${newPath}/header`), { turno: newTurno, jefe: currentJefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo });
 
             // Borrar datos actuales
             set(dbRefs.aviones, []);
             set(dbRefs.techs, []);
-            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "" });
+            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA' });
 
             // Redirigir al destino nuevo
             document.getElementById('global-date-select').value = newDate;
@@ -1420,20 +1485,68 @@
         }
     }
 
+    function buildTimesLabel(start, end) {
+        if (start && end) return `${start} - ${end}`;
+        if (start) return `DESDE ${start}`;
+        if (end) return `HASTA ${end}`;
+        return '';
+    }
+
     function formatTime(input) {
-        let val = input.value.replace(/\D/g, ''); 
-        if (val.length >= 3) {
-            val = val.substring(0, 2) + ':' + val.substring(2, 4);
+        let d = input.value.replace(/\D/g, '').slice(0, 4);
+        if (!d) { input.value = ''; return; }
+        let out;
+        if (d.length <= 2) {
+            out = d;
+        } else if (d.length === 3) {
+            out = '0' + d[0] + ':' + d.slice(1);
+        } else {
+            out = d.slice(0, 2) + ':' + d.slice(2);
         }
-        if (val.length >= 2) {
-            let h = parseInt(val.substring(0, 2));
-            if (h > 23) val = '23' + val.substring(2); 
+        input.value = out;
+    }
+
+    function normalizeTime(raw) {
+        if (!raw) return '';
+        const digits = raw.replace(/\D/g, '');
+        if (!digits) return '';
+        let h, m;
+        if (raw.includes(':')) {
+            const parts = raw.split(':');
+            h = parseInt(parts[0], 10);
+            m = parseInt(String(parts[1] || '').slice(0, 2), 10);
+        } else if (digits.length === 4) {
+            h = parseInt(digits.slice(0, 2), 10);
+            m = parseInt(digits.slice(2), 10);
+        } else if (digits.length === 3) {
+            h = parseInt(digits[0], 10);
+            m = parseInt(digits.slice(1), 10);
+        } else if (digits.length === 2) {
+            if (parseInt(digits, 10) <= 23) { h = parseInt(digits, 10); m = 0; }
+            else { h = parseInt(digits[0], 10); m = parseInt(digits[1], 10) * 10; }
+        } else {
+            h = parseInt(digits[0], 10); m = 0;
         }
-        if (val.length >= 5) {
-            let m = parseInt(val.substring(3, 5));
-            if (m > 59) val = val.substring(0, 3) + '59'; 
+        if (isNaN(h)) h = 0;
+        if (isNaN(m)) m = 0;
+        h = Math.max(0, Math.min(23, h));
+        m = Math.max(0, Math.min(59, m));
+        return String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+    }
+
+    function finalizeTime(input) {
+        input.value = normalizeTime(input.value);
+    }
+
+    function onTimeKeyEnter(input, e, nextId) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            input.blur();
+            if (nextId) {
+                const next = document.getElementById(nextId);
+                if (next) { next.focus(); next.select(); }
+            }
         }
-        input.value = val;
     }
 
     function formatMatricula(input) {
@@ -1456,7 +1569,7 @@
 
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
-    function generateTaskHTML(avion, t, showPlaneReg = false) {
+    function generateTaskHTML(avion, t, showPlaneReg = false, showHandle = false) {
         let cleanDesc = t.desc || ''; let tangoDisplay = '';
         if (t.tango) {
             const escapedTango = t.tango.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -1467,6 +1580,9 @@
 
         const atencionLabel = t.atencion ? `<span class="atencion-badge ${t.alertaByTL ? 'alerta-tl' : 'alerta-tech'}">⚠️ ${t.alerta || 'ALERTA'}${t.alertaNombre ? ' (' + t.alertaNombre + ')' : ''}</span>` : '';
         const planePrefix = showPlaneReg ? `<strong style="color:var(--accent);">[${avion.reg}]</strong> ` : '';
+        const activityTime = avion.isActivity && (avion.start || avion.end)
+            ? `<span class="activity-time-badge">🕒 ${buildTimesLabel(avion.start, avion.end)}</span> `
+            : '';
         
         const locked = isShiftLockedForMe();
         const toggleClick = locked ? "" : `onclick="toggleTask(${avion.id}, ${t.id})"`;
@@ -1482,17 +1598,22 @@
             `;
         }
 
+        const handleHtml = showHandle
+            ? `<span class="drag-handle leader-only no-print" onpointerdown="startOrderDrag(event, 'tarea', ${avion.id}, ${t.id})" oncontextmenu="event.preventDefault(); return false;" title="Sostener y arrastrar para ordenar">⋮⋮</span>`
+            : '';
+
         return `
             <div class="task-item ${t.done ? 'completed' : ''} ${t.atencion ? (t.alertaByTL ? 'alerta-tl' : 'alerta-tech') : ''}" data-avion-id="${avion.id}" data-task-id="${t.id}">
                 <div class="status-toggle no-print" ${toggleClick} style="${toggleCursor}">✓</div>
                 <div class="task-main">
                     <div class="task-info">
-                        <div class="task-desc">${planePrefix}${cleanDesc}${tangoDisplay} ${atencionLabel}</div>
+                        <div class="task-desc">${planePrefix}${activityTime}${cleanDesc}${tangoDisplay} ${atencionLabel}</div>
                         ${t.techs ? `<div class="task-techs">${t.techs}</div>` : ''}
                         ${t.comment ? `<div class="task-comment">↳ NOTA: ${t.comment}</div>` : ''}
                     </div>
                     <div class="action-bar no-print">
                         ${actionButtonsHtml}
+                        ${handleHtml}
                     </div>
                 </div>
             </div>
@@ -1588,6 +1709,7 @@
         const container = document.getElementById('aviones-container'); container.innerHTML = '';
         let displayData = JSON.parse(JSON.stringify(avionesData));
         const locked = isShiftLockedForMe();
+        const allowOrder = isTeamLeader && !locked && currentViewMode === 'default' && !currentTechFilter;
 
         if (currentTechFilter) {
             displayData.forEach(avion => {
@@ -1630,32 +1752,28 @@
             return;
         }
 
-            displayData.forEach(avion => {
+        // Separar aviones y actividades: los aviones primero, luego TODAS las actividades juntas bajo un solo banner
+        const planes = displayData.filter(a => !a.isActivity);
+        const activities = displayData.filter(a => a.isActivity);
+
+        planes.forEach(avion => {
             const div = document.createElement('div'); div.className = 'avion-section'; div.dataset.avionId = avion.id;
             const wpDisplay = avion.wp ? `<span class="tango-link" onclick="handleTangoClick('${avion.wp}')">[${avion.wp}]</span>` : '';
             const posDisplay = avion.pos ? `<span class="avion-pos">POS: ${avion.pos}</span>` : '';
-            // Se actualizó para mostrar un formato mucho más explícito y sin malentendidos
-            const timesDisplay = (avion.start || avion.end) ? `<span class="avion-times">${avion.start || '--:--'} - ${avion.end || '--:--'}</span>` : '';
+            const timesLabel = buildTimesLabel(avion.start, avion.end);
+            const timesDisplay = timesLabel ? `<span class="avion-times">${timesLabel}</span>` : '';
             
-            const headerClass = (avion.isActivity ? 'activity-header' : '') + (isAvionAllDone(avion) ? ' all-done' : '');
+            const headerClass = isAvionAllDone(avion) ? ' all-done' : '';
             
             let avionActionBtns = '';
             if (!locked) {
-                if (avion.isActivity) {
-                    avionActionBtns = `
-                        <div class="leader-only leader-wrapper">
-                            <button class="action-btn btn-action-small" onclick="openEditAvionModal(${avion.id})">🕒 EDITAR HORA</button>
-                        </div>
-                    `;
-                } else {
-                    avionActionBtns = `
-                        <div class="leader-only leader-wrapper">
-                            <button class="action-btn btn-highlight" onclick="openAddTaskModal(${avion.id})">➕ TAREA</button>
-                            <button class="action-btn btn-highlight" onclick="openPredefModal(${avion.id})" style="background-color: #ffffff; border-color: #cbd5e0;" title="Agregar Tareas Predefinidas / Preventivas">📑 PREDEF.</button>
-                            <button class="action-btn btn-action-small" onclick="openEditAvionModal(${avion.id})">✏️ EDITAR</button>
-                        </div>
-                    `;
-                }
+                avionActionBtns = `
+                    <div class="leader-only leader-wrapper">
+                        <button class="action-btn btn-highlight" onclick="openAddTaskModal(${avion.id})">➕ TAREA</button>
+                        <button class="action-btn btn-highlight" onclick="openPredefModal(${avion.id})" style="background-color: #ffffff; border-color: #cbd5e0;" title="Agregar Tareas Predefinidas / Preventivas">📑 PREDEF.</button>
+                        <button class="action-btn btn-action-small" onclick="openEditAvionModal(${avion.id})">✏️ EDITAR</button>
+                    </div>
+                `;
             }
 
             let html = `
@@ -1666,6 +1784,7 @@
                     </div>
                     <div class="action-bar avion-bar no-print">
                         ${avionActionBtns}
+                        ${allowOrder ? `<span class="drag-handle leader-only no-print" onpointerdown="startOrderDrag(event, 'avion', ${avion.id})" oncontextmenu="event.preventDefault(); return false;" title="Sostener y arrastrar para ordenar">⋮⋮</span>` : ''}
                     </div>
                 </div>
                 <div class="task-container">
@@ -1674,13 +1793,44 @@
             if(avion.tareas) {
                 const pendingTasks = avion.tareas.filter(t => !t.done);
                 const completedTasks = avion.tareas.filter(t => t.done);
-                pendingTasks.forEach(t => { html += generateTaskHTML(avion, t, false); });
-                completedTasks.forEach(t => { html += generateTaskHTML(avion, t, false); });
+                pendingTasks.forEach(t => { html += generateTaskHTML(avion, t, false, allowOrder); });
+                completedTasks.forEach(t => { html += generateTaskHTML(avion, t, false, allowOrder); });
             }
 
             html += `</div>`;
             div.innerHTML = html; container.appendChild(div);
         });
+
+        // GRUPO ÚNICO DE ACTIVIDADES EXTRA
+        if (activities.length > 0) {
+            const gDiv = document.createElement('div');
+            gDiv.className = 'avion-section activity-group';
+            gDiv.dataset.avionId = 'actividades';
+
+            const groupTasks = [];
+            activities.forEach(a => (a.tareas || []).forEach(t => groupTasks.push({ avion: a, task: t })));
+            const pendingTasks = groupTasks.filter(x => !x.task.done);
+            const completedTasks = groupTasks.filter(x => x.task.done);
+
+            let gHtml = `
+                <div class="avion-title activity-header">
+                    <div class="avion-info-main">
+                        <span>${actividadGrupoTitulo}</span>
+                    </div>
+                    <div class="action-bar avion-bar no-print">
+                        ${!locked ? `<div class="leader-only leader-wrapper">
+                            <button class="action-btn btn-highlight" onclick="openAddActivityModal()">➕ ACTIVIDAD</button>
+                            <button class="action-btn btn-action-small" onclick="openEditActivityGroupModal()">✏️ EDITAR</button>
+                        </div>` : ''}
+                    </div>
+                </div>
+                <div class="task-container">
+                    ${pendingTasks.map(x => generateTaskHTML(x.avion, x.task, false, allowOrder)).join('')}
+                    ${completedTasks.map(x => generateTaskHTML(x.avion, x.task, false, allowOrder)).join('')}
+                </div>
+            `;
+            gDiv.innerHTML = gHtml; container.appendChild(gDiv);
+        }
     }
 
     function toggleTask(aId, tId) {
@@ -1844,6 +1994,30 @@
             }] 
         });
         saveData(); closeModal('add-activity-modal');
+    }
+
+    function openEditActivityGroupModal() {
+        if(checkLock()) return;
+        document.getElementById('edit-act-group-title').value = actividadGrupoTitulo;
+        document.getElementById('edit-activity-group-modal').style.display = 'block';
+    }
+
+    function saveEditActivityGroup() {
+        if(checkLock()) return;
+        const title = document.getElementById('edit-act-group-title').value.trim().toUpperCase();
+        if (!title) return showConfirm("INGRESE UN TÍTULO PARA EL GRUPO DE ACTIVIDADES.", null);
+        actividadGrupoTitulo = title;
+        set(ref(db, `${getBasePath()}/header/actividadTitulo`), title);
+        closeModal('edit-activity-group-modal');
+    }
+
+    function confirmDeleteActivities() {
+        if(checkLock()) return;
+        closeModal('edit-activity-group-modal'); // Cierra la ventana actual ANTES de confirmar
+        showConfirm("⚠️ ¿CONFIRMAS BORRAR TODAS LAS ACTIVIDADES EXTRA?\n(Se eliminarán del turno todas las actividades del grupo)", () => {
+            avionesData = avionesData.filter(a => !a.isActivity);
+            saveData();
+        });
     }
 
     function openEditAvionModal(id) {
@@ -2025,6 +2199,11 @@
         document.getElementById('edit-task-desc').value = tarea.desc; 
         document.getElementById('edit-task-tango').value = tarea.tango || "";
         document.getElementById('edit-task-tango').style.display = avion.isActivity ? 'none' : 'block';
+
+        const editTimesWrap = document.getElementById('edit-task-times');
+        editTimesWrap.style.display = avion.isActivity ? 'block' : 'none';
+        document.getElementById('edit-task-start').value = avion.start || '';
+        document.getElementById('edit-task-end').value = avion.end || '';
         
         buildTechGrid('edit-task-techs', tarea.techs || ""); 
         
@@ -2043,6 +2222,11 @@
         if (!avion.isActivity) {
             tango = document.getElementById('edit-task-tango').value.trim().toUpperCase();
             if (tango && tango.length !== 8) return showConfirm("EL TANGO DEBE TENER 8 CARACTERES.", null);
+        }
+        
+        if (avion.isActivity) {
+            avion.start = document.getElementById('edit-task-start').value;
+            avion.end = document.getElementById('edit-task-end').value;
         }
         
         if (!desc) return showConfirm("LA DESCRIPCIÓN NO PUEDE ESTAR VACÍA.", null);
@@ -2117,6 +2301,204 @@
         const el = document.getElementById('print-area');
         el.style.zoom = '';
         document.documentElement.style.removeProperty('--print-font-size');
+    });
+
+    // ─── ORDENAR MANUALMENTE (drag & drop con Pointer Events) ───
+    let orderDrag = null;
+    let orderDropLine = null;
+
+    function getDropLine() {
+        if (!orderDropLine) {
+            orderDropLine = document.createElement('div');
+            orderDropLine.className = 'drop-line';
+            orderDropLine.style.display = 'none';
+            document.body.appendChild(orderDropLine);
+        }
+        return orderDropLine;
+    }
+
+    function startOrderDrag(e, type, avionId, taskId) {
+        if (e.button !== 0) return;
+        if (isShiftLockedForMe()) return;
+        if (currentViewMode !== 'default' || currentTechFilter) return;
+
+        const el = type === 'avion'
+            ? document.querySelector(`.avion-section[data-avion-id="${avionId}"]`)
+            : document.querySelector(`.task-item[data-avion-id="${avionId}"][data-task-id="${taskId}"]`);
+        if (!el) return;
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const ghost = el.cloneNode(true);
+        ghost.classList.add('drag-ghost');
+        ghost.style.width = Math.min(el.offsetWidth, 360) + 'px';
+        document.body.appendChild(ghost);
+
+        orderDrag = {
+            type,
+            el,
+            avionId: Number(avionId),
+            taskId: taskId ? Number(taskId) : null,
+            ghost,
+            pointerId: e.pointerId !== undefined ? e.pointerId : null,
+            targetEl: null,
+            before: false,
+            groupContainer: null,
+            moved: false
+        };
+
+        el.classList.add('dragging');
+        document.body.classList.add('dragging-active');
+        moveOrderGhost(e);
+    }
+
+    function moveOrderGhost(e) {
+        const w = orderDrag.ghost.offsetWidth;
+        orderDrag.ghost.style.left = (e.clientX - w / 2) + 'px';
+        orderDrag.ghost.style.top = (e.clientY + 12) + 'px';
+        orderDrag.moved = true;
+    }
+
+    function updateOrderIndicator(clientY) {
+        let candidates;
+        if (orderDrag.type === 'avion') {
+            candidates = Array.from(document.querySelectorAll('#aviones-container .avion-section:not(.activity-group)'));
+        } else {
+            orderDrag.groupContainer = orderDrag.el.closest('.activity-group');
+            candidates = Array.from(orderDrag.groupContainer
+                ? orderDrag.groupContainer.querySelectorAll('.task-item')
+                : document.querySelectorAll(`.avion-section[data-avion-id="${orderDrag.avionId}"] .task-item`));
+        }
+
+        // Buscar el borde más cercano (incluso entre bloques, en los espacios vacíos)
+        let best = null, bestBefore = false, bestDist = Infinity;
+        for (const c of candidates) {
+            if (c === orderDrag.el) continue;
+            const r = c.getBoundingClientRect();
+            if (clientY >= r.top && clientY <= r.bottom) {
+                best = c;
+                bestBefore = (clientY - r.top) < r.height / 2;
+                break;
+            }
+            if (clientY < r.top) {
+                const d = r.top - clientY;
+                if (d < bestDist) { best = c; bestBefore = true; bestDist = d; }
+            } else {
+                const d = clientY - r.bottom;
+                if (d < bestDist) { best = c; bestBefore = false; bestDist = d; }
+            }
+        }
+
+        const line = getDropLine();
+        if (!best) {
+            line.style.display = 'none';
+            orderDrag.targetEl = null;
+            return;
+        }
+
+        const r = best.getBoundingClientRect();
+        const container = orderDrag.type === 'avion'
+            ? document.getElementById('aviones-container')
+            : best.closest('.task-container');
+        const cr = container.getBoundingClientRect();
+        const y = bestBefore ? r.top : r.bottom;
+
+        line.style.display = 'block';
+        line.style.left = (cr.left + 2) + 'px';
+        line.style.width = (cr.width - 4) + 'px';
+        line.style.top = (y - 2) + 'px';
+        orderDrag.targetEl = best;
+        orderDrag.before = bestBefore;
+    }
+
+    function applyOrder() {
+        if (!orderDrag || !orderDrag.targetEl) return;
+        const before = orderDrag.before;
+        const draggedId = orderDrag.type === 'avion' ? orderDrag.avionId : orderDrag.taskId;
+
+        if (orderDrag.type === 'avion') {
+            const ids = Array.from(document.querySelectorAll('#aviones-container .avion-section:not(.activity-group)'))
+                .map(s => Number(s.dataset.avionId));
+            const targetId = Number(orderDrag.targetEl.dataset.avionId);
+            const newIds = ids.filter(id => id !== draggedId);
+            const pos = newIds.indexOf(targetId) + (before ? 0 : 1);
+            newIds.splice(pos, 0, draggedId);
+            avionesData.sort((a, b) => newIds.indexOf(a.id) - newIds.indexOf(b.id));
+        } else if (orderDrag.groupContainer) {
+            // Reordenar actividades dentro del grupo único
+            const ids = Array.from(orderDrag.groupContainer.querySelectorAll('.task-item'))
+                .map(i => Number(i.dataset.taskId));
+            const targetId = Number(orderDrag.targetEl.dataset.taskId);
+            const newIds = ids.filter(id => id !== draggedId);
+            const pos = newIds.indexOf(targetId) + (before ? 0 : 1);
+            newIds.splice(pos, 0, draggedId);
+
+            const byId = {};
+            avionesData.forEach(a => byId[a.id] = a);
+            const avionOfTask = {};
+            avionesData.forEach(a => (a.tareas || []).forEach(t => avionOfTask[t.id] = a.id));
+
+            // Reordenar las tareas de cada actividad según la secuencia global
+            const activities = avionesData.filter(a => a.isActivity);
+            activities.forEach(a => {
+                const seq = newIds.filter(tid => avionOfTask[tid] === a.id);
+                const taskById = {};
+                a.tareas.forEach(t => taskById[t.id] = t);
+                a.tareas = seq.map(tid => taskById[tid]).filter(Boolean);
+            });
+
+            // Reordenar las actividades según la posición de su primera tarea
+            const orderedActivityIds = [];
+            newIds.forEach(tid => {
+                const aid = avionOfTask[tid];
+                if (aid && !orderedActivityIds.includes(aid)) orderedActivityIds.push(aid);
+            });
+            const others = avionesData.filter(a => !a.isActivity);
+            const rebuilt = others.concat(orderedActivityIds.map(id => byId[id]).filter(Boolean));
+            avionesData.splice(0, avionesData.length, ...rebuilt);
+        } else {
+            const avion = avionesData.find(a => a.id === orderDrag.avionId);
+            if (!avion) return;
+            const ids = Array.from(document.querySelectorAll(`.avion-section[data-avion-id="${orderDrag.avionId}"] .task-item`))
+                .map(i => Number(i.dataset.taskId));
+            const targetId = Number(orderDrag.targetEl.dataset.taskId);
+            const newIds = ids.filter(id => id !== draggedId);
+            const pos = newIds.indexOf(targetId) + (before ? 0 : 1);
+            newIds.splice(pos, 0, draggedId);
+            avion.tareas.sort((a, b) => newIds.indexOf(a.id) - newIds.indexOf(b.id));
+        }
+
+        localMutation = true;
+        saveData();
+    }
+
+    function cleanupOrderDrag() {
+        if (orderDrag) {
+            if (orderDrag.el) orderDrag.el.classList.remove('dragging');
+            if (orderDrag.ghost) orderDrag.ghost.remove();
+        }
+        if (orderDropLine) orderDropLine.style.display = 'none';
+        orderDrag = null;
+        document.body.classList.remove('dragging-active');
+    }
+
+    function onOrderDragMove(e) {
+        if (!orderDrag || (orderDrag.pointerId !== null && e.pointerId !== orderDrag.pointerId)) return;
+        moveOrderGhost(e);
+        updateOrderIndicator(e.clientY);
+    }
+
+    function onOrderDragEnd(e) {
+        if (!orderDrag || (orderDrag.pointerId !== null && e.pointerId !== orderDrag.pointerId)) return;
+        if (orderDrag.moved) applyOrder();
+        cleanupOrderDrag();
+    }
+
+    document.addEventListener('pointermove', onOrderDragMove);
+    document.addEventListener('pointerup', onOrderDragEnd);
+    document.addEventListener('pointercancel', (e) => {
+        if (orderDrag && (orderDrag.pointerId === null || e.pointerId === orderDrag.pointerId)) cleanupOrderDrag();
     });
 
     // Universal search across all dates and turns
@@ -2322,14 +2704,16 @@
         formatMatricula, autoFormatTango, handleTangoClick, closeModal,
         toggleTask, toggleAtencion,
         openAddAvionModal, saveAddAvion, openAddActivityModal, saveAddActivity, 
+        openEditActivityGroupModal, saveEditActivityGroup, confirmDeleteActivities,
         openEditAvionModal, saveEditAvion, confirmDeleteAvion,
         openAddTaskModal, saveAddTask, openEditTaskModal, saveEditTask, confirmDeleteTask,
         editAvionComment, editTaskComment, closeConfirmModal, closePromptModal,
         changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput,
         formatTime, changeTurno, changeDate, goToToday, toggleLockShift,
+        finalizeTime, onTimeKeyEnter,
         openManageTechsModal, addGlobalTech, removeGlobalTech,
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
-        openManageShiftModal, deleteEntireShift, moveShift, performSearch, clearSearch
+        openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch
     });
 
 </script>
