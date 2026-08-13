@@ -1576,7 +1576,8 @@
     }
 
     function formatTime(input) {
-        let d = input.value.replace(/\D/g, '').slice(0, 4);
+        let d = input.value.replace(/\D/g, '');
+        if (d.length > 4) d = d.slice(-4);
         if (!d) { input.value = ''; return; }
         let out;
         if (d.length <= 2) {
@@ -1591,8 +1592,9 @@
 
     function normalizeTime(raw) {
         if (!raw) return '';
-        const digits = raw.replace(/\D/g, '');
+        let digits = raw.replace(/\D/g, '');
         if (!digits) return '';
+        if (digits.length > 4) digits = digits.slice(-4);
         let h, m;
         if (raw.includes(':')) {
             const parts = raw.split(':');
