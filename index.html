@@ -969,7 +969,7 @@
 
     let correosAutorizados = [];
 
-    const tlAuthRef = ref(db, 'mantenimiento/tl_autorizados');
+    const tlAuthRef = ref(db, 'mantenimiento/tl_autorizados_pd');
     onValue(tlAuthRef, (snapshot) => {
         const data = snapshot.val();
         correosAutorizados = data || [];
@@ -1558,10 +1558,10 @@
 
     function handleTaskDescInput(inputElem, tangoElemId) {
         let val = inputElem.value;
-        const regex = /(T00[A-Z0-9]{5})/i;
-        const match = val.match(regex);
-        if (match) {
-            const tangoCode = match[1].toUpperCase();
+        const regex = /(T00[A-Z0-9]{5})/ig;
+        const matches = val.match(regex);
+        if (matches && matches.length > 0) {
+            const tangoCode = matches[matches.length - 1].toUpperCase();
             const tangoInput = document.getElementById(tangoElemId);
             if (!tangoInput.value) { tangoInput.value = tangoCode; }
             inputElem.value = val.replace(new RegExp(`[\\[\\(]?${tangoCode}[\\]\\)]?`, 'i'), '').trim();
