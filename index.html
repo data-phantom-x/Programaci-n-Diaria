@@ -504,6 +504,14 @@
             border-radius: 12px 0 12px 0; overflow: hidden;
         }
 
+        #toast {
+            visibility: hidden; min-width: 250px; background-color: var(--primary); color: #fff;
+            text-align: center; border-radius: 4px; padding: 10px; position: fixed; z-index: 1001;
+            bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            opacity: 0; transition: opacity 0.3s, visibility 0.3s; border-left: 4px solid var(--accent);
+        }
+        #toast.show { visibility: visible; opacity: 1; }
+
         /* Ultra-Comprimido para Imprimir en una sola hoja carta (va DESPUÉS del móvil para que la impresión siempre gane) */
         @media print {
             @page { size: letter; margin: 1.2cm; } 
@@ -569,6 +577,7 @@
             <span id="logged-user" class="leader-only" style="font-size: 10px; font-weight: bold; color: var(--primary); border: 1px solid var(--primary); padding: 0 10px; border-radius: 4px; background: #e0f2fe; display: none; align-items: center; height: 28px; box-sizing: border-box; margin: 0;"></span>
             <button type="button" id="btn-logout" class="btn-danger-outline" onclick="logoutLeader()" style="width:28px; min-width:28px; padding:0; display:none; font-size:14px; flex:none;">✖</button>
             <button class="btn-outline" onclick="window.print()" title="Imprimir" style="width:28px; min-width:28px; padding:0; font-size:14px; flex:none;">🖨️</button>
+            <button type="button" id="btn-admin" class="btn-outline" onclick="openAdminModal()" title="Administrar usuarios autorizados" style="display:none; padding:0 10px; font-size:10px;">⚙ ADMIN</button>
         </div>
         <div id="live-clock" class="live-clock"></div>
     </div>
@@ -661,6 +670,8 @@
         <div id="group-messages-bottom"></div>
     </div>
 </div>
+
+<div id="toast">✅ Acción realizada con éxito</div>
 
 <div id="confirm-modal" class="modal">
     <div class="modal-content" style="max-width: 380px; text-align: center;">
@@ -919,6 +930,25 @@
     </div>
 </div>
 
+<div id="admin-modal" class="modal">
+    <div class="modal-content" style="max-width: 480px;">
+        <div class="modal-header" style="border:none; padding-bottom:0; margin-bottom:10px;">⚙ ADMIN · USUARIOS AUTORIZADOS</div>
+        <div id="admin-list" style="max-height: 220px; overflow-y: auto; margin-bottom: 12px; font-size: 11px;"></div>
+        <div style="border-top: 1px solid var(--border); padding-top: 12px;">
+            <strong style="font-size: 10px; color: var(--primary);">AGREGAR NUEVO USUARIO:</strong>
+            <input type="text" id="admin-name" placeholder="EJ: juan.perez o juan.perez@latam.com" autocomplete="off" style="width:100%; margin:8px 0 10px;" onkeypress="if(event.key === 'Enter') adminAddUser()">
+            <div style="display:flex; gap:15px; margin-bottom:5px;">
+                <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-tl" checked> AUTORIZAR COMO TEAM LEADER</label>
+                <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-admin"> AGREGAR TAMBIÉN COMO ADMIN</label>
+            </div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-outline btn-modal-action" onclick="closeModal('admin-modal')">CERRAR</button>
+            <button class="btn-leader btn-modal-action" onclick="adminAddUser()">AGREGAR USUARIO</button>
+        </div>
+    </div>
+</div>
+
 <div id="manage-techs-modal" class="modal">
     <div class="modal-content">
         <div class="modal-header" style="color: var(--leader-color);">👥 BASE GLOBAL DE TÉCNICOS</div>
@@ -968,6 +998,7 @@
       });
 
     let correosAutorizados = [];
+    let adminList = [];
 
     const tlAuthRef = ref(db, 'mantenimiento/tl_autorizados_pd');
     onValue(tlAuthRef, (snapshot) => {
@@ -975,6 +1006,16 @@
         correosAutorizados = data || [];
         checkSession();
     });
+
+    const tlAdminsRef = ref(db, 'mantenimiento/tl_admins_pd');
+    onValue(tlAdminsRef, (snapshot) => {
+        adminList = snapshot.val() || [];
+        updateAdminUI();
+    });
+
+    function isAuthorizedUser(name) {
+        return correosAutorizados.includes(name) || adminList.includes(name);
+    }
 
     function extractUsername(email) {
         return email.trim().toLowerCase().split('@')[0];
@@ -1073,7 +1114,7 @@
         const loginTime = localStorage.getItem('tl_login_time');
 
         if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
-            if (correosAutorizados.includes(savedEmail)) {
+            if (isAuthorizedUser(savedEmail)) {
                 activateLeaderUI();
             } else {
                 logoutLeader();
@@ -1085,6 +1126,7 @@
 
     function activateLeaderUI() {
         isTeamLeader = true;
+        myEmail = localStorage.getItem('tl_email') || '';
         document.body.classList.add('team-leader-mode');
         
         const userAlias = (myEmail || localStorage.getItem('tl_email') || '').toUpperCase();
@@ -1104,6 +1146,7 @@
         if (loggedUserSpan) loggedUserSpan.style.display = 'none';
         
         updateLockUI();
+        updateAdminUI();
         render();
     }
 
@@ -1126,6 +1169,7 @@
         if (loggedUserSpan) loggedUserSpan.style.display = 'none';
         
         updateLockUI();
+        updateAdminUI();
         render();
     }
 
@@ -1136,7 +1180,7 @@
             const savedEmail = localStorage.getItem('tl_email');
             const loginTime = localStorage.getItem('tl_login_time');
 
-            if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS && correosAutorizados.includes(savedEmail)) {
+            if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS && isAuthorizedUser(savedEmail)) {
                 activateLeaderUI();
             } else {
                 const email = prompt("🔒 ACCESO TEAM LEADER\nIngrese su correo corporativo autorizado:");
@@ -1144,7 +1188,7 @@
 
                 const username = extractUsername(email);
                 
-                if (correosAutorizados.includes(username)) {
+                if (isAuthorizedUser(username)) {
                     localStorage.setItem('tl_email', username);
                     localStorage.setItem('tl_login_time', Date.now().toString());
                     myEmail = username;
@@ -1160,6 +1204,108 @@
         localStorage.removeItem('tl_email');
         localStorage.removeItem('tl_login_time');
         deactivateLeaderUI();
+    }
+
+    // ─── PANEL ADMIN (SOLO PARA ADMINISTRADORES) ───
+    function isAdminUser() {
+        return isTeamLeader && adminList.includes(myEmail);
+    }
+
+    function updateAdminUI() {
+        const btn = document.getElementById('btn-admin');
+        if (btn) btn.style.display = isAdminUser() ? 'inline-flex' : 'none';
+    }
+
+    function showToast(msg) {
+        const toast = document.getElementById('toast');
+        toast.innerText = msg;
+        toast.className = 'show';
+        setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+    }
+
+    function openAdminModal() {
+        if (!isAdminUser()) return;
+        document.getElementById('admin-name').value = '';
+        document.getElementById('admin-is-tl').checked = true;
+        document.getElementById('admin-is-admin').checked = false;
+        document.getElementById('admin-modal').style.display = 'block';
+        refreshAdminList();
+    }
+
+    function refreshAdminList() {
+        const listEl = document.getElementById('admin-list');
+        const all = new Set([...correosAutorizados, ...adminList]);
+        if (all.size === 0) {
+            listEl.innerHTML = '<div style="font-weight:800; color:var(--comment); padding:8px 0;">SIN USUARIOS AÚN</div>';
+            updateAdminUI();
+            return;
+        }
+        let html = '';
+        for (const user of Array.from(all).sort()) {
+            const isTl = correosAutorizados.includes(user);
+            const isAdm = adminList.includes(user);
+            html += `<div style="display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--light-gray); border-radius:4px; margin-bottom:5px; background:white;">
+                <span style="flex:1; font-weight:700; color:var(--primary); font-size:11px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+                    ${user.toUpperCase()}
+                    ${isAdm ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--danger); padding:1px 5px; border-radius:3px;">ADMIN</span>' : ''}
+                    ${isTl ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--leader-color); padding:1px 5px; border-radius:3px;">TL</span>' : ''}
+                </span>
+                <button class="btn-action-small" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" style="${isTl ? 'background:var(--leader-color); color:white;' : ''}">${isTl ? 'TL' : 'TL?'}</button>
+                <button class="btn-action-small" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" style="${isAdm ? 'background:var(--danger); color:white;' : ''}">${isAdm ? 'ADMIN' : 'ADMIN?'}</button>
+                <button class="btn-action-small" onclick="adminRemoveUser('${user}')" title="Quitar acceso">✖</button>
+            </div>`;
+        }
+        listEl.innerHTML = html;
+        updateAdminUI();
+    }
+
+    function adminAddUser() {
+        if (!isAdminUser()) return;
+        const name = extractUsername(document.getElementById('admin-name').value);
+        if (!name) return showConfirm("INGRESE EL NOMBRE DEL USUARIO (EJ: juan.perez).", null);
+        const asTl = document.getElementById('admin-is-tl').checked;
+        const asAdmin = document.getElementById('admin-is-admin').checked;
+        if (!asTl && !asAdmin) return showConfirm("SELECCIONE AL MENOS UN ROL (TL O ADMIN).", null);
+        const alreadyTl = correosAutorizados.includes(name);
+        const alreadyAdm = adminList.includes(name);
+        if ((!asTl || alreadyTl) && (!asAdmin || alreadyAdm)) return showConfirm("EL USUARIO YA TIENE ESOS ROLES.", null);
+        if (asTl && !alreadyTl) correosAutorizados = [...correosAutorizados, name];
+        if (asAdmin && !alreadyAdm) adminList = [...adminList, name];
+        document.getElementById('admin-name').value = '';
+        refreshAdminList();
+        showToast(`✅ USUARIO AGREGADO: ${name.toUpperCase()}`);
+        set(ref(db, 'mantenimiento/tl_autorizados_pd'), correosAutorizados);
+        set(ref(db, 'mantenimiento/tl_admins_pd'), adminList);
+    }
+
+    function adminToggleTl(user) {
+        if (!isAdminUser()) return;
+        const isTl = correosAutorizados.includes(user);
+        correosAutorizados = isTl ? correosAutorizados.filter(u => u !== user) : [...correosAutorizados, user];
+        refreshAdminList();
+        showToast(isTl ? `✖ TL QUITADO: ${user.toUpperCase()}` : `✅ TL OTORGADO: ${user.toUpperCase()}`);
+        set(ref(db, 'mantenimiento/tl_autorizados_pd'), correosAutorizados);
+    }
+
+    function adminToggleAdmin(user) {
+        if (!isAdminUser()) return;
+        const isAdm = adminList.includes(user);
+        adminList = isAdm ? adminList.filter(u => u !== user) : [...adminList, user];
+        refreshAdminList();
+        showToast(isAdm ? `✖ ADMIN QUITADO: ${user.toUpperCase()}` : `✅ ADMIN OTORGADO: ${user.toUpperCase()}`);
+        set(ref(db, 'mantenimiento/tl_admins_pd'), adminList);
+    }
+
+    function adminRemoveUser(user) {
+        if (!isAdminUser()) return;
+        showConfirm(`¿ELIMINAR A ${user.toUpperCase()} DE TODOS LOS ACCESOS?`, () => {
+            correosAutorizados = correosAutorizados.filter(u => u !== user);
+            adminList = adminList.filter(u => u !== user);
+            refreshAdminList();
+            showToast(`✖ ACCESO ELIMINADO: ${user.toUpperCase()}`);
+            set(ref(db, 'mantenimiento/tl_autorizados_pd'), correosAutorizados);
+            set(ref(db, 'mantenimiento/tl_admins_pd'), adminList);
+        });
     }
 
     function changeTurno() {
@@ -2882,7 +3028,8 @@
         finalizeTime, onTimeKeyEnter,
         openManageTechsModal, addGlobalTech, removeGlobalTech,
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
-        openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch
+        openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
+        openAdminModal, adminAddUser, adminToggleTl, adminToggleAdmin, adminRemoveUser
     });
 
 </script>
