@@ -1691,6 +1691,11 @@
             container.innerHTML = '<span style="font-size:10px; color:var(--comment); font-style:italic;">No hay técnicos registrados.</span>';
             return;
         }
+        const countPill = document.createElement('div'); countPill.className = 'tech-pill';
+        countPill.style.fontWeight = '800';
+        countPill.title = `Total de técnicos en el turno: ${shiftTechs.length}`;
+        countPill.innerHTML = `<span class="tech-name">👥 ${shiftTechs.length}</span>`;
+        container.appendChild(countPill);
         shiftTechs.forEach((tech, index) => {
             const pill = document.createElement('div'); pill.className = 'tech-pill';
             pill.innerHTML = `<span class="tech-name">${tech}</span> <span class="tech-remove" onclick="removeTech(${index})" title="Eliminar">✖</span>`;
