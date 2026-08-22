@@ -999,22 +999,36 @@
 
     let correosAutorizados = [];
     let adminList = [];
+    let superAdmins = [];
 
-    const tlAuthRef = ref(db, 'mantenimiento/tl_autorizados_pd');
+    // SUPER ADMINS (gestionados directamente en Firebase, no en el código)
+    const superAdminsRef = ref(db, 'mantenimiento/super_admin');
+    onValue(superAdminsRef, (snapshot) => {
+        superAdmins = snapshot.val() || [];
+        checkSession();
+        updateAdminUI();
+        refreshAdminListIfOpen();
+    });
+
+    function isSuperAdmin(name) {
+        return superAdmins.includes(name);
+    }
+
+    const tlAuthRef = ref(db, 'mantenimiento/pd/autorizados');
     onValue(tlAuthRef, (snapshot) => {
         const data = snapshot.val();
         correosAutorizados = data || [];
         checkSession();
     });
 
-    const tlAdminsRef = ref(db, 'mantenimiento/tl_admins_pd');
+    const tlAdminsRef = ref(db, 'mantenimiento/pd/admin');
     onValue(tlAdminsRef, (snapshot) => {
         adminList = snapshot.val() || [];
         updateAdminUI();
     });
 
     function isAuthorizedUser(name) {
-        return correosAutorizados.includes(name) || adminList.includes(name);
+        return isSuperAdmin(name) || correosAutorizados.includes(name) || adminList.includes(name);
     }
 
     function extractUsername(email) {
@@ -1097,13 +1111,13 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    const globalTechsRef = ref(db, 'mantenimiento/global_techs');
+    const globalTechsRef = ref(db, 'mantenimiento/pd/global_techs');
     onValue(globalTechsRef, (snapshot) => {
         globalTechs = snapshot.val() || [];
         updateGlobalTechsUI();
     });
     
-    const predefTasksRef = ref(db, 'mantenimiento/predefined_tasks');
+    const predefTasksRef = ref(db, 'mantenimiento/pd/predefined_task');
     onValue(predefTasksRef, (snapshot) => {
         predefTasks = snapshot.val() || [];
         updatePredefTasksUI();
@@ -1132,8 +1146,8 @@
         const userAlias = (myEmail || localStorage.getItem('tl_email') || '').toUpperCase();
 
         const btnToggle = document.getElementById('btn-mode-toggle');
-        btnToggle.innerText = `👤 ${userAlias}`;
-        btnToggle.title = userAlias ? `TEAM LEADER: ${userAlias}` : '';
+        btnToggle.innerText = isSuperAdmin(myEmail) ? `🛡️ ${userAlias}` : `👤 ${userAlias}`;
+        btnToggle.title = userAlias ? `TEAM LEADER: ${userAlias}${isSuperAdmin(myEmail) ? ' (SUPER ADMIN)' : ''}` : '';
         btnToggle.style.background = "";
         btnToggle.style.color = "";
         btnToggle.style.border = "";
@@ -1208,7 +1222,7 @@
 
     // ─── PANEL ADMIN (SOLO PARA ADMINISTRADORES) ───
     function isAdminUser() {
-        return isTeamLeader && adminList.includes(myEmail);
+        return isTeamLeader && (isSuperAdmin(myEmail) || adminList.includes(myEmail));
     }
 
     function updateAdminUI() {
@@ -1223,6 +1237,11 @@
         setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
     }
 
+    function refreshAdminListIfOpen() {
+        const modal = document.getElementById('admin-modal');
+        if (modal && modal.style.display === 'block') refreshAdminList();
+    }
+
     function openAdminModal() {
         if (!isAdminUser()) return;
         document.getElementById('admin-name').value = '';
@@ -1234,7 +1253,7 @@
 
     function refreshAdminList() {
         const listEl = document.getElementById('admin-list');
-        const all = new Set([...correosAutorizados, ...adminList]);
+        const all = new Set([...correosAutorizados, ...adminList, ...superAdmins]);
         if (all.size === 0) {
             listEl.innerHTML = '<div style="font-weight:800; color:var(--comment); padding:8px 0;">SIN USUARIOS AÚN</div>';
             updateAdminUI();
@@ -1242,17 +1261,22 @@
         }
         let html = '';
         for (const user of Array.from(all).sort()) {
-            const isTl = correosAutorizados.includes(user);
-            const isAdm = adminList.includes(user);
-            html += `<div style="display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--light-gray); border-radius:4px; margin-bottom:5px; background:white;">
+            const isTl = correosAutorizados.includes(user) || isSuperAdmin(user);
+            const isAdm = adminList.includes(user) || isSuperAdmin(user);
+            const isSA = isSuperAdmin(user);
+            const actions = isSA
+                ? `<span style="font-size:9px; font-weight:800; color:var(--comment); padding:4px 6px;">PROTEGIDO</span>`
+                : `<button class="btn-action-small" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" style="${isTl ? 'background:var(--leader-color); color:white;' : ''}">${isTl ? 'TL' : 'TL?'}</button>
+                <button class="btn-action-small" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" style="${isAdm ? 'background:var(--danger); color:white;' : ''}">${isAdm ? 'ADMIN' : 'ADMIN?'}</button>
+                <button class="btn-action-small" onclick="adminRemoveUser('${user}')" title="Quitar acceso">✖</button>`;
+            html += `<div style="display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--light-gray); border-radius:4px; margin-bottom:5px; background:${isSA ? '#fffbe6' : 'white'};">
                 <span style="flex:1; font-weight:700; color:var(--primary); font-size:11px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
                     ${user.toUpperCase()}
-                    ${isAdm ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--danger); padding:1px 5px; border-radius:3px;">ADMIN</span>' : ''}
-                    ${isTl ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--leader-color); padding:1px 5px; border-radius:3px;">TL</span>' : ''}
+                    ${isSA ? '<span style="font-size:9px; font-weight:700; color:white; background:#b8860b; padding:1px 5px; border-radius:3px;">SUPER ADMIN</span>' : ''}
+                    ${!isSA && isAdm ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--danger); padding:1px 5px; border-radius:3px;">ADMIN</span>' : ''}
+                    ${!isSA && isTl ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--leader-color); padding:1px 5px; border-radius:3px;">TL</span>' : ''}
                 </span>
-                <button class="btn-action-small" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" style="${isTl ? 'background:var(--leader-color); color:white;' : ''}">${isTl ? 'TL' : 'TL?'}</button>
-                <button class="btn-action-small" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" style="${isAdm ? 'background:var(--danger); color:white;' : ''}">${isAdm ? 'ADMIN' : 'ADMIN?'}</button>
-                <button class="btn-action-small" onclick="adminRemoveUser('${user}')" title="Quitar acceso">✖</button>
+                ${actions}
             </div>`;
         }
         listEl.innerHTML = html;
@@ -1274,37 +1298,40 @@
         document.getElementById('admin-name').value = '';
         refreshAdminList();
         showToast(`✅ USUARIO AGREGADO: ${name.toUpperCase()}`);
-        set(ref(db, 'mantenimiento/tl_autorizados_pd'), correosAutorizados);
-        set(ref(db, 'mantenimiento/tl_admins_pd'), adminList);
+        set(ref(db, 'mantenimiento/pd/autorizados'), correosAutorizados);
+        set(ref(db, 'mantenimiento/pd/admin'), adminList);
     }
 
     function adminToggleTl(user) {
         if (!isAdminUser()) return;
+        if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
         const isTl = correosAutorizados.includes(user);
         correosAutorizados = isTl ? correosAutorizados.filter(u => u !== user) : [...correosAutorizados, user];
         refreshAdminList();
         showToast(isTl ? `✖ TL QUITADO: ${user.toUpperCase()}` : `✅ TL OTORGADO: ${user.toUpperCase()}`);
-        set(ref(db, 'mantenimiento/tl_autorizados_pd'), correosAutorizados);
+        set(ref(db, 'mantenimiento/pd/autorizados'), correosAutorizados);
     }
 
     function adminToggleAdmin(user) {
         if (!isAdminUser()) return;
+        if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
         const isAdm = adminList.includes(user);
         adminList = isAdm ? adminList.filter(u => u !== user) : [...adminList, user];
         refreshAdminList();
         showToast(isAdm ? `✖ ADMIN QUITADO: ${user.toUpperCase()}` : `✅ ADMIN OTORGADO: ${user.toUpperCase()}`);
-        set(ref(db, 'mantenimiento/tl_admins_pd'), adminList);
+        set(ref(db, 'mantenimiento/pd/admin'), adminList);
     }
 
     function adminRemoveUser(user) {
         if (!isAdminUser()) return;
+        if (isSuperAdmin(user)) return showToast('⚠️ EL SUPER ADMIN NO PUEDE SER ELIMINADO');
         showConfirm(`¿ELIMINAR A ${user.toUpperCase()} DE TODOS LOS ACCESOS?`, () => {
             correosAutorizados = correosAutorizados.filter(u => u !== user);
             adminList = adminList.filter(u => u !== user);
             refreshAdminList();
             showToast(`✖ ACCESO ELIMINADO: ${user.toUpperCase()}`);
-            set(ref(db, 'mantenimiento/tl_autorizados_pd'), correosAutorizados);
-            set(ref(db, 'mantenimiento/tl_admins_pd'), adminList);
+            set(ref(db, 'mantenimiento/pd/autorizados'), correosAutorizados);
+            set(ref(db, 'mantenimiento/pd/admin'), adminList);
         });
     }
 
@@ -1327,7 +1354,7 @@
 
     function getBasePath() {
         const safeTurno = activeTurno.replace(/\s+/g, '_');
-        return `mantenimiento/historial/${viewingDate}/${safeTurno}`;
+        return `mantenimiento/pd/historial/${viewingDate}/${safeTurno}`;
     }
 
     function isShiftLockedForMe() {
@@ -1639,7 +1666,7 @@
 
         showConfirm(`⚠️ ¿CONFIRMAS TRASLADAR TODO A:\n${newTurno.toUpperCase()} DEL ${newDate}?`, () => {
             const safeNewTurno = newTurno.replace(/\s+/g, '_');
-            const newPath = `mantenimiento/historial/${newDate}/${safeNewTurno}`;
+            const newPath = `mantenimiento/pd/historial/${newDate}/${safeNewTurno}`;
 
             // Escribir en la nueva fecha/turno
             set(ref(db, `${newPath}/aviones`), avionesData);
@@ -2842,7 +2869,7 @@
         try {
             let data;
             if (forceRefresh || !searchCache) {
-                const snap = await get(ref(db, 'mantenimiento/historial'));
+                const snap = await get(ref(db, 'mantenimiento/pd/historial'));
                 data = snap.val();
                 searchCache = data;
             } else {
