@@ -936,10 +936,12 @@
         <div id="admin-list" style="max-height: 220px; overflow-y: auto; margin-bottom: 12px; font-size: 11px;"></div>
         <div style="border-top: 1px solid var(--border); padding-top: 12px;">
             <strong style="font-size: 10px; color: var(--primary);">AGREGAR NUEVO USUARIO:</strong>
-            <input type="text" id="admin-name" placeholder="EJ: juan.perez o juan.perez@latam.com" autocomplete="off" style="width:100%; margin:8px 0 10px;" onkeypress="if(event.key === 'Enter') adminAddUser()">
-            <div style="display:flex; gap:15px; margin-bottom:5px;">
-                <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-tl" checked> AUTORIZAR COMO TEAM LEADER</label>
-                <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-admin"> AGREGAR TAMBIÉN COMO ADMIN</label>
+            <input type="text" id="admin-name" placeholder="USUARIO · EJ: juan.perez" autocomplete="off" style="width:100%; margin:8px 0 8px;" onkeypress="if(event.key === 'Enter') adminAddUser()">
+            <input type="text" id="admin-realname" placeholder="NOMBRE REAL · EJ: JUAN PEREZ" autocomplete="off" style="width:100%; margin:0 0 10px;" onkeypress="if(event.key === 'Enter') adminAddUser()">
+            <div style="display:flex; gap:15px; margin-bottom:5px; flex-wrap:wrap;">
+                <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-user" checked> USUARIO (👤)</label>
+                <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-tl"> TEAM LEADER</label>
+                <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-admin"> ADMIN</label>
             </div>
         </div>
         <div class="modal-footer">
@@ -1014,17 +1016,57 @@
         return superAdmins.includes(name);
     }
 
-    const tlAuthRef = ref(db, 'mantenimiento/pd/autorizados');
-    onValue(tlAuthRef, (snapshot) => {
-        const data = snapshot.val();
-        correosAutorizados = data || [];
+    // REGISTRO ÚNICO DE USUARIOS: acceso, roles y nombre real viven aquí.
+    // ej en Firebase: hector_vargas: { u: "hector.vargas", nombre: "...", usuario: true, tl: false, admin: false }
+    let usuariosDB = {};
+    function userRec(user) {
+        if (!usuariosDB[user]) usuariosDB[user] = { nombre: '', usuario: false, tl: false, admin: false };
+        return usuariosDB[user];
+    }
+    function syncRoleArrays() {
+        correosAutorizados = Object.keys(usuariosDB).filter(u => usuariosDB[u].tl);
+        adminList = Object.keys(usuariosDB).filter(u => usuariosDB[u].admin);
+    }
+    function saveUsuarios() {
+        const out = {};
+        Object.keys(usuariosDB).sort().forEach(u => {
+            out[u.replace(/\./g, '_')] = {
+                u,
+                nombre: usuariosDB[u].nombre || '',
+                usuario: !!usuariosDB[u].usuario,
+                tl: !!usuariosDB[u].tl,
+                admin: !!usuariosDB[u].admin
+            };
+        });
+        set(ref(db, 'mantenimiento/pd/usuarios'), out);
+    }
+    const tlUsersRef = ref(db, 'mantenimiento/pd/usuarios');
+    onValue(tlUsersRef, (snapshot) => {
+        const raw = snapshot.val();
+        usuariosDB = {};
+        const ingest = (name, e) => {
+            if (!name || isSuperAdmin(name)) return;
+            if (typeof e === 'string') e = {};
+            usuariosDB[name] = {
+                nombre: e.nombre || '',
+                usuario: !!(e.usuario || e.acceso), // acceso = campo del formato anterior
+                tl: !!e.tl,
+                admin: !!e.admin
+            };
+        };
+        if (Array.isArray(raw)) { // formato antiguo: lista de strings o de registros
+            raw.filter(Boolean).forEach(e => ingest(typeof e === 'string' ? e : e.u, e));
+        } else if (raw && typeof raw === 'object') {
+            Object.keys(raw).forEach(k => {
+                const e = raw[k];
+                if (!e) return;
+                ingest((typeof e === 'string') ? k.replace(/%2E/g, '.') : (e.u || k.replace(/%2E/g, '.')), e);
+            });
+        }
+        syncRoleArrays();
         checkSession();
-    });
-
-    const tlAdminsRef = ref(db, 'mantenimiento/pd/admin');
-    onValue(tlAdminsRef, (snapshot) => {
-        adminList = snapshot.val() || [];
         updateAdminUI();
+        refreshAdminListIfOpen();
     });
 
     function isAuthorizedUser(name) {
@@ -1245,7 +1287,9 @@
     function openAdminModal() {
         if (!isAdminUser()) return;
         document.getElementById('admin-name').value = '';
-        document.getElementById('admin-is-tl').checked = true;
+        document.getElementById('admin-realname').value = '';
+        document.getElementById('admin-is-user').checked = true;
+        document.getElementById('admin-is-tl').checked = false;
         document.getElementById('admin-is-admin').checked = false;
         document.getElementById('admin-modal').style.display = 'block';
         refreshAdminList();
@@ -1253,7 +1297,7 @@
 
     function refreshAdminList() {
         const listEl = document.getElementById('admin-list');
-        const all = new Set([...correosAutorizados, ...adminList].filter(u => !isSuperAdmin(u)));
+        const all = new Set([...Object.keys(usuariosDB), ...correosAutorizados, ...adminList].filter(u => !isSuperAdmin(u)));
         if (all.size === 0) {
             listEl.innerHTML = '<div style="font-weight:800; color:var(--comment); padding:8px 0;">SIN USUARIOS AÚN</div>';
             updateAdminUI();
@@ -1261,17 +1305,25 @@
         }
         let html = '';
         for (const user of Array.from(all).sort()) {
+            if (!user) continue;
+            const info = usuariosDB[user] || {};
+            const nombreReal = (info.nombre || '').trim();
             const isTl = correosAutorizados.includes(user);
             const isAdm = adminList.includes(user);
-            html += `<div style="display:flex; align-items:center; gap:8px; padding:6px 8px; border:1px solid var(--light-gray); border-radius:4px; margin-bottom:5px; background:white;">
-                <span style="flex:1; font-weight:700; color:var(--primary); font-size:11px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
+            const esUsuario = !!info.usuario;
+            const sinAcceso = !isTl && !isAdm && !esUsuario;
+            html += `<div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid var(--light-gray); border-radius:4px; margin-bottom:5px; background:${sinAcceso ? '#f8f8f8' : 'white'};">
+                <span style="flex:1; font-weight:700; color:${sinAcceso ? 'var(--comment)' : 'var(--primary)'}; font-size:11px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
                     ${user.toUpperCase()}
+                    ${nombreReal ? `<span style="font-weight:600; color:var(--comment);">${nombreReal}</span>` : ''}
                     ${isAdm ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--danger); padding:1px 5px; border-radius:3px;">ADMIN</span>' : ''}
-                    ${isTl ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--leader-color); padding:1px 5px; border-radius:3px;">TL</span>' : ''}
+                    ${sinAcceso ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--comment); padding:1px 5px; border-radius:3px;">SIN ACCESO</span>' : ''}
                 </span>
-                <button class="btn-action-small" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" style="${isTl ? 'background:var(--leader-color); color:white;' : ''}">${isTl ? 'TL' : 'TL?'}</button>
-                <button class="btn-action-small" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" style="${isAdm ? 'background:var(--danger); color:white;' : ''}">${isAdm ? 'ADMIN' : 'ADMIN?'}</button>
-                <button class="btn-action-small" onclick="adminRemoveUser('${user}')" title="Quitar acceso">✖</button>
+                <button class="btn-action-small" onclick="adminToggleUsuario('${user}')" title="Quitar/Dar acceso de usuario (quitarlo también quita TL y ADMIN)" style="${esUsuario ? 'background:var(--leader-color); color:white;' : ''}">👤</button>
+                <button class="btn-action-small" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" style="${isTl ? 'background:var(--leader-color); color:white;' : ''}">TL</button>
+                <button class="btn-action-small" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" style="${isAdm ? 'background:var(--danger); color:white;' : ''}">ADMIN</button>
+                <button class="btn-action-small" onclick="adminEditNombre('${user}')" title="Editar nombre real">✎</button>
+                <button class="btn-action-small" onclick="adminRemoveUser('${user}')" title="Eliminar usuario definitivamente">✖</button>
             </div>`;
         }
         listEl.innerHTML = html;
@@ -1283,51 +1335,93 @@
         const name = extractUsername(document.getElementById('admin-name').value);
         if (!name) return showConfirm("INGRESE EL NOMBRE DEL USUARIO (EJ: juan.perez).", null);
         if (isSuperAdmin(name)) return showToast('⚠️ ESE USUARIO YA ES SUPER ADMIN');
+        const asUser = document.getElementById('admin-is-user').checked;
         const asTl = document.getElementById('admin-is-tl').checked;
         const asAdmin = document.getElementById('admin-is-admin').checked;
-        if (!asTl && !asAdmin) return showConfirm("SELECCIONE AL MENOS UN ROL (TL O ADMIN).", null);
-        const alreadyTl = correosAutorizados.includes(name);
-        const alreadyAdm = adminList.includes(name);
-        if ((!asTl || alreadyTl) && (!asAdmin || alreadyAdm)) return showConfirm("EL USUARIO YA TIENE ESOS ROLES.", null);
-        if (asTl && !alreadyTl) correosAutorizados = [...correosAutorizados, name];
-        if (asAdmin && !alreadyAdm) adminList = [...adminList, name];
+        if (!asUser && !asTl && !asAdmin) return showConfirm("SELECCIONE AL MENOS UN ROL (👤, TL O ADMIN).", null);
+        const prev = usuariosDB[name] || {};
+        const yaEsUsuario = !!prev.usuario;
+        const alreadyTl = !!prev.tl;
+        const alreadyAdm = !!prev.admin;
+        if ((!asUser || yaEsUsuario) && (!asTl || alreadyTl) && (!asAdmin || alreadyAdm)) return showConfirm("EL USUARIO YA TIENE ESOS ROLES.", null);
+        userRec(name);
+        const nombreReal = document.getElementById('admin-realname').value.trim();
+        if (nombreReal && !usuariosDB[name].nombre) usuariosDB[name].nombre = nombreReal;
+        // TL/ADMIN implican usuario
+        if (asUser || asTl || asAdmin) usuariosDB[name].usuario = true;
+        if (asTl) usuariosDB[name].tl = true;
+        if (asAdmin) usuariosDB[name].admin = true;
+        syncRoleArrays();
         document.getElementById('admin-name').value = '';
+        document.getElementById('admin-realname').value = '';
         refreshAdminList();
         showToast(`✅ USUARIO AGREGADO: ${name.toUpperCase()}`);
-        set(ref(db, 'mantenimiento/pd/autorizados'), correosAutorizados);
-        set(ref(db, 'mantenimiento/pd/admin'), adminList);
+        saveUsuarios();
+    }
+
+    function adminToggleUsuario(user) {
+        if (!isAdminUser()) return;
+        if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
+        const rec = userRec(user);
+        const nuevoEstado = !rec.usuario;
+        rec.usuario = nuevoEstado;
+        let quitoRoles = false;
+        if (!nuevoEstado && (rec.tl || rec.admin)) {
+            rec.tl = false;
+            rec.admin = false;
+            quitoRoles = true;
+        }
+        syncRoleArrays();
+        refreshAdminList();
+        showToast(nuevoEstado ? `✅ USUARIO ACTIVADO: ${user.toUpperCase()}` : quitoRoles ? `⚠️ ${user.toUpperCase()} SE QUEDÓ SIN NINGÚN ACCESO` : `⚠️ ACCESO DE USUARIO QUITADO A ${user.toUpperCase()}`);
+        saveUsuarios();
+    }
+
+    function adminEditNombre(user) {
+        if (!isAdminUser()) return;
+        showPromptModal(`NOMBRE REAL DE ${user.toUpperCase()}:`, userRec(user).nombre || '', (valor) => {
+            usuariosDB[user].nombre = valor || '';
+            refreshAdminList();
+            saveUsuarios();
+            if (valor) showToast(`✅ NOMBRE GUARDADO: ${valor.toUpperCase()}`);
+        });
     }
 
     function adminToggleTl(user) {
         if (!isAdminUser()) return;
         if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
-        const isTl = correosAutorizados.includes(user);
-        correosAutorizados = isTl ? correosAutorizados.filter(u => u !== user) : [...correosAutorizados, user];
+        const rec = userRec(user);
+        const isTl = !!rec.tl;
+        rec.tl = !isTl;
+        if (!isTl) rec.usuario = true; // TL implica usuario
+        syncRoleArrays();
         refreshAdminList();
-        showToast(isTl ? `✖ TL QUITADO: ${user.toUpperCase()}` : `✅ TL OTORGADO: ${user.toUpperCase()}`);
-        set(ref(db, 'mantenimiento/pd/autorizados'), correosAutorizados);
+        showToast(isTl ? `⚠️ TL QUITADO A ${user.toUpperCase()}` : `✅ TL OTORGADO: ${user.toUpperCase()}`);
+        saveUsuarios();
     }
 
     function adminToggleAdmin(user) {
         if (!isAdminUser()) return;
         if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
-        const isAdm = adminList.includes(user);
-        adminList = isAdm ? adminList.filter(u => u !== user) : [...adminList, user];
+        const rec = userRec(user);
+        const isAdm = !!rec.admin;
+        rec.admin = !isAdm;
+        if (!isAdm) rec.usuario = true; // ADMIN implica usuario
+        syncRoleArrays();
         refreshAdminList();
-        showToast(isAdm ? `✖ ADMIN QUITADO: ${user.toUpperCase()}` : `✅ ADMIN OTORGADO: ${user.toUpperCase()}`);
-        set(ref(db, 'mantenimiento/pd/admin'), adminList);
+        showToast(isAdm ? `⚠️ ADMIN QUITADO A ${user.toUpperCase()}` : `✅ ADMIN OTORGADO: ${user.toUpperCase()}`);
+        saveUsuarios();
     }
 
     function adminRemoveUser(user) {
         if (!isAdminUser()) return;
         if (isSuperAdmin(user)) return showToast('⚠️ EL SUPER ADMIN NO PUEDE SER ELIMINADO');
-        showConfirm(`¿ELIMINAR A ${user.toUpperCase()} DE TODOS LOS ACCESOS?`, () => {
-            correosAutorizados = correosAutorizados.filter(u => u !== user);
-            adminList = adminList.filter(u => u !== user);
+        showConfirm(`¿ELIMINAR A ${user.toUpperCase()} DEFINITIVAMENTE? Ya no aparecerá en la lista.`, () => {
+            delete usuariosDB[user];
+            syncRoleArrays();
             refreshAdminList();
-            showToast(`✖ ACCESO ELIMINADO: ${user.toUpperCase()}`);
-            set(ref(db, 'mantenimiento/pd/autorizados'), correosAutorizados);
-            set(ref(db, 'mantenimiento/pd/admin'), adminList);
+            showToast(`✖ USUARIO ELIMINADO: ${user.toUpperCase()}`);
+            saveUsuarios();
         });
     }
 
@@ -3064,7 +3158,8 @@
         openManageTechsModal, addGlobalTech, removeGlobalTech,
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
-        openAdminModal, adminAddUser, adminToggleTl, adminToggleAdmin, adminRemoveUser
+        openAdminModal, adminAddUser, adminToggleTl, adminToggleAdmin, adminRemoveUser,
+        adminToggleUsuario, adminEditNombre
     });
 
 </script>
