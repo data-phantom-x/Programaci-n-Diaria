@@ -565,10 +565,37 @@
             .view-controls, .view-controls > div { flex-direction: row !important; align-items: center !important; }
         }
     </style>
+    <style>
+        /* Pantalla de inicio de sesión obligatorio */
+        .login-screen { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, #2A0087, #1A0055, #2A0087); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: white; border-radius: 16px 0 16px 0; box-shadow: 0 20px 60px rgba(0,0,0,0.35); padding: 32px 28px; width: 100%; max-width: 360px; text-align: center; display: flex; flex-direction: column; gap: 10px; }
+        .login-card img { height: 52px; width: auto; margin: 0 auto; }
+        .login-title { font-size: 1.15em; font-weight: 900; color: var(--primary); }
+        .login-sub { font-size: 10px; font-weight: 700; color: var(--comment); margin-bottom: 6px; }
+        .login-card input { width: 100%; height: 40px; font-size: 12px; padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; flex: none; }
+        .login-card input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(42,0,135,0.1); outline: none; }
+        .login-btn { width: 100%; height: 40px; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 800; color: white; transition: opacity 0.2s; flex: none; }
+        .login-btn:hover { opacity: 0.88; }
+        .login-btn-primary { background: var(--gradient-primary); }
+        .login-btn-danger { background: var(--danger); }
+        .login-error { color: var(--danger); font-size: 10px; font-weight: 700; min-height: 14px; }
+    </style>
 </head>
 <body>
 
-<datalist id="global-techs-list"></datalist>
+    <datalist id="global-techs-list"></datalist>
+
+<div id="login-obligatorio" class="login-screen" style="display:none;">
+    <div class="login-card">
+        <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines">
+        <div id="login-card-title" class="login-title">PROGRAMACIÓN DIARIA</div>
+        <div class="login-sub">ACCESO RESTRINGIDO · PERSONAL AUTORIZADO</div>
+        <input type="text" id="login-user-input" placeholder="USUARIO (EJ: JUAN.PEREZ)" autocomplete="off" onkeydown="if(event.key==='Enter')doLoginObligatorio()">
+        <button id="login-enter-btn" class="login-btn login-btn-primary" onclick="doLoginObligatorio()">ENTRAR</button>
+        <button id="login-switch-btn" class="login-btn login-btn-danger" style="display:none;" onclick="logoutFull()">CERRAR SESIÓN Y CAMBIAR USUARIO</button>
+        <div id="login-error-msg" class="login-error"></div>
+    </div>
+</div>
 
 <div class="container">
     <div class="top-bar no-print">
@@ -933,6 +960,10 @@
 <div id="admin-modal" class="modal">
     <div class="modal-content" style="max-width: 480px;">
         <div class="modal-header" style="border:none; padding-bottom:0; margin-bottom:10px;">⚙ ADMIN · USUARIOS AUTORIZADOS</div>
+        <div id="admin-login-toggle" style="display:none; align-items:center; justify-content:space-between; gap:8px; border-bottom:2px solid var(--accent); padding-bottom:8px; margin-bottom:10px;">
+            <span style="font-weight:800; font-size:11px; color:var(--leader-color);">🔒 INICIO DE SESIÓN PARA TODOS</span>
+            <button id="btn-login-obligatorio" class="btn-action-small" onclick="toggleLoginObligatorio()">🔓 DESACTIVADO</button>
+        </div>
         <div id="admin-list" style="max-height: 220px; overflow-y: auto; margin-bottom: 12px; font-size: 11px;"></div>
         <div style="border-top: 1px solid var(--border); padding-top: 12px;">
             <strong style="font-size: 10px; color: var(--primary);">AGREGAR NUEVO USUARIO:</strong>
@@ -1010,6 +1041,7 @@
         checkSession();
         updateAdminUI();
         refreshAdminListIfOpen();
+        if (typeof evaluateGate === 'function') evaluateGate();
     });
 
     function isSuperAdmin(name) {
@@ -1067,6 +1099,7 @@
         checkSession();
         updateAdminUI();
         refreshAdminListIfOpen();
+        evaluateGate();
     });
 
     function isAuthorizedUser(name) {
@@ -1238,6 +1271,8 @@
 
             if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS && isAuthorizedUser(savedEmail)) {
                 activateLeaderUI();
+            } else if (loginObligatorio) {
+                showToast('🔒 INICIO DE SESIÓN OBLIGATORIO: USA LA PANTALLA DE LOGIN');
             } else {
                 const email = prompt("🔒 ACCESO TEAM LEADER\nIngrese su correo corporativo autorizado:");
                 if (!email) return; 
@@ -1260,6 +1295,101 @@
         localStorage.removeItem('tl_email');
         localStorage.removeItem('tl_login_time');
         deactivateLeaderUI();
+    }
+
+    // ─── INICIO DE SESIÓN OBLIGATORIO (activado por el SUPER ADMIN) ───
+    let loginObligatorio = false;
+    onValue(ref(db, 'mantenimiento/pd/login_obligatorio'), (snapshot) => {
+        loginObligatorio = !!snapshot.val();
+        evaluateGate();
+        refreshAdminListIfOpen();
+    });
+
+    function sessionUser() {
+        const u = localStorage.getItem('login_email');
+        const t = parseInt(localStorage.getItem('login_time') || '0', 10);
+        return (u && t && (Date.now() - t) < SESSION_EXPIRATION_MS) ? u : null;
+    }
+    function canLogin(u) {
+        if (!u) return false;
+        if (isSuperAdmin(u)) return true;
+        const rec = usuariosDB[u];
+        return !!(rec && (rec.usuario || rec.tl || rec.admin));
+    }
+    function hasLeaderRole(u) {
+        return isSuperAdmin(u) || correosAutorizados.includes(u) || adminList.includes(u);
+    }
+    function evaluateGate() {
+        const overlay = document.getElementById('login-obligatorio');
+        if (!overlay) return;
+        const btnLogout = document.getElementById('btn-logout');
+        if (!loginObligatorio) {
+            overlay.style.display = 'none';
+            if (btnLogout) btnLogout.onclick = null;
+            updateLoginToggleUI();
+            return;
+        }
+        const u = sessionUser();
+        if (!u || !canLogin(u)) {
+            deactivateLeaderUI();
+            const denied = !!u;
+            document.getElementById('login-card-title').innerText = denied ? 'ACCESO NO AUTORIZADO' : 'PROGRAMACIÓN DIARIA';
+            document.getElementById('login-error-msg').innerText = denied ? `${u.toUpperCase()} NO TIENE ACCESO HABILITADO` : '';
+            document.getElementById('login-user-input').style.display = denied ? 'none' : 'block';
+            document.getElementById('login-enter-btn').style.display = denied ? 'none' : 'block';
+            document.getElementById('login-switch-btn').style.display = denied ? 'block' : 'none';
+            overlay.style.display = 'flex';
+            updateLoginToggleUI();
+            return;
+        }
+        overlay.style.display = 'none';
+        if (hasLeaderRole(u)) {
+            localStorage.setItem('tl_email', u);
+            localStorage.setItem('tl_login_time', Date.now().toString());
+            myEmail = u;
+            activateLeaderUI();
+            if (btnLogout) btnLogout.onclick = logoutFull;
+        } else {
+            if (isTeamLeader) logoutLeader();
+            updateAdminUI();
+        }
+    }
+    function doLoginObligatorio() {
+        const inp = document.getElementById('login-user-input');
+        const err = document.getElementById('login-error-msg');
+        const username = extractUsername(inp.value || '');
+        if (!username) { err.innerText = 'INGRESE SU USUARIO'; return; }
+        if (!canLogin(username)) { err.innerText = 'USUARIO NO AUTORIZADO'; inp.select(); return; }
+        localStorage.setItem('login_email', username);
+        localStorage.setItem('login_time', Date.now().toString());
+        err.innerText = '';
+        inp.value = '';
+        evaluateGate();
+    }
+    function logoutFull() {
+        ['tl_email', 'tl_login_time', 'login_email', 'login_time'].forEach(k => localStorage.removeItem(k));
+        location.reload();
+    }
+    function toggleLoginObligatorio() {
+        if (!isAdminUser() || !isSuperAdmin(myEmail)) return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE CAMBIAR ESTO');
+        const nuevo = !loginObligatorio;
+        showConfirm(nuevo
+            ? '¿ACTIVAR INICIO DE SESIÓN OBLIGATORIO PARA TODOS? Nadie podrá ver la app sin iniciar sesión.'
+            : '¿DESACTIVAR EL INICIO DE SESIÓN OBLIGATORIO? Volverá al acceso libre como siempre.', () => {
+            set(ref(db, 'mantenimiento/pd/login_obligatorio'), nuevo);
+            showToast(nuevo ? '🔒 LOGIN OBLIGATORIO ACTIVADO' : '🔓 LOGIN OBLIGATORIO DESACTIVADO');
+        });
+    }
+    function updateLoginToggleUI() {
+        const sec = document.getElementById('admin-login-toggle');
+        if (!sec) return;
+        sec.style.display = isAdminUser() && isSuperAdmin(myEmail) ? 'flex' : 'none';
+        const b = document.getElementById('btn-login-obligatorio');
+        if (b) {
+            b.innerText = loginObligatorio ? '🔒 ACTIVADO' : '🔓 DESACTIVADO';
+            b.style.background = loginObligatorio ? 'var(--danger)' : '';
+            b.style.color = loginObligatorio ? 'white' : '';
+        }
     }
 
     // ─── PANEL ADMIN (SOLO PARA ADMINISTRADORES) ───
@@ -1301,6 +1431,7 @@
         if (all.size === 0) {
             listEl.innerHTML = '<div style="font-weight:800; color:var(--comment); padding:8px 0;">SIN USUARIOS AÚN</div>';
             updateAdminUI();
+            updateLoginToggleUI();
             return;
         }
         let html = '';
@@ -1313,9 +1444,11 @@
             const esUsuario = !!info.usuario;
             const sinAcceso = !isTl && !isAdm && !esUsuario;
             html += `<div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid var(--light-gray); border-radius:4px; margin-bottom:5px; background:${sinAcceso ? '#f8f8f8' : 'white'};">
-                <span style="flex:1; font-weight:700; color:${sinAcceso ? 'var(--comment)' : 'var(--primary)'}; font-size:11px; display:flex; align-items:center; gap:5px; flex-wrap:wrap;">
-                    ${user.toUpperCase()}
-                    ${nombreReal ? `<span style="font-weight:600; color:var(--comment);">${nombreReal}</span>` : ''}
+                <span style="flex:1; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
+                    <span style="display:flex; flex-direction:column; gap:1px; min-width:0;">
+                        <span style="font-weight:700; color:${sinAcceso ? 'var(--comment)' : 'var(--primary)'}; font-size:11px;">${user.toUpperCase()}</span>
+                        ${nombreReal ? `<span style="font-weight:600; color:var(--comment); font-size:10px;">${nombreReal}</span>` : ''}
+                    </span>
                     ${isAdm ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--danger); padding:1px 5px; border-radius:3px;">ADMIN</span>' : ''}
                     ${sinAcceso ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--comment); padding:1px 5px; border-radius:3px;">SIN ACCESO</span>' : ''}
                 </span>
@@ -1328,6 +1461,7 @@
         }
         listEl.innerHTML = html;
         updateAdminUI();
+        updateLoginToggleUI();
     }
 
     function adminAddUser() {
@@ -3159,7 +3293,8 @@
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
         openAdminModal, adminAddUser, adminToggleTl, adminToggleAdmin, adminRemoveUser,
-        adminToggleUsuario, adminEditNombre
+        adminToggleUsuario, adminEditNombre,
+        doLoginObligatorio, toggleLoginObligatorio, logoutFull
     });
 
 </script>
