@@ -356,6 +356,7 @@
             .top-bar { flex-direction: column; gap: 8px; }
             .top-bar-left { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 5px; }
             .top-bar-left > * { flex: 1; min-width: 0; }
+            #btn-mode-toggle { flex: 1 1 0; max-width: none; min-width: 0; }
             .live-clock { width: 100%; justify-content: center; height: auto; padding: 6px; position: static; transform: none; }
             
             .view-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
@@ -1151,7 +1152,8 @@
     function getLogicalTodayDate() {
         const now = new Date();
         const hours = now.getHours();
-        if (hours >= 0 && hours < 7) {
+        if ((activeTurno === 'Turno Noche' && hours >= 0 && hours < 8) ||
+            (activeTurno === 'Turno Tarde' && hours >= 0 && hours < 2)) {
             now.setDate(now.getDate() - 1);
         }
         
