@@ -1325,7 +1325,7 @@
         const btnLogout = document.getElementById('btn-logout');
         if (!loginObligatorio) {
             overlay.style.display = 'none';
-            if (btnLogout) btnLogout.onclick = null;
+            if (btnLogout) btnLogout.onclick = handleLogoutClick;
             updateLoginToggleUI();
             return;
         }
@@ -1348,10 +1348,14 @@
             localStorage.setItem('tl_login_time', Date.now().toString());
             myEmail = u;
             activateLeaderUI();
-            if (btnLogout) btnLogout.onclick = logoutFull;
+            if (btnLogout) btnLogout.onclick = handleLogoutClick;
         } else {
             if (isTeamLeader) logoutLeader();
             updateAdminUI();
+            if (btnLogout) { // los usuarios simples también necesitan poder salir
+                btnLogout.style.display = 'inline-flex';
+                btnLogout.onclick = handleLogoutClick;
+            }
         }
     }
     function doLoginObligatorio() {
@@ -1369,6 +1373,10 @@
     function logoutFull() {
         ['tl_email', 'tl_login_time', 'login_email', 'login_time'].forEach(k => localStorage.removeItem(k));
         location.reload();
+    }
+    function handleLogoutClick() {
+        if (loginObligatorio && sessionUser()) { logoutFull(); return; }
+        logoutLeader();
     }
     function toggleLoginObligatorio() {
         if (!isAdminUser() || !isSuperAdmin(myEmail)) return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE CAMBIAR ESTO');
