@@ -100,7 +100,12 @@
         input[type="text"], input[type="date"], select, button, textarea {
             padding: 6px 10px; border: 1px solid var(--border);
             border-radius: 4px; font-size: 10px; outline: none; box-sizing: border-box;
-            height: 28px; 
+            height: 28px;
+        }
+
+        /* Texto escrito en azul, como en CRT */
+        input[type="text"], input[type="date"], select, textarea {
+            color: var(--primary);
         }
         
         input[type="date"] {
@@ -577,6 +582,7 @@
         .login-btn { width: 100%; height: 40px; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 800; color: white; transition: opacity 0.2s; flex: none; }
         .login-btn:hover { opacity: 0.88; }
         .login-btn-primary { background: var(--gradient-primary); }
+        .login-btn-google { background: #4285F4; }
         .login-btn-danger { background: var(--danger); }
         .login-error { color: var(--danger); font-size: 10px; font-weight: 700; min-height: 14px; }
     </style>
@@ -590,9 +596,13 @@
         <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines">
         <div id="login-card-title" class="login-title">PROGRAMACIÓN DIARIA</div>
         <div class="login-sub">ACCESO RESTRINGIDO · PERSONAL AUTORIZADO</div>
-        <input type="text" id="login-user-input" placeholder="USUARIO (EJ: JUAN.PEREZ)" autocomplete="off" onkeydown="if(event.key==='Enter')doLoginObligatorio()">
-        <button id="login-enter-btn" class="login-btn login-btn-primary" onclick="doLoginObligatorio()">ENTRAR</button>
-        <button id="login-switch-btn" class="login-btn login-btn-danger" style="display:none;" onclick="logoutFull()">CERRAR SESIÓN Y CAMBIAR USUARIO</button>
+        <button id="login-google-btn" class="login-btn login-btn-google" onclick="doGoogleLogin()">G · ENTRAR CON GOOGLE</button>
+        <div id="login-google-sub" class="login-sub" style="font-size: 9px; margin-top: 2px;">USA TU CUENTA CORPORATIVA DE GOOGLE</div>
+        <div id="login-user-row" style="display:none; flex-direction:column; gap:8px;">
+            <input type="text" id="login-user-input" placeholder="USUARIO (EJ: JUAN.PEREZ)" autocomplete="off" onkeydown="if(event.key==='Enter')doLoginObligatorio()">
+            <button id="login-enter-btn" class="login-btn login-btn-primary" onclick="doLoginObligatorio()">ENTRAR CON USUARIO</button>
+        </div>
+        <button id="login-switch-btn" class="login-btn login-btn-danger" style="display:none;" onclick="logoutFull()">CERRAR SESIÓN Y CAMBIAR CUENTA</button>
         <div id="login-error-msg" class="login-error"></div>
     </div>
 </div>
@@ -958,13 +968,14 @@
 </div>
 
 <div id="admin-modal" class="modal">
-    <div class="modal-content" style="max-width: 480px;">
+    <div class="modal-content" style="max-width: 520px; width: 92%;">
         <div class="modal-header" style="border:none; padding-bottom:0; margin-bottom:10px;">⚙ ADMIN · USUARIOS AUTORIZADOS</div>
         <div id="admin-login-toggle" style="display:none; align-items:center; justify-content:space-between; gap:8px; border-bottom:2px solid var(--accent); padding-bottom:8px; margin-bottom:10px;">
-            <span style="font-weight:800; font-size:11px; color:var(--leader-color);">🔒 INICIO DE SESIÓN PARA TODOS</span>
+            <span style="font-weight:800; font-size:11px; color:var(--leader-color);">🔒 INICIO DE SESIÓN</span>
             <button id="btn-login-obligatorio" class="btn-action-small" onclick="toggleLoginObligatorio()">🔓 DESACTIVADO</button>
         </div>
-        <div id="admin-list" style="max-height: 220px; overflow-y: auto; margin-bottom: 12px; font-size: 11px;"></div>
+        <input type="text" id="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE REAL..." autocomplete="off" oninput="refreshAdminList()" style="width:100%; margin-bottom:10px;">
+        <div id="admin-list" style="max-height: 45vh; overflow-y: auto; margin-bottom: 12px; font-size: 11px;"></div>
         <div style="border-top: 1px solid var(--border); padding-top: 12px;">
             <strong style="font-size: 10px; color: var(--primary);">AGREGAR NUEVO USUARIO:</strong>
             <input type="text" id="admin-name" placeholder="USUARIO · EJ: juan.perez" autocomplete="off" style="width:100%; margin:8px 0 8px;" onkeypress="if(event.key === 'Enter') adminAddUser()">
@@ -1005,7 +1016,7 @@
     import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
     
     // 1. NUEVA LÍNEA: Importamos las herramientas del "Pase temporal" (Autenticación)
-    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyADC1Wwcypek8g1gwOTcgqKskpqiTo0-oM",
@@ -1062,13 +1073,17 @@
     function saveUsuarios() {
         const out = {};
         Object.keys(usuariosDB).sort().forEach(u => {
-            out[u.replace(/\./g, '_')] = {
+            const rec = usuariosDB[u];
+            const item = {
                 u,
-                nombre: usuariosDB[u].nombre || '',
-                usuario: !!usuariosDB[u].usuario,
-                tl: !!usuariosDB[u].tl,
-                admin: !!usuariosDB[u].admin
+                nombre: rec.nombre || '',
+                usuario: !!rec.usuario,
+                tl: !!rec.tl,
+                admin: !!rec.admin
             };
+            if (rec.uid) item.uid = rec.uid;
+            if (rec.email) item.email = rec.email;
+            out[u.replace(/\./g, '_')] = item;
         });
         set(ref(db, 'mantenimiento/pd/usuarios'), out);
     }
@@ -1083,7 +1098,9 @@
                 nombre: e.nombre || '',
                 usuario: !!(e.usuario || e.acceso), // acceso = campo del formato anterior
                 tl: !!e.tl,
-                admin: !!e.admin
+                admin: !!e.admin,
+                uid: e.uid || '',
+                email: e.email || ''
             };
         };
         if (Array.isArray(raw)) { // formato antiguo: lista de strings o de registros
@@ -1304,11 +1321,27 @@
         evaluateGate();
         refreshAdminListIfOpen();
     });
+    onAuthStateChanged(auth, () => { evaluateGate(); });
 
+    function googleUser() {
+        try {
+            const cu = auth.currentUser;
+            if (cu && Array.isArray(cu.providerData) && cu.providerData.some(p => p.providerId === 'google.com')) return cu;
+        } catch (e) {}
+        return null;
+    }
     function sessionUser() {
+        const g = googleUser();
+        if (g && g.email) return extractUsername(g.email);
+        const now = Date.now();
         const u = localStorage.getItem('login_email');
         const t = parseInt(localStorage.getItem('login_time') || '0', 10);
-        return (u && t && (Date.now() - t) < SESSION_EXPIRATION_MS) ? u : null;
+        if (u && t && (now - t) < SESSION_EXPIRATION_MS) return u;
+        // respaldo: sesión de Team Leader ya existente
+        const tl = localStorage.getItem('tl_email');
+        const tt = parseInt(localStorage.getItem('tl_login_time') || '0', 10);
+        if (tl && tt && (now - tt) < SESSION_EXPIRATION_MS && canLogin(tl)) return tl;
+        return null;
     }
     function canLogin(u) {
         if (!u) return false;
@@ -1335,8 +1368,9 @@
             const denied = !!u;
             document.getElementById('login-card-title').innerText = denied ? 'ACCESO NO AUTORIZADO' : 'PROGRAMACIÓN DIARIA';
             document.getElementById('login-error-msg').innerText = denied ? `${u.toUpperCase()} NO TIENE ACCESO HABILITADO` : '';
-            document.getElementById('login-user-input').style.display = denied ? 'none' : 'block';
-            document.getElementById('login-enter-btn').style.display = denied ? 'none' : 'block';
+            document.getElementById('login-google-btn').style.display = denied ? 'none' : 'block';
+            document.getElementById('login-google-sub').style.display = denied ? 'none' : 'block';
+            document.getElementById('login-user-row').style.display = 'none';
             document.getElementById('login-switch-btn').style.display = denied ? 'block' : 'none';
             overlay.style.display = 'flex';
             updateLoginToggleUI();
@@ -1358,6 +1392,45 @@
             }
         }
     }
+    async function doGoogleLogin() {
+        const err = document.getElementById('login-error-msg');
+        err.innerText = 'ABRIENDO GOOGLE...';
+        try {
+            const provider = new GoogleAuthProvider();
+            provider.setCustomParameters({ prompt: 'select_account' });
+            const result = await signInWithPopup(auth, provider);
+            const email = ((result.user && result.user.email) || '').toLowerCase();
+            const username = extractUsername(email);
+            if (!username || !canLogin(username)) {
+                // NO cerrar sesión: evaluateGate mostrará la tarjeta ACCESO NO AUTORIZADO
+                evaluateGate();
+                return;
+            }
+            localStorage.setItem('login_email', username);
+            localStorage.setItem('login_time', Date.now().toString());
+            linkUid(result.user, username);
+            err.innerText = '';
+            evaluateGate();
+        } catch (e) {
+            err.innerText = 'GOOGLE NO DISPONIBLE AQUÍ (' + (e.code || e.message) + '). USA TU USUARIO:';
+            showManualLogin();
+        }
+    }
+    function showManualLogin() {
+        const row = document.getElementById('login-user-row');
+        if (row) row.style.display = 'flex';
+        const inp = document.getElementById('login-user-input');
+        if (inp) inp.focus();
+    }
+    function linkUid(fu, username) {
+        const rec = usuariosDB[username];
+        try { set(ref(db, 'mantenimiento/uids/' + fu.uid), username.replace(/\./g, '_')); } catch (e) {} // índice para reglas de seguridad
+        if (!rec) return;
+        let dirty = false;
+        if (fu.uid && rec.uid !== fu.uid) { rec.uid = fu.uid; dirty = true; }
+        if (fu.email && rec.email !== fu.email.toLowerCase()) { rec.email = fu.email.toLowerCase(); dirty = true; }
+        if (dirty) saveUsuarios();
+    }
     function doLoginObligatorio() {
         const inp = document.getElementById('login-user-input');
         const err = document.getElementById('login-error-msg');
@@ -1372,7 +1445,10 @@
     }
     function logoutFull() {
         ['tl_email', 'tl_login_time', 'login_email', 'login_time'].forEach(k => localStorage.removeItem(k));
-        location.reload();
+        try { signOut(auth).catch(() => {}); } catch (e) {}
+        myEmail = '';
+        deactivateLeaderUI();
+        evaluateGate(); // vuelve directo a la pantalla de login, sin depender de recargar
     }
     function handleLogoutClick() {
         if (loginObligatorio && sessionUser()) { logoutFull(); return; }
@@ -1384,7 +1460,11 @@
         showConfirm(nuevo
             ? '¿ACTIVAR INICIO DE SESIÓN OBLIGATORIO PARA TODOS? Nadie podrá ver la app sin iniciar sesión.'
             : '¿DESACTIVAR EL INICIO DE SESIÓN OBLIGATORIO? Volverá al acceso libre como siempre.', () => {
-            set(ref(db, 'mantenimiento/pd/login_obligatorio'), nuevo);
+            loginObligatorio = nuevo; // cambio optimista: la UI reacciona al instante
+            updateLoginToggleUI();
+            evaluateGate();
+            set(ref(db, 'mantenimiento/pd/login_obligatorio'), nuevo)
+                .catch(() => showToast('⚠️ ERROR AL GUARDAR EL CAMBIO'));
             showToast(nuevo ? '🔒 LOGIN OBLIGATORIO ACTIVADO' : '🔓 LOGIN OBLIGATORIO DESACTIVADO');
         });
     }
@@ -1426,6 +1506,7 @@
         if (!isAdminUser()) return;
         document.getElementById('admin-name').value = '';
         document.getElementById('admin-realname').value = '';
+        document.getElementById('admin-search').value = '';
         document.getElementById('admin-is-user').checked = true;
         document.getElementById('admin-is-tl').checked = false;
         document.getElementById('admin-is-admin').checked = false;
@@ -1435,6 +1516,7 @@
 
     function refreshAdminList() {
         const listEl = document.getElementById('admin-list');
+        const q = (document.getElementById('admin-search')?.value || '').trim().toLowerCase();
         const all = new Set([...Object.keys(usuariosDB), ...correosAutorizados, ...adminList].filter(u => !isSuperAdmin(u)));
         if (all.size === 0) {
             listEl.innerHTML = '<div style="font-weight:800; color:var(--comment); padding:8px 0;">SIN USUARIOS AÚN</div>';
@@ -1446,6 +1528,7 @@
         for (const user of Array.from(all).sort()) {
             if (!user) continue;
             const info = usuariosDB[user] || {};
+            if (q && !user.toLowerCase().includes(q) && !(info.nombre || '').toLowerCase().includes(q)) continue;
             const nombreReal = (info.nombre || '').trim();
             const isTl = correosAutorizados.includes(user);
             const isAdm = adminList.includes(user);
@@ -1467,10 +1550,10 @@
                 <button class="btn-action-small" onclick="adminRemoveUser('${user}')" title="Eliminar usuario definitivamente">✖</button>
             </div>`;
         }
-        listEl.innerHTML = html;
-        updateAdminUI();
-        updateLoginToggleUI();
-    }
+            listEl.innerHTML = html || '<div style="font-weight:800; color:var(--comment); padding:8px 0;">SIN COINCIDENCIAS PARA LA BÚSQUEDA</div>';
+            updateAdminUI();
+            updateLoginToggleUI();
+        }
 
     function adminAddUser() {
         if (!isAdminUser()) return;
@@ -1526,7 +1609,7 @@
             refreshAdminList();
             saveUsuarios();
             if (valor) showToast(`✅ NOMBRE GUARDADO: ${valor.toUpperCase()}`);
-        });
+        }, 'GUARDAR NOMBRE', 'EJ: JUAN PEREZ');
     }
 
     function adminToggleTl(user) {
@@ -1776,10 +1859,12 @@
     document.getElementById('confirm-yes-btn').onclick = function() { if(confirmCallback) confirmCallback(); closeConfirmModal(); };
 
     let promptCallback = null;
-    function showPromptModal(title, defaultVal, callback) {
+    function showPromptModal(title, defaultVal, callback, saveLabel, placeholder) {
         document.getElementById('prompt-title').innerText = title;
         const input = document.getElementById('prompt-input');
         input.value = defaultVal || "";
+        input.placeholder = placeholder || 'Escribe aquí... (Dejar en blanco para borrar)';
+        document.getElementById('prompt-save-btn').innerText = saveLabel || 'GUARDAR NOTA';
         promptCallback = callback;
         document.getElementById('prompt-modal').style.display = 'block';
         setTimeout(() => input.focus(), 50);
@@ -3301,8 +3386,8 @@
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
         openAdminModal, adminAddUser, adminToggleTl, adminToggleAdmin, adminRemoveUser,
-        adminToggleUsuario, adminEditNombre,
-        doLoginObligatorio, toggleLoginObligatorio, logoutFull
+        adminToggleUsuario, adminEditNombre, refreshAdminList,
+        doGoogleLogin, doLoginObligatorio, toggleLoginObligatorio, logoutFull
     });
 
 </script>
