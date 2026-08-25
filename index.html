@@ -586,11 +586,27 @@
         .login-btn-google { background: #4285F4; }
         .login-btn-danger { background: var(--danger); }
         .login-error { color: var(--danger); font-size: 10px; font-weight: 700; min-height: 14px; }
+
+        /* Pantalla de carga profesional */
+        #boot-splash { position: fixed; inset: 0; z-index: 10000; background: linear-gradient(135deg, #1A0055, #2A0087, #1A0055); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: opacity .35s ease; }
+        #boot-splash.hide { opacity: 0; pointer-events: none; }
+        #boot-splash img { height: 56px; width: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,.4)); }
+        #boot-splash .boot-title { color: white; font-weight: 900; font-size: 1.05em; letter-spacing: 2px; }
+        #boot-splash .boot-sub { color: #C4B8D0; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+        .boot-spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(255,255,255,.15); border-top-color: var(--cyan); animation: bootspin .8s linear infinite; }
+        @keyframes bootspin { to { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-    <datalist id="global-techs-list"></datalist>
+    <div id="boot-splash">
+    <img src="https://raw.githubusercontent.com/data-phantom-x/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo-light.svg" alt="LATAM Airlines">
+    <div class="boot-title">PROGRAMACIÓN DIARIA</div>
+    <div class="boot-spinner"></div>
+    <div class="boot-sub">CONECTANDO CON EL SERVIDOR...</div>
+</div>
+
+<datalist id="global-techs-list"></datalist>
 
 <div id="login-obligatorio" class="login-screen" style="display:none;">
     <div class="login-card">
@@ -599,10 +615,6 @@
         <div class="login-sub">ACCESO RESTRINGIDO · PERSONAL AUTORIZADO</div>
         <button id="login-google-btn" class="login-btn login-btn-google" onclick="doGoogleLogin()">G · ENTRAR CON GOOGLE</button>
         <div id="login-google-sub" class="login-sub" style="font-size: 9px; margin-top: 2px;">USA TU CUENTA CORPORATIVA DE GOOGLE</div>
-        <div id="login-user-row" style="display:none; flex-direction:column; gap:8px;">
-            <input type="text" id="login-user-input" placeholder="USUARIO (EJ: JUAN.PEREZ)" autocomplete="off" onkeydown="if(event.key==='Enter')doLoginObligatorio()">
-            <button id="login-enter-btn" class="login-btn login-btn-primary" onclick="doLoginObligatorio()">ENTRAR CON USUARIO</button>
-        </div>
         <button id="login-switch-btn" class="login-btn login-btn-danger" style="display:none;" onclick="logoutFull()">CERRAR SESIÓN Y CAMBIAR CUENTA</button>
         <div id="login-error-msg" class="login-error"></div>
     </div>
@@ -1032,15 +1044,23 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    // 2. NUEVAS LÍNEAS: Pedimos el pase temporal de forma invisible al cargar la página
+    // Pase temporal anónimo: se restaura solo si se pierde (tras cerrar sesión o expirar)
     const auth = getAuth(app);
-    signInAnonymously(auth)
-      .then(() => {
-          console.log("Conectado a la Base de Datos de forma segura 🔒");
-      })
-      .catch((error) => {
-          console.error("Error al obtener el pase de Firebase:", error);
-      });
+    let ensuringAuth = false;
+    async function ensureAuth() {
+        try { await auth.authStateReady(); } catch (e) {} // ESPERA la sesión guardada (Google) antes de decidir
+        if (auth.currentUser || ensuringAuth) return;
+        ensuringAuth = true;
+        try {
+            await signInAnonymously(auth);
+            console.log("Conectado a la Base de Datos de forma segura 🔒");
+        } catch (error) {
+            console.error("Error al obtener el pase de Firebase:", error);
+            setTimeout(ensureAuth, 10000);
+        }
+        ensuringAuth = false;
+    }
+    ensureAuth();
 
     let correosAutorizados = [];
     let adminList = [];
@@ -1048,13 +1068,6 @@
 
     // SUPER ADMINS (gestionados directamente en Firebase, no en el código)
     const superAdminsRef = ref(db, 'mantenimiento/super_admin');
-    onValue(superAdminsRef, (snapshot) => {
-        superAdmins = snapshot.val() || [];
-        checkSession();
-        updateAdminUI();
-        refreshAdminListIfOpen();
-        if (typeof evaluateGate === 'function') evaluateGate();
-    });
 
     function isSuperAdmin(name) {
         return superAdmins.includes(name);
@@ -1086,11 +1099,32 @@
             if (rec.email) item.email = rec.email;
             out[u.replace(/\./g, '_')] = item;
         });
-        set(ref(db, 'mantenimiento/pd/usuarios'), out);
+        dbSet(ref(db, 'mantenimiento/pd/usuarios'), out, 'GUARDAR USUARIOS');
     }
     const tlUsersRef = ref(db, 'mantenimiento/pd/usuarios');
-    onValue(tlUsersRef, (snapshot) => {
-        const raw = snapshot.val();
+
+    // Los listeners de roles se RE-SUSCRIBEN cada vez que cambia la identidad:
+    // un listener cancelado por "permission denied" (estando anónimo) no se
+    // reactiva solo al mejorar la sesión, y sin esto la base de usuarios
+    // quedaría vacía para siempre tras el login con Google.
+    let rolesUnsubs = [];
+    let lastRolesUid = '__none__';
+    function subscribeRoles() {
+        const uid = (auth.currentUser && auth.currentUser.uid) || null;
+        if (uid === lastRolesUid) return;
+        lastRolesUid = uid;
+        rolesUnsubs.forEach(u => { try { u(); } catch (e) {} });
+        rolesUnsubs = [];
+        rolesUnsubs.push(onValue(superAdminsRef, (snapshot) => {
+            superAdmins = snapshot.val() || [];
+            checkSession();
+            updateAdminUI();
+            refreshAdminListIfOpen();
+            if (typeof evaluateGate === 'function') evaluateGate();
+        }, (e) => console.warn('super_admin:', e.code)));
+        rolesUnsubs.push(onValue(tlUsersRef, (snapshot) => {
+            const raw = snapshot.val();
+            usuariosLoaded = true;
         usuariosDB = {};
         const ingest = (name, e) => {
             if (!name || isSuperAdmin(name)) return;
@@ -1118,7 +1152,9 @@
         updateAdminUI();
         refreshAdminListIfOpen();
         evaluateGate();
-    });
+        }, (e) => console.warn('usuarios:', e.code)));
+    }
+    subscribeRoles();
 
     function isAuthorizedUser(name) {
         return isSuperAdmin(name) || correosAutorizados.includes(name) || adminList.includes(name);
@@ -1206,16 +1242,7 @@
     updateClock();
 
     const globalTechsRef = ref(db, 'mantenimiento/pd/global_techs');
-    onValue(globalTechsRef, (snapshot) => {
-        globalTechs = snapshot.val() || [];
-        updateGlobalTechsUI();
-    });
-    
     const predefTasksRef = ref(db, 'mantenimiento/pd/predefined_task');
-    onValue(predefTasksRef, (snapshot) => {
-        predefTasks = snapshot.val() || [];
-        updatePredefTasksUI();
-    });
 
     function checkSession() {
         const savedEmail = localStorage.getItem('tl_email');
@@ -1290,7 +1317,7 @@
 
             if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS && isAuthorizedUser(savedEmail)) {
                 activateLeaderUI();
-            } else if (loginObligatorio) {
+            } else if (loginObligatorio !== false) {
                 showToast('🔒 INICIO DE SESIÓN OBLIGATORIO: USA LA PANTALLA DE LOGIN');
             } else {
                 const email = prompt("🔒 ACCESO TEAM LEADER\nIngrese su correo corporativo autorizado:");
@@ -1316,14 +1343,26 @@
         deactivateLeaderUI();
     }
 
-    // ─── INICIO DE SESIÓN OBLIGATORIO (activado por el SUPER ADMIN) ───
-    let loginObligatorio = false;
+    // ─── CONTROL CENTRAL DE MODOS Y ARRANQUE ───
+    // null = aún cargando (pantalla de carga); false = modo libre; true = solo Google
+    let loginObligatorio = null;
+    let usuariosLoaded = false;
+    let dataAttached = false;
+    let splashHidden = false;
+    let gateRolesTimer = null;
+    const staticUnsubs = [];
+
     onValue(ref(db, 'mantenimiento/pd/login_obligatorio'), (snapshot) => {
         loginObligatorio = !!snapshot.val();
         evaluateGate();
         refreshAdminListIfOpen();
+    }, (e) => console.warn('login_obligatorio:', e.code));
+
+    onAuthStateChanged(auth, (user) => {
+        subscribeRoles(); // nueva identidad → re-suscribir roles con permisos reales
+        if (!user) ensureAuth();
+        evaluateGate();
     });
-    onAuthStateChanged(auth, () => { evaluateGate(); });
 
     function googleUser() {
         try {
@@ -1333,17 +1372,9 @@
         return null;
     }
     function sessionUser() {
+        // En modo obligatorio la identidad SOLO viene de Google (a prueba de suplantación)
         const g = googleUser();
-        if (g && g.email) return extractUsername(g.email);
-        const now = Date.now();
-        const u = localStorage.getItem('login_email');
-        const t = parseInt(localStorage.getItem('login_time') || '0', 10);
-        if (u && t && (now - t) < SESSION_EXPIRATION_MS) return u;
-        // respaldo: sesión de Team Leader ya existente
-        const tl = localStorage.getItem('tl_email');
-        const tt = parseInt(localStorage.getItem('tl_login_time') || '0', 10);
-        if (tl && tt && (now - tt) < SESSION_EXPIRATION_MS && canLogin(tl)) return tl;
-        return null;
+        return (g && g.email) ? extractUsername(g.email) : null;
     }
     function canLogin(u) {
         if (!u) return false;
@@ -1354,45 +1385,108 @@
     function hasLeaderRole(u) {
         return isSuperAdmin(u) || correosAutorizados.includes(u) || adminList.includes(u);
     }
+
+    // ── Gestor de listeners de datos: conectados solo cuando hay acceso real ──
+    function attachData() {
+        if (dataAttached) return;
+        dataAttached = true;
+        staticUnsubs.push(
+            onValue(globalTechsRef, (snapshot) => {
+                globalTechs = snapshot.val() || [];
+                updateGlobalTechsUI();
+            }, readErr),
+            onValue(predefTasksRef, (snapshot) => {
+                predefTasks = snapshot.val() || [];
+                updatePredefTasksUI();
+            }, readErr)
+        );
+        listenToTurno(activeTurno);
+    }
+
+    function detachData() {
+        if (!dataAttached) return;
+        dataAttached = false;
+        staticUnsubs.forEach(u => { try { u(); } catch (e) {} });
+        staticUnsubs.length = 0;
+        if (unsubAviones) { unsubAviones(); unsubAviones = null; }
+        if (unsubTechs) { unsubTechs(); unsubTechs = null; }
+        if (unsubHeader) { unsubHeader(); unsubHeader = null; }
+        avionesData = [];
+        shiftTechs = [];
+        groupMessages = [];
+        document.getElementById('display-header').innerHTML = 'CARGANDO DATOS...';
+        render();
+        renderTechPills();
+        renderGroupMessages();
+    }
+
+    function hideSplash() {
+        if (splashHidden) return;
+        splashHidden = true;
+        const sp = document.getElementById('boot-splash');
+        if (sp) {
+            sp.classList.add('hide');
+            setTimeout(() => { sp.style.display = 'none'; }, 400);
+        }
+    }
+    setTimeout(hideSplash, 9000); // red de seguridad: jamás una carga eterna
+
     function evaluateGate() {
         const overlay = document.getElementById('login-obligatorio');
         if (!overlay) return;
+        if (loginObligatorio === null) return; // pantalla de carga hasta conocer el modo
         const btnLogout = document.getElementById('btn-logout');
-        if (!loginObligatorio) {
+
+        if (loginObligatorio === false) {
+            // ═══ MODO LIBRE: acceso a la antigua, sin Google ═══
             overlay.style.display = 'none';
+            if (!auth.currentUser) ensureAuth();
+            attachData();
             if (btnLogout) btnLogout.onclick = handleLogoutClick;
+            checkSession();
             updateLoginToggleUI();
-            return;
+            return; // la pantalla de carga se retira sola al llegar los primeros datos
         }
+
+        // ═══ MODO INICIO DE SESIÓN OBLIGATORIO: solo cuenta Google verificada ═══
         const u = sessionUser();
-        if (!u || !canLogin(u)) {
-            deactivateLeaderUI();
-            const denied = !!u;
-            document.getElementById('login-card-title').innerText = denied ? 'ACCESO NO AUTORIZADO' : 'PROGRAMACIÓN DIARIA';
-            document.getElementById('login-error-msg').innerText = denied ? `${u.toUpperCase()} NO TIENE ACCESO HABILITADO` : '';
-            document.getElementById('login-google-btn').style.display = denied ? 'none' : 'block';
-            document.getElementById('login-google-sub').style.display = denied ? 'none' : 'block';
-            document.getElementById('login-user-row').style.display = 'none';
-            document.getElementById('login-switch-btn').style.display = denied ? 'block' : 'none';
-            overlay.style.display = 'flex';
-            updateLoginToggleUI();
+        if (u && !usuariosLoaded) {
+            // roles aún cargando: espera breve y reintenta (sin parpadeos ni bloqueos falsos)
+            if (!gateRolesTimer) gateRolesTimer = setTimeout(() => { gateRolesTimer = null; evaluateGate(); }, 2500);
             return;
         }
-        overlay.style.display = 'none';
-        if (hasLeaderRole(u)) {
-            localStorage.setItem('tl_email', u);
-            localStorage.setItem('tl_login_time', Date.now().toString());
-            myEmail = u;
-            activateLeaderUI();
-            if (btnLogout) btnLogout.onclick = handleLogoutClick;
-        } else {
-            if (isTeamLeader) logoutLeader();
+        if (gateRolesTimer) { clearTimeout(gateRolesTimer); gateRolesTimer = null; }
+
+        if (u && canLogin(u)) {
+            overlay.style.display = 'none';
+            attachData();
+            if (hasLeaderRole(u)) {
+                localStorage.setItem('tl_email', u);
+                localStorage.setItem('tl_login_time', Date.now().toString());
+                myEmail = u;
+                activateLeaderUI();
+            } else if (isTeamLeader) {
+                logoutLeader();
+            }
             updateAdminUI();
-            if (btnLogout) { // los usuarios simples también necesitan poder salir
+            if (btnLogout) {
                 btnLogout.style.display = 'inline-flex';
                 btnLogout.onclick = handleLogoutClick;
             }
+            return; // la pantalla de carga se retira sola al llegar los primeros datos
         }
+
+        // Sin sesión válida → pantalla de acceso con Google
+        detachData();
+        deactivateLeaderUI();
+        const denied = !!u;
+        document.getElementById('login-card-title').innerText = denied ? 'ACCESO NO AUTORIZADO' : 'PROGRAMACIÓN DIARIA';
+        document.getElementById('login-error-msg').innerText = denied ? `${u.toUpperCase()} NO TIENE ACCESO HABILITADO` : '';
+        const sw = document.getElementById('login-switch-btn');
+        if (sw) sw.style.display = auth.currentUser ? 'block' : 'none';
+        overlay.style.display = 'flex';
+        updateLoginToggleUI();
+        hideSplash();
     }
     async function doGoogleLogin() {
         const err = document.getElementById('login-error-msg');
@@ -1401,63 +1495,42 @@
             const provider = new GoogleAuthProvider();
             provider.setCustomParameters({ prompt: 'select_account' });
             const result = await signInWithPopup(auth, provider);
+            err.innerText = 'VERIFICANDO PERMISOS...';
             const email = ((result.user && result.user.email) || '').toLowerCase();
             const username = extractUsername(email);
-            if (!username || !canLogin(username)) {
-                // NO cerrar sesión: evaluateGate mostrará la tarjeta ACCESO NO AUTORIZADO
-                evaluateGate();
-                return;
-            }
-            localStorage.setItem('login_email', username);
-            localStorage.setItem('login_time', Date.now().toString());
-            linkUid(result.user, username);
-            err.innerText = '';
-            evaluateGate();
+            if (!username) throw new Error('SIN CORREO EN LA CUENTA GOOGLE');
+            await linkUid(result.user, username); // registra el uid si tiene acceso; la puerta decide tras recargar
+            location.reload();
         } catch (e) {
-            err.innerText = 'GOOGLE NO DISPONIBLE AQUÍ (' + (e.code || e.message) + '). USA TU USUARIO:';
-            showManualLogin();
+            err.innerText = 'NO SE PUDO INICIAR SESIÓN (' + (e.code || e.message) + '). INTENTA DE NUEVO.';
         }
     }
-    function showManualLogin() {
-        const row = document.getElementById('login-user-row');
-        if (row) row.style.display = 'flex';
-        const inp = document.getElementById('login-user-input');
-        if (inp) inp.focus();
-    }
-    function linkUid(fu, username) {
+    async function linkUid(fu, username) {
+        await dbSet(ref(db, 'mantenimiento/uids/' + fu.uid), username.replace(/\./g, '_'), 'REGISTRAR UID: PIDE QUE TE DEN USUARIO EN PANEL ADMIN'); // índice para reglas de seguridad
         const rec = usuariosDB[username];
-        try { set(ref(db, 'mantenimiento/uids/' + fu.uid), username.replace(/\./g, '_')); } catch (e) {} // índice para reglas de seguridad
         if (!rec) return;
         let dirty = false;
         if (fu.uid && rec.uid !== fu.uid) { rec.uid = fu.uid; dirty = true; }
         if (fu.email && rec.email !== fu.email.toLowerCase()) { rec.email = fu.email.toLowerCase(); dirty = true; }
-        if (dirty) saveUsuarios();
+        if (dirty) await saveUsuarios();
     }
-    function doLoginObligatorio() {
-        const inp = document.getElementById('login-user-input');
-        const err = document.getElementById('login-error-msg');
-        const username = extractUsername(inp.value || '');
-        if (!username) { err.innerText = 'INGRESE SU USUARIO'; return; }
-        if (!canLogin(username)) { err.innerText = 'USUARIO NO AUTORIZADO'; inp.select(); return; }
-        localStorage.setItem('login_email', username);
-        localStorage.setItem('login_time', Date.now().toString());
-        err.innerText = '';
-        inp.value = '';
-        evaluateGate();
-    }
-    function logoutFull() {
+    let loggingOut = false;
+    async function logoutFull() {
+        if (loggingOut) return; // ignora clics repetidos mientras se cierra
+        loggingOut = true;
         ['tl_email', 'tl_login_time', 'login_email', 'login_time'].forEach(k => localStorage.removeItem(k));
-        try { signOut(auth).catch(() => {}); } catch (e) {}
+        try { await signOut(auth); } catch (e) {} // ESPERA a que la sesión se cierre de verdad antes de recargar
         myEmail = '';
         deactivateLeaderUI();
-        evaluateGate(); // vuelve directo a la pantalla de login, sin depender de recargar
+        location.reload(); // arranque limpio: pantalla de login + listeners nuevos
     }
     function handleLogoutClick() {
-        if (loginObligatorio && sessionUser()) { logoutFull(); return; }
+        if (sessionUser() && loginObligatorio !== false) { logoutFull(); return; }
         logoutLeader();
     }
     function toggleLoginObligatorio() {
         if (!isAdminUser() || !isSuperAdmin(myEmail)) return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE CAMBIAR ESTO');
+        if (loginObligatorio === null) return showToast('⏳ ESPERA: CARGANDO ESTADO DEL INICIO DE SESIÓN...');
         const nuevo = !loginObligatorio;
         showConfirm(nuevo
             ? '¿ACTIVAR INICIO DE SESIÓN OBLIGATORIO PARA TODOS? Nadie podrá ver la app sin iniciar sesión.'
@@ -1476,7 +1549,7 @@
         sec.style.display = isAdminUser() && isSuperAdmin(myEmail) ? 'flex' : 'none';
         const b = document.getElementById('btn-login-obligatorio');
         if (b) {
-            b.innerText = loginObligatorio ? '🔒 ACTIVADO' : '🔓 DESACTIVADO';
+            b.innerText = loginObligatorio === null ? '⏳ CARGANDO...' : (loginObligatorio ? '🔒 ACTIVADO' : '🔓 DESACTIVADO');
             b.style.background = loginObligatorio ? 'var(--danger)' : '';
             b.style.color = loginObligatorio ? 'white' : '';
         }
@@ -1497,6 +1570,33 @@
         toast.innerText = msg;
         toast.className = 'show';
         setTimeout(() => { toast.className = toast.className.replace('show', ''); }, 3000);
+    }
+
+    let _lastToastAt = 0;
+    function toastThrottled(msg) {
+        const now = Date.now();
+        if (now - _lastToastAt < 8000) return;
+        _lastToastAt = now;
+        showToast(msg);
+    }
+
+    function dbSet(r, v, label) {
+        return set(r, v).catch((e) => {
+            console.error('FIREBASE WRITE ERROR', e);
+            let msg = '⚠️ NO SE GUARDÓ' + (label ? ' (' + label + ')' : '') + ': ' + (e.code || e.message);
+            if ((e.code || '').includes('permission')) {
+                msg = loginObligatorio && !googleUser()
+                    ? '🔒 SIN PERMISO DE ESCRITURA: CIERRA SESIÓN Y ENTRA CON GOOGLE'
+                    : '🔒 SIN PERMISO DE ESCRITURA (' + (e.code || '') + ')';
+            }
+            toastThrottled(msg);
+        });
+    }
+
+    function readErr(err) {
+        console.error('FIREBASE READ ERROR', err);
+        if ((err.code || '').includes('permission') && !auth.currentUser) ensureAuth(); // sesión caída: reintenta
+        toastThrottled('⚠️ SIN ACCESO DE LECTURA (' + err.code + ')');
     }
 
     function refreshAdminListIfOpen() {
@@ -1688,6 +1788,7 @@
     }
 
     function listenToTurno(turno) {
+        if (!dataAttached) return; // sin acceso: no conectar nada
         if (unsubAviones) unsubAviones();
         if (unsubTechs) unsubTechs();
         if (unsubHeader) unsubHeader();
@@ -1743,13 +1844,13 @@
                     }
                 }, 50);
             }
-        });
+        }, readErr);
 
         unsubTechs = onValue(dbRefs.techs, (snapshot) => {
             shiftTechs = snapshot.val() || [];
             renderTechPills();
             updateTechFilterDropdown();
-        });
+        }, readErr);
 
         unsubHeader = onValue(dbRefs.header, (snapshot) => {
             const data = snapshot.val() || {};
@@ -1780,10 +1881,9 @@
             updateLockUI();
             render();
             renderGroupMessages();
-        });
+            hideSplash(); // primeros datos recibidos: fin de la pantalla de carga
+        }, readErr);
     }
-
-    listenToTurno(activeTurno);
 
     function updateLockUI() {
         const btns = ['btn-lock-shift', 'btn-lock-shift-mobile'].map(id => document.getElementById(id)).filter(Boolean);
@@ -1826,25 +1926,25 @@
         if (shiftState.estado === 'cerrado') {
             if (shiftState.cerradoPor === myEmail) {
                 showConfirm("¿ABRIR TURNO? Otros líderes y técnicos podrán editar.", () => {
-                    set(ref(db, `${getBasePath()}/header/estado`), 'abierto');
-                    set(ref(db, `${getBasePath()}/header/cerradoPor`), '');
+                    dbSet(ref(db, `${getBasePath()}/header/estado`), 'abierto', 'ABRIR TURNO');
+                    dbSet(ref(db, `${getBasePath()}/header/cerradoPor`), '', 'ABRIR TURNO');
                 });
             }
         } else {
             showConfirm("¿CERRAR TURNO? Nadie más podrá hacer cambios para este día, y los técnicos no podrán completar tareas, hasta que el Team Leader que cierre este turno lo vuelva a abrir.", () => {
-                set(ref(db, `${getBasePath()}/header/estado`), 'cerrado');
-                set(ref(db, `${getBasePath()}/header/cerradoPor`), myEmail);
+                dbSet(ref(db, `${getBasePath()}/header/estado`), 'cerrado', 'CERRAR TURNO');
+                dbSet(ref(db, `${getBasePath()}/header/cerradoPor`), myEmail, 'CERRAR TURNO');
             });
         }
     }
 
-    function saveData() { if(!checkLock()) set(dbRefs.aviones, avionesData); }
-    function saveTechs() { if(!checkLock()) set(dbRefs.techs, shiftTechs); }
+    function saveData() { if(!checkLock()) dbSet(dbRefs.aviones, avionesData, 'GUARDAR PROGRAMACIÓN'); }
+    function saveTechs() { if(!checkLock()) dbSet(dbRefs.techs, shiftTechs, 'GUARDAR TÉCNICOS'); }
     
     function updateHeader() {
         if(checkLock()) return;
         const jefe = document.getElementById('in-jefe').value.toUpperCase();
-        set(dbRefs.header, { turno: activeTurno, jefe: jefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo, mensajes: groupMessages });
+        dbSet(dbRefs.header, { turno: activeTurno, jefe: jefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo, mensajes: groupMessages }, 'GUARDAR TL');
     }
 
     let confirmCallback = null;
@@ -1918,14 +2018,14 @@
         if (globalTechs.includes(name)) return showConfirm("EL TÉCNICO YA EXISTE EN LA BASE GLOBAL.", null);
         globalTechs.push(name);
         globalTechs.sort();
-        set(globalTechsRef, globalTechs);
+        dbSet(globalTechsRef, globalTechs, 'GUARDAR BASE GLOBAL');
         input.value = '';
     }
 
     function removeGlobalTech(index) {
         showConfirm(`¿CONFIRMAS ELIMINAR A ${globalTechs[index]} DE LA BASE DE DATOS GLOBAL?`, () => {
             globalTechs.splice(index, 1);
-            set(globalTechsRef, globalTechs);
+            dbSet(globalTechsRef, globalTechs, 'GUARDAR BASE GLOBAL');
         });
     }
 
@@ -1966,9 +2066,9 @@
         showConfirm("⚠️ ¿ESTÁS SEGURO DE BORRAR TODO EL TURNO?\n(Se eliminarán aviones, técnicos y el Team Leader)", () => {
             avionesData = [];
             shiftTechs = [];
-            set(dbRefs.aviones, avionesData);
-            set(dbRefs.techs, shiftTechs);
-            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA', mensajes: [] });
+            dbSet(dbRefs.aviones, avionesData, 'BORRAR TURNO');
+            dbSet(dbRefs.techs, shiftTechs, 'BORRAR TURNO');
+            dbSet(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA', mensajes: [] }, 'BORRAR TURNO');
         });
     }
 
@@ -1988,15 +2088,15 @@
             const newPath = `mantenimiento/pd/historial/${newDate}/${safeNewTurno}`;
 
             // Escribir en la nueva fecha/turno
-            set(ref(db, `${newPath}/aviones`), avionesData);
-            set(ref(db, `${newPath}/techs`), shiftTechs);
+            dbSet(ref(db, `${newPath}/aviones`), avionesData, 'TRASLADAR');
+            dbSet(ref(db, `${newPath}/techs`), shiftTechs, 'TRASLADAR');
             const currentJefe = document.getElementById('in-jefe').value.toUpperCase();
-            set(ref(db, `${newPath}/header`), { turno: newTurno, jefe: currentJefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo, mensajes: groupMessages });
+            dbSet(ref(db, `${newPath}/header`), { turno: newTurno, jefe: currentJefe, estado: shiftState.estado, cerradoPor: shiftState.cerradoPor, actividadTitulo: actividadGrupoTitulo, mensajes: groupMessages }, 'TRASLADAR');
 
             // Borrar datos actuales
-            set(dbRefs.aviones, []);
-            set(dbRefs.techs, []);
-            set(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA', mensajes: [] });
+            dbSet(dbRefs.aviones, [], 'TRASLADAR');
+            dbSet(dbRefs.techs, [], 'TRASLADAR');
+            dbSet(dbRefs.header, { turno: activeTurno, jefe: "", estado: "abierto", cerradoPor: "", actividadTitulo: '⭐ ACTIVIDADES EXTRA', mensajes: [] }, 'TRASLADAR');
 
             // Redirigir al destino nuevo
             document.getElementById('global-date-select').value = newDate;
@@ -2588,7 +2688,7 @@
         const title = document.getElementById('edit-act-group-title').value.trim().toUpperCase();
         if (!title) return showConfirm("INGRESE UN TÍTULO PARA EL GRUPO DE ACTIVIDADES.", null);
         actividadGrupoTitulo = title;
-        set(ref(db, `${getBasePath()}/header/actividadTitulo`), title);
+        dbSet(ref(db, `${getBasePath()}/header/actividadTitulo`), title, 'GUARDAR TÍTULO');
         closeModal('edit-activity-group-modal');
     }
 
@@ -2631,7 +2731,7 @@
     }
 
     function saveHeaderMessages() {
-        set(ref(db, `${getBasePath()}/header/mensajes`), groupMessages);
+        dbSet(ref(db, `${getBasePath()}/header/mensajes`), groupMessages, 'GUARDAR MENSAJES');
     }
 
     function openAddMessageModal() {
@@ -2825,7 +2925,7 @@
         if (!predefTasks.includes(desc)) {
             predefTasks.push(desc);
             predefTasks.sort();
-            set(predefTasksRef, predefTasks);
+            dbSet(predefTasksRef, predefTasks, 'GUARDAR TAREA PREDEFINIDA');
         }
         
         addPredefToAvion(desc);
@@ -2860,7 +2960,7 @@
     function removePredefTask(index) {
         showConfirm(`¿CONFIRMAS ELIMINAR ESTA TAREA PREDEFINIDA DE LA BASE DE DATOS GLOBAL?`, () => {
             predefTasks.splice(index, 1);
-            set(predefTasksRef, predefTasks);
+            dbSet(predefTasksRef, predefTasks, 'GUARDAR TAREA PREDEFINIDA');
         });
     }
 
@@ -3389,7 +3489,7 @@
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
         openAdminModal, adminAddUser, adminToggleTl, adminToggleAdmin, adminRemoveUser,
         adminToggleUsuario, adminEditNombre, refreshAdminList,
-        doGoogleLogin, doLoginObligatorio, toggleLoginObligatorio, logoutFull
+        doGoogleLogin, toggleLoginObligatorio, logoutFull
     });
 
 </script>
