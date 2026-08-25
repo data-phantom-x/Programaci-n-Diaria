@@ -1257,14 +1257,16 @@
         const loginTime = localStorage.getItem('tl_login_time');
 
         if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
+            
+            if (!usuariosLoaded) return; 
+
             if (isAuthorizedUser(savedEmail)) {
                 activateLeaderUI();
             } else {
                 logoutLeader();
             }
         } else {
-            // Limpiamos los rastros muertos al igual que en el CRT
-            logoutLeader(); 
+            logoutLeader();
         }
     }
 
