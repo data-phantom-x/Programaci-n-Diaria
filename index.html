@@ -1028,8 +1028,8 @@
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
     import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
     
-    // 1. NUEVA LÍNEA: Importamos las herramientas del "Pase temporal" (Autenticación)
-    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    // Añadimos setPersistence y browserLocalPersistence como hicimos en el CRT
+    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyADC1Wwcypek8g1gwOTcgqKskpqiTo0-oM",
@@ -1043,14 +1043,22 @@
 
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
-
-    // Pase temporal anónimo: se restaura solo si se pierde (tras cerrar sesión o expirar)
     const auth = getAuth(app);
+
+    // Pase temporal anónimo con persistencia local forzada (Solución F5)
     let ensuringAuth = false;
     async function ensureAuth() {
-        try { await auth.authStateReady(); } catch (e) {} // ESPERA la sesión guardada (Google) antes de decidir
+        try { 
+            await setPersistence(auth, browserLocalPersistence); 
+        } catch (e) { 
+            console.error("Error al fijar persistencia:", e); 
+        }
+        
+        try { await auth.authStateReady(); } catch (e) {} // ESPERA la sesión guardada antes de decidir
+        
         if (auth.currentUser || ensuringAuth) return;
         ensuringAuth = true;
+        
         try {
             await signInAnonymously(auth);
             console.log("Conectado a la Base de Datos de forma segura 🔒");
@@ -1255,7 +1263,8 @@
                 logoutLeader();
             }
         } else {
-            deactivateLeaderUI();
+            // Limpiamos los rastros muertos al igual que en el CRT
+            logoutLeader(); 
         }
     }
 
