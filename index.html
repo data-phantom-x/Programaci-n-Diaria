@@ -2430,6 +2430,7 @@
     // P2 FIX: Render optimizado con DocumentFragment - antes repintaba toda la casa por 1 clavo
     function render() {
         const container = document.getElementById('aviones-container'); 
+        container.innerHTML = '';
         const fragment = document.createDocumentFragment();
         let displayData = JSON.parse(JSON.stringify(avionesData));
         const locked = isShiftLockedForMe();
