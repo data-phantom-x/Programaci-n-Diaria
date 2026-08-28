@@ -1082,7 +1082,7 @@
     const superAdminsRef = ref(db, 'mantenimiento/super_admin');
 
     function isSuperAdmin(name) {
-        return superAdmins.includes(name);
+        return Array.isArray(superAdmins) ? superAdmins.includes(name) : Object.values(superAdmins||{}).includes(name);
     }
 
     // REGISTRO ÚNICO DE USUARIOS: acceso, roles y nombre real viven aquí.
@@ -1128,7 +1128,10 @@
         rolesUnsubs.forEach(u => { try { u(); } catch (e) {} });
         rolesUnsubs = [];
         rolesUnsubs.push(onValue(superAdminsRef, (snapshot) => {
-            superAdmins = snapshot.val() || [];
+            const v = snapshot.val();
+            if(Array.isArray(v)) superAdmins = v;
+            else if(v && typeof v==='object') superAdmins = Object.values(v);
+            else superAdmins = [];
             checkSession();
             updateAdminUI();
             refreshAdminListIfOpen();
