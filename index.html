@@ -518,9 +518,9 @@
         }
         #toast.show { visibility: visible; opacity: 1; }
 
-        /* Ultra-Comprimido para Imprimir en una sola hoja carta (va DESPUÉS del móvil para que la impresión siempre gane) */
+        /* Ultra-Comprimido para Imprimir en una sola hoja carta 216x279mm */
         @media print {
-            @page { size: letter; margin: 1.2cm; } 
+            @page { size: 216mm 279mm; margin: 1.2cm; } 
             body .no-print { display: none !important; }
             body { padding: 0 !important; background-color: white; font-size: var(--print-font-size); line-height: 1.15; }
             .container { padding: 0 3px 0 0 !important; box-shadow: none; max-width: 100%; }
@@ -531,10 +531,10 @@
             .logo-container { position: absolute !important; left: 0 !important; top: 50% !important; transform: translateY(-50%) !important; }
             .document-header { font-size: 1.1em; padding: 0 85px !important; } 
             
-            .avion-section { margin-bottom: 15px; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .avion-section { margin-bottom: 0.9em; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .avion-title { 
                 background: var(--gradient-primary) !important; color: white !important; 
-                padding: 10px 14px; border-bottom: 1px solid var(--border); gap: 10px !important;
+                padding: 0.6em 0.9em; border-bottom: 1px solid var(--border); gap: 0.6em !important;
                 flex-direction: row !important; text-align: left !important;
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
@@ -548,7 +548,7 @@
             .task-item .tango-link { color: #EE1750; }
             
             .task-container { padding-left: 0 !important; }
-            .task-item { padding: 6px 10px !important; position: static !important; border-bottom: 1px solid var(--border); page-break-inside: avoid; }
+            .task-item { padding: 0.4em 0.6em !important; position: static !important; border-bottom: 1px solid var(--border); page-break-inside: avoid; }
             .task-item:nth-child(even) { background-color: var(--light-gray); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .task-item.completed:nth-child(even) { background-color: #f0f0f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .task-item.completed:nth-child(odd) { background-color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -562,7 +562,7 @@
             .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #9ca3af !important; border-color: #9ca3af !important; color: white !important; }
             .status-toggle { margin-top: 0px; margin-right: 6px; width: 12px; min-width: 12px; height: 12px; min-height: 12px; font-size: 8px; border-width: 1px; position: static !important; margin: 0 6px 0 0 !important; }
             .task-desc { font-size: 1em; }
-            .task-techs, .task-comment { font-size: 0.85em; margin-top: 6px; }
+            .task-techs, .task-comment { font-size: 0.85em; margin-top: 0.25em; }
             .atencion-badge { padding: 1px 4px; font-size: 0.75em; }
             
             .task-main { flex-direction: row !important; align-items: center !important; gap: 12px !important; }
@@ -1901,7 +1901,7 @@
             
             const turnoInfo = `${turno.toUpperCase()} | ${fechaDisplay}`;
             const jefeInfo = data.jefe ? `TL: ${data.jefe}` : '';
-            const lockInfo = shiftState.estado === 'cerrado' ? `<span style="color:var(--danger); font-weight:bold;">🔒 TURNO CERRADO POR ${shiftState.cerradoPor.toUpperCase()}</span>` : '';
+            const lockInfo = shiftState.estado === 'cerrado' ? `<span class="no-print" style="color:var(--danger); font-weight:bold;">🔒 TURNO CERRADO POR ${shiftState.cerradoPor.toUpperCase()}</span>` : '';
 
             document.getElementById('display-header').innerHTML = `
                 <span>${turnoInfo}</span>
@@ -3081,42 +3081,42 @@
         });
     }
 
-    // Smart Print - escala todo para que quepa exactamente en 1 hoja carta
+    // FIX PRINT: Mide con los mismos estilos de impresión (0.25em) y aprovecha el blanco
     function getPrintScale() {
         const cmToPx = 37.795;
-        const usableHeightPx = (27.94 - 2.4) * cmToPx;
-        const usableWidthPx = (21.59 - 2.4) * cmToPx;
+        const usableHeightPx = (27.94 - 3.2) * cmToPx; // 934px
+        const printArea = document.getElementById('print-area');
+        // Usa el ancho real del contenedor impreso, no un fijo, para medir alto real
+        const measureWidth = Math.min(printArea.offsetWidth, 720); // 720px ≈ ancho carta útil
 
         const m = document.createElement('div');
-        m.style.cssText = `position:absolute;top:-99999px;left:0;width:${usableWidthPx}px;visibility:hidden;`;
+        m.style.cssText = `position:absolute;top:-99999px;left:0;visibility:hidden;`;
+        m.style.width = measureWidth + 'px';
         m.style.fontSize = '15px';
-        m.style.lineHeight = '1.15';
+        m.style.lineHeight = '1.1';
+        m.classList.add('measure-print'); // usa mismos paddings que impresión (0.25em)
 
-        const c = document.getElementById('print-area').cloneNode(true);
+        const c = printArea.cloneNode(true);
         c.querySelectorAll('.no-print, .leader-only').forEach(el => el.remove());
+        c.style.zoom = '';
         m.appendChild(c);
         document.body.appendChild(m);
 
         const h = m.scrollHeight;
         document.body.removeChild(m);
 
-        if (h <= usableHeightPx) return 1;
-        return usableHeightPx / h;
+        const targetH = usableHeightPx; // usa 100% del alto útil para no dejar blanco
+        console.log(`PRINT SCALE: h=${Math.round(h)} usable=${Math.round(usableHeightPx)} target=${Math.round(targetH)} raw=${(targetH/h).toFixed(3)}`);
+        if (h <= targetH) return 1;
+        return Math.max((targetH / h), 0.53); // 8px mínimo
     }
 
     window.addEventListener('beforeprint', () => {
         const s = getPrintScale();
         document.documentElement.style.setProperty('--print-font-size', (15 * s) + 'px');
-
-        if (s < 1) {
-            const el = document.getElementById('print-area');
-            el.style.setProperty('zoom', s, 'important');
-        }
     });
 
     window.addEventListener('afterprint', () => {
-        const el = document.getElementById('print-area');
-        el.style.zoom = '';
         document.documentElement.style.removeProperty('--print-font-size');
     });
 
