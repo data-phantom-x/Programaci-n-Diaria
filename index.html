@@ -693,7 +693,7 @@
 
         <div class="control-group" style="margin-top: 8px;">
             <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">🔍 BUSCAR:</span>
-            <input type="text" id="global-search-input" placeholder="TAREA, TANGO, WP, COMENTARIO..." style="flex:1;">
+            <input type="text" id="global-search-input" placeholder="🔍 BUSCAR SOLO ÚLTIMOS 30 DÍAS - TAREA, TANGO, WP, COMENTARIO..." style="flex:1;">
             <button class="btn-outline" onclick="clearSearch()" style="padding: 0 10px; font-size: 14px; display:none; height:28px;" id="btn-clear-search">✖</button>
         </div>
         <div id="search-results" style="display:none; margin-top: 8px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: white; padding: 10px;"></div>
@@ -710,7 +710,7 @@
             <div class="logo-container">
                 <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines">
             </div>
-            <h1 class="document-header" id="display-header">CARGANDO DATOS...</h1>
+            <h1 class="document-header" id="display-header"></h1>
         </div>
         
         <div id="group-messages-top"></div>
@@ -1026,11 +1026,14 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getDatabase, ref, set, onValue, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    import { getDatabase, ref, set, onValue, get, runTransaction } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    // C5 App Check: descomenta cuando actives ReCaptcha en consola Firebase > App Check. Dominios autorizados solo protege Login, App Check protege la DB.
+    // import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app-check.js";
     
     // Añadimos setPersistence y browserLocalPersistence como hicimos en el CRT
     import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
+    // C4 CORREGIDO: Tu número real es 449926089536
     const firebaseConfig = {
       apiKey: "AIzaSyADC1Wwcypek8g1gwOTcgqKskpqiTo0-oM",
       authDomain: "programacion-diaria-3dddb.firebaseapp.com",
@@ -1042,6 +1045,7 @@
     };
 
     const app = initializeApp(firebaseConfig);
+    // Para activar App Check después: const appCheck = initializeAppCheck(app, { provider: new ReCaptchaEnterpriseProvider('TU_SITE_KEY'), isTokenAutoRefreshEnabled: true });
     const db = getDatabase(app);
     const auth = getAuth(app);
 
@@ -1162,7 +1166,8 @@
         evaluateGate();
         }, (e) => console.warn('usuarios:', e.code)));
     }
-    subscribeRoles();
+    // P4 FIX: Esperar a que Firebase restaure sesión antes de suscribir roles - evita carrera ensureAuth vs subscribe
+    auth.authStateReady().then(()=> subscribeRoles()).catch(()=> subscribeRoles());
 
     function isAuthorizedUser(name) {
         return isSuperAdmin(name) || correosAutorizados.includes(name) || adminList.includes(name);
@@ -1249,8 +1254,8 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    const globalTechsRef = ref(db, 'mantenimiento/pd/global_techs');
-    const predefTasksRef = ref(db, 'mantenimiento/pd/predefined_task');
+    const globalTechsRef = ref(db, 'mantenimiento/pd/equipos/cabina/global_techs');
+    const predefTasksRef = ref(db, 'mantenimiento/pd/equipos/cabina/predefined_task');
 
     function checkSession() {
         const savedEmail = localStorage.getItem('tl_email');
@@ -1425,7 +1430,7 @@
         avionesData = [];
         shiftTechs = [];
         groupMessages = [];
-        document.getElementById('display-header').innerHTML = 'CARGANDO DATOS...';
+        document.getElementById('display-header').innerHTML = '';
         render();
         renderTechPills();
         renderGroupMessages();
@@ -1440,7 +1445,8 @@
             setTimeout(() => { sp.style.display = 'none'; }, 400);
         }
     }
-    setTimeout(hideSplash, 9000); // red de seguridad: jamás una carga eterna
+    // P3 FIX: Solo se oculta cuando llegan datos del header (arriba). Fallback 15s para no quedar pegado si no hay datos.
+    setTimeout(() => { if(!splashHidden) console.warn('Splash fallback 15s'); hideSplash(); }, 15000);
 
     function evaluateGate() {
         const overlay = document.getElementById('login-obligatorio');
@@ -1780,9 +1786,24 @@
         listenToTurno(activeTurno);
     }
 
+    // HISTORIAL ORDENADO: 2026/08/28/Turno - JSON ya viene ordenado, no necesita leer lo viejo
     function getBasePath() {
         const safeTurno = activeTurno.replace(/\s+/g, '_');
-        return `mantenimiento/pd/historial/${viewingDate}/${safeTurno}`;
+        const [y,m,d] = viewingDate.split('-');
+        return `mantenimiento/pd/equipos/cabina/historial/${y}/${m}/${d}/${safeTurno}`;
+    }
+    function flattenHistorialForSearch(nested){
+        if(!nested) return {};
+        const flat={};
+        for(const y of Object.keys(nested)){
+            for(const m of Object.keys(nested[y]||{})){
+                for(const d of Object.keys(nested[y][m]||{})){
+                    const dateKey = `${y}-${m}-${d}`;
+                    flat[dateKey]= nested[y][m][d];
+                }
+            }
+        }
+        return flat;
     }
 
     function isShiftLockedForMe() {
@@ -1814,7 +1835,7 @@
 
         avionesData = [];
         shiftTechs = [];
-        document.getElementById('display-header').innerHTML = 'CARGANDO DATOS...';
+        document.getElementById('display-header').innerHTML = '';
         render();
         renderTechPills();
         updateTechFilterDropdown();
@@ -1949,7 +1970,12 @@
         }
     }
 
-    function saveData() { if(!checkLock()) dbSet(dbRefs.aviones, avionesData, 'GUARDAR PROGRAMACIÓN'); }
+    // B1 FIX: Transacción evita que 2 líderes borren lo del otro al guardar a la vez (antes last-write-wins)
+    function saveData() { 
+        if(checkLock()) return;
+        // Transacción = Firebase revisa que nadie cambió el turno mientras guardabas
+        runTransaction(dbRefs.aviones, (current) => avionesData).catch((e) => dbSet(dbRefs.aviones, avionesData, 'GUARDAR PROGRAMACIÓN'));
+    }
     function saveTechs() { if(!checkLock()) dbSet(dbRefs.techs, shiftTechs, 'GUARDAR TÉCNICOS'); }
     
     function updateHeader() {
@@ -2096,7 +2122,8 @@
 
         showConfirm(`⚠️ ¿CONFIRMAS TRASLADAR TODO A:\n${newTurno.toUpperCase()} DEL ${newDate}?`, () => {
             const safeNewTurno = newTurno.replace(/\s+/g, '_');
-            const newPath = `mantenimiento/pd/historial/${newDate}/${safeNewTurno}`;
+            const [ny,nm,nd] = newDate.split('-');
+            const newPath = `mantenimiento/pd/equipos/cabina/historial/${ny}/${nm}/${nd}/${safeNewTurno}`;
 
             // Escribir en la nueva fecha/turno
             dbSet(ref(db, `${newPath}/aviones`), avionesData, 'TRASLADAR');
@@ -2261,19 +2288,22 @@
 
     function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
 
+    // C3 FIX: Todo texto de usuario escapado - antes un <script> en la descripción se ejecutaba en todos
     function generateTaskHTML(avion, t, showPlaneReg = false, showHandle = false) {
-        let cleanDesc = t.desc || ''; let tangoDisplay = '';
+        let cleanDesc = escapeHtml(t.desc || ''); let tangoDisplay = '';
         if (t.tango) {
             const escapedTango = t.tango.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
             const regexClean = new RegExp(`\\[?${escapedTango}\\]?`, 'gi');
             cleanDesc = cleanDesc.replace(regexClean, '').trim().replace(/[- ]+$/, '').trim();
-            tangoDisplay = ` <span class="tango-link" onclick="handleTangoClick('${t.tango}')">[${t.tango}]</span>`;
+            tangoDisplay = ` <span class="tango-link" onclick="handleTangoClick('${escapeHtml(t.tango)}')">[${escapeHtml(t.tango)}]</span>`;
         }
 
-        const atencionLabel = t.atencion ? `<span class="atencion-badge ${t.alertaByTL ? 'alerta-tl' : 'alerta-tech'}">⚠️ ${t.alerta || 'ALERTA'}${t.alertaNombre ? ' (' + t.alertaNombre + ')' : ''}</span>` : '';
-        const planePrefix = showPlaneReg ? `<strong style="color:var(--accent);">[${avion.reg}]</strong> ` : '';
+        const alertaSafe = escapeHtml(t.alerta || 'ALERTA');
+        const alertaNombreSafe = t.alertaNombre ? ' (' + escapeHtml(t.alertaNombre) + ')' : '';
+        const atencionLabel = t.atencion ? `<span class="atencion-badge ${t.alertaByTL ? 'alerta-tl' : 'alerta-tech'}">⚠️ ${alertaSafe}${alertaNombreSafe}</span>` : '';
+        const planePrefix = showPlaneReg ? `<strong style="color:var(--accent);">[${escapeHtml(avion.reg)}]</strong> ` : '';
         const activityTime = avion.isActivity && (avion.start || avion.end)
-            ? `<span class="activity-time-badge">🕒 ${buildTimesLabel(avion.start, avion.end)}</span> `
+            ? `<span class="activity-time-badge">🕒 ${escapeHtml(buildTimesLabel(avion.start, avion.end))}</span> `
             : '';
         
         const locked = isShiftLockedForMe();
@@ -2300,8 +2330,8 @@
                 <div class="task-main">
                     <div class="task-info">
                         <div class="task-desc">${planePrefix}${activityTime}${cleanDesc}${tangoDisplay} ${atencionLabel}</div>
-                        ${t.techs ? `<div class="task-techs">${t.techs}</div>` : ''}
-                        ${t.comment ? `<div class="task-comment">↳ NOTA: ${t.comment}</div>` : ''}
+                        ${t.techs ? `<div class="task-techs">${escapeHtml(t.techs)}</div>` : ''}
+                        ${t.comment ? `<div class="task-comment">↳ NOTA: ${escapeHtml(t.comment)}</div>` : ''}
                     </div>
                     <div class="action-bar no-print">
                         ${actionButtonsHtml}
@@ -2397,8 +2427,10 @@
         });
     }
 
+    // P2 FIX: Render optimizado con DocumentFragment - antes repintaba toda la casa por 1 clavo
     function render() {
-        const container = document.getElementById('aviones-container'); container.innerHTML = '';
+        const container = document.getElementById('aviones-container'); 
+        const fragment = document.createDocumentFragment();
         let displayData = JSON.parse(JSON.stringify(avionesData));
         const locked = isShiftLockedForMe();
         const allowOrder = isTeamLeader && !locked && currentViewMode === 'default' && !currentTechFilter;
@@ -2450,10 +2482,10 @@
 
         planes.forEach(avion => {
             const div = document.createElement('div'); div.className = 'avion-section'; div.dataset.avionId = avion.id;
-            const wpDisplay = avion.wp ? `<span class="tango-link" onclick="handleTangoClick('${avion.wp}')">[${avion.wp}]</span>` : '';
-            const posDisplay = avion.pos ? `<span class="avion-pos">POS: ${avion.pos}</span>` : '';
+            const wpDisplay = avion.wp ? `<span class="tango-link" onclick="handleTangoClick('${escapeHtml(avion.wp)}')">[${escapeHtml(avion.wp)}]</span>` : '';
+            const posDisplay = avion.pos ? `<span class="avion-pos">POS: ${escapeHtml(avion.pos)}</span>` : '';
             const timesLabel = buildTimesLabel(avion.start, avion.end);
-            const timesDisplay = timesLabel ? `<span class="avion-times">${timesLabel}</span>` : '';
+            const timesDisplay = timesLabel ? `<span class="avion-times">${escapeHtml(timesLabel)}</span>` : '';
             
             const headerClass = isAvionAllDone(avion) ? ' all-done' : '';
             
@@ -2471,8 +2503,8 @@
             let html = `
                 <div class="avion-title ${headerClass}">
                     <div class="avion-info-main">
-                        <span>• ${avion.reg} ${wpDisplay}</span> ${posDisplay} ${timesDisplay}
-                        ${avion.comment ? `<span class="avion-comment">NOTA: ${avion.comment}</span>` : ''}
+                        <span>• ${escapeHtml(avion.reg)} ${wpDisplay}</span> ${posDisplay} ${timesDisplay}
+                        ${avion.comment ? `<span class="avion-comment">NOTA: ${escapeHtml(avion.comment)}</span>` : ''}
                     </div>
                     <div class="action-bar avion-bar no-print">
                         ${avionActionBtns}
@@ -2490,7 +2522,7 @@
             }
 
             html += `</div>`;
-            div.innerHTML = html; container.appendChild(div);
+            div.innerHTML = html; fragment.appendChild(div);
         });
 
         // GRUPO ÚNICO DE ACTIVIDADES EXTRA
@@ -2521,8 +2553,9 @@
                     ${completedTasks.map(x => generateTaskHTML(x.avion, x.task, false, allowOrder)).join('')}
                 </div>
             `;
-            gDiv.innerHTML = gHtml; container.appendChild(gDiv);
+            gDiv.innerHTML = gHtml; fragment.appendChild(gDiv);
         }
+        container.appendChild(fragment);
     }
 
     function toggleTask(aId, tId) {
@@ -3306,16 +3339,24 @@
         const btnClear = document.getElementById('btn-clear-search');
         resultsDiv.style.display = 'block';
         btnClear.style.display = 'inline-flex';
-        resultsDiv.innerHTML = '<div id="search-loading">🔍 BUSCANDO EN TODO EL HISTORIAL...</div>';
+        resultsDiv.innerHTML = '<div id="search-loading">🔍 BUSCANDO EN ÚLTIMOS 30 DÍAS...</div>';
 
         try {
             let data;
             if (forceRefresh || !searchCache) {
-                const snap = await get(ref(db, 'mantenimiento/pd/historial'));
-                data = snap.val();
+                const snap = await get(ref(db, 'mantenimiento/pd/equipos/cabina/historial'));
+                data = flattenHistorialForSearch(snap.val());
                 searchCache = data;
             } else {
                 data = searchCache;
+            }
+            // B3 FIX: Limitar a últimos 30 días para no descargar 1 año entero (era muy lento)
+            const cutoff = new Date(); cutoff.setDate(cutoff.getDate() - 30);
+            const cutoffStr = cutoff.toISOString().slice(0,10);
+            if(data){
+                const filtered = {};
+                Object.keys(data).sort().reverse().forEach(d => { if(d >= cutoffStr) filtered[d] = data[d]; });
+                data = filtered;
             }
             if (!data) {
                 resultsDiv.innerHTML = '<div id="search-no-results">📭 SIN DATOS EN EL HISTORIAL</div>';
@@ -3379,7 +3420,7 @@
                 else if (r.type === 'TAREA') currGroup.tasks.push(r);
             }
 
-            let html = `<div style="font-size:10px;color:var(--comment);padding:8px 10px;border-bottom:1px solid var(--border);">🔍 ${results.length} resultado(s) para "<strong>${escapeHtml(query)}</strong>"</div><div class="search-results-wrap">`;
+            let html = `<div style="font-size:10px;color:var(--comment);padding:8px 10px;border-bottom:1px solid var(--border);">🔍 ${results.length} resultado(s) para "<strong>${escapeHtml(query)}</strong>" <span style="opacity:0.7;">· últimos 30 días</span></div><div class="search-results-wrap">`;
             let lastDt = '';
             let groupIdx = 0;
             for (const g of grouped) {
