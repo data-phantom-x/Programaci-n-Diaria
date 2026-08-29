@@ -162,6 +162,28 @@
         }
         .tech-pill span.tech-remove:hover { transform: scale(1.2); }
 
+        /* Técnico sin tareas asignadas en el turno: ámbar / naranja suave */
+        .tech-pill.tech-idle {
+            background-color: #FFF8E1;
+            border-color: #FFB74D;
+            color: #8D4A00;
+        }
+        .tech-checkbox-label.tech-idle span {
+            background: #FFF8E1;
+            border-color: #FFCC80;
+            color: #8D4A00;
+        }
+        .tech-checkbox-label.tech-idle:hover span {
+            border-color: #FFA726;
+            background: #FFECB3;
+        }
+        /* Si está seleccionado, prima el estilo de seleccionado por encima del idle */
+        .tech-checkbox-label.tech-idle input:checked + span {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
         /* Título de documento mejorado y centrado matemáticamente */
         .main-header-wrapper {
             position: relative;
@@ -1847,6 +1869,7 @@
             const oldData = avionesData;
             avionesData = snapshot.val() || [];
             render();
+            renderTechPills();
             if (localMutation) {
                 localMutation = false;
                 return;
@@ -2149,19 +2172,40 @@
         });
     }
 
+    // ——— Técnicos sin asignación en el turno (ámbar) ———
+    function getAssignedTechsSet() {
+        const s = new Set();
+        (avionesData || []).forEach(avion => {
+            (avion.tareas || []).forEach(t => {
+                if (!t.techs) return;
+                t.techs.split(' - ').forEach(n => {
+                    const name = n.trim();
+                    if (name) s.add(name);
+                });
+            });
+        });
+        return s;
+    }
+    function isTechIdle(tech) {
+        return !getAssignedTechsSet().has(tech);
+    }
+
     function renderTechPills() {
         const container = document.getElementById('tech-pills-container'); container.innerHTML = '';
         if(shiftTechs.length === 0) {
             container.innerHTML = '<span style="font-size:10px; color:var(--comment); font-style:italic;">No hay técnicos registrados.</span>';
             return;
         }
+        const assigned = getAssignedTechsSet();
         const countPill = document.createElement('div'); countPill.className = 'tech-pill';
         countPill.style.fontWeight = '800';
         countPill.title = `Total de técnicos en el turno: ${shiftTechs.length}`;
         countPill.innerHTML = `<span class="tech-name">👥 ${shiftTechs.length}</span>`;
         container.appendChild(countPill);
         shiftTechs.forEach((tech, index) => {
-            const pill = document.createElement('div'); pill.className = 'tech-pill';
+            const idle = !assigned.has(tech);
+            const pill = document.createElement('div'); pill.className = 'tech-pill' + (idle ? ' tech-idle' : '');
+            if (idle) pill.title = `${tech} · SIN TAREAS ASIGNADAS EN ESTE TURNO`;
             pill.innerHTML = `<span class="tech-name">${tech}</span> <span class="tech-remove" onclick="removeTech(${index})" title="Eliminar">✖</span>`;
             container.appendChild(pill);
         });
@@ -2901,8 +2945,11 @@
         } else {
             shiftTechs.forEach(tech => {
                 const isChecked = currentTechs.includes(tech) ? "checked" : "";
+                const idle = isTechIdle(tech);
+                const idleClass = idle ? ' tech-idle' : '';
+                const idleTitle = idle ? ' title="SIN TAREAS EN ESTE TURNO · LIBRE"' : '';
                 container.innerHTML += `
-                    <label class="tech-checkbox-label">
+                    <label class="tech-checkbox-label${idleClass}"${idleTitle}>
                         <input type="checkbox" class="${containerId}-cb" value="${tech}" ${isChecked}>
                         <span>${tech}</span>
                     </label>`;
