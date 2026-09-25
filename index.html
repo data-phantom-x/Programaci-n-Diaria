@@ -22,6 +22,11 @@
             --comment: #6B5E8A;
             --gradient-accent: linear-gradient(135deg, #2A0087, #3D0DA8);
             --gradient-primary: linear-gradient(135deg, #2A0087, #1A0055);
+            --surface: #FFFFFF;
+            --surface-soft: #F8FAFC;
+            --text-soft: #526176;
+            --shadow-soft: 0 8px 24px rgba(31, 41, 55, 0.07);
+            --shadow-card: 0 3px 12px rgba(42, 0, 135, 0.08);
             --print-font-size: 15px;
         }
 
@@ -31,29 +36,53 @@
         }
 
         body {
-            background-color: var(--bg);
+            background: linear-gradient(135deg, #F7F9FC 0%, #EEF3F9 100%);
             color: var(--primary);
             margin: 0;
             padding: 20px;
         }
 
-        .container { max-width: 1000px; margin: 0 auto; background: white; padding: 25px; border-radius: 24px 0 24px 0; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .container {
+            max-width: 1000px; margin: 0 auto; background: var(--surface); padding: 25px;
+            border: 1px solid rgba(192, 208, 220, 0.55); border-radius: 24px 0 24px 0;
+            box-shadow: var(--shadow-soft);
+        }
 
         /* Barra superior general */
         .top-bar {
-            display: flex; justify-content: space-between; margin-bottom: 10px;
-            background-color: var(--light-gray); padding: 6px 15px;
-            border-radius: 16px 0 16px 0; align-items: center; position: relative;
+            display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px;
+            background: linear-gradient(90deg, #EDF3FA, #F7F9FC); padding: 7px 15px;
+            border: 1px solid rgba(192, 208, 220, 0.75); border-radius: 16px 0 16px 0;
+            align-items: center; position: relative;
         }
 
         .top-bar-left { display: flex; gap: 5px; }
 
         /* Reloj Inteligente (Mejorado) */
         .live-clock {
-            display: flex; gap: 12px; font-size: 11px; font-weight: normal;
-            background: white; padding: 0 24px; border-radius: 6px; border: 1px solid var(--border);
-            align-items: center; justify-content: center; height: 36px; box-sizing: border-box;
+            display: flex; gap: 8px; font-size: 11px; font-weight: normal;
+            background: transparent; padding: 0; border-radius: 0;
+            border: 0; box-shadow: none;
+            align-items: stretch; justify-content: center; height: 36px; box-sizing: border-box;
         }
+        .clock-zone {
+            display: flex; flex: 1; min-width: 0; align-items: center; justify-content: center; gap: 9px;
+            padding: 2px 10px; border-radius: 14px; background: var(--surface);
+        }
+        .clock-zone.local { border: 1px solid rgba(42, 0, 135, 0.12); }
+        .clock-zone.utc { border: 1px solid rgba(107, 94, 138, 0.16); }
+        .clock-zone-identity { display: flex; flex-direction: column; align-items: center; line-height: 1.05; }
+        .clock-zone-icon { font-size: 13px; line-height: 1.1; }
+        .clock-zone-label { font-size: 9px; line-height: 1.05; letter-spacing: 0.7px; }
+        .clock-zone.local .clock-zone-label { color: var(--primary); font-weight: 800; }
+        .clock-zone.utc .clock-zone-label { color: var(--comment); font-weight: 800; }
+        .clock-zone-details { display: flex; flex-direction: column; align-items: center; line-height: 1.3; }
+        .clock-time { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .clock-date { font-size: 9px; font-weight: 500; white-space: nowrap; }
+        .clock-zone.local .clock-time, .clock-zone.local .clock-date { color: var(--primary); }
+        .clock-zone.utc .clock-time, .clock-zone.utc .clock-date { color: var(--comment); }
+        .clock-z { text-transform: lowercase; }
+        .clock-divider { align-self: center; width: 1px; height: 24px; background: var(--border); margin: 0 1px; }
 
         .btn-top {
             width: 140px; height: 28px; font-size: 10px; padding: 0; font-weight: bold;
@@ -82,19 +111,32 @@
 
         /* PANEL DE CONTROL TEAM LEADER */
         .header-controls {
-            background-color: var(--light-gray); border: 1px solid var(--border);
-            border-left: 6px solid var(--leader-color); padding: 16px;
-            border-radius: 16px 0 16px 0; margin-bottom: 10px; transition: opacity 0.3s;
+            background: linear-gradient(90deg, #EDF3FA, #F7F9FC); border: 1px solid #CFC3E4;
+            border-top: 3px solid var(--leader-color); padding: 0; overflow: hidden;
+            border-radius: 14px 0 14px 0; margin-bottom: 10px; box-shadow: 0 7px 20px rgba(42, 0, 135, 0.13);
+            transition: opacity 0.3s, box-shadow 0.25s ease;
         }
 
         .leader-panel-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid #E0D6ED; padding-bottom: 10px; margin-bottom: 12px;
+            background: var(--gradient-primary);
+            padding: 10px 14px; margin: 0;
         }
 
-        .leader-title { font-size: 1.1em; font-weight: 800; color: var(--leader-color); display: flex; align-items: center; gap: 8px; }
-        .leader-grid { display: flex; flex-direction: column; gap: 10px; }
-        .control-group { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+        .leader-title {
+            font-size: 10px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px;
+            letter-spacing: 0.55px;
+        }
+        .leader-title::after { content: ''; width: 34px; height: 2px; border-radius: 2px; background: var(--accent); }
+        .leader-grid { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 0; }
+        .control-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+        .control-label { flex: 0 0 92px; width: 92px; color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: 0.2px; }
+        .leader-search-row { margin: 0 14px; padding: 10px 0; border-top: 1px solid #E2E8F0; }
+        .leader-search-results { margin: 0 14px 10px !important; }
+        .leader-add-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 !important; padding: 10px 14px 14px; border-top: 1px solid #E2E8F0; background: #FBFCFE; }
+        .leader-add-buttons button { box-shadow: 0 3px 8px rgba(42, 0, 135, 0.12); }
+        .leader-add-buttons .btn-panel-secondary { background: white; color: var(--primary); border: 1px solid rgba(42, 0, 135, 0.3); }
+        .leader-add-buttons .btn-panel-secondary:hover { background: #F0ECF8; }
 
         /* Estilos generales corregidos para altura uniforme de controles */
         input[type="text"], input[type="date"], select, button, textarea {
@@ -145,13 +187,13 @@
 
         #tech-pills-container {
             display: flex; flex-wrap: wrap; gap: 6px; width: auto;
-            padding: 10px; background: white; border-radius: 6px; border: 1px dashed var(--border);
+            padding: 8px; background: var(--surface-soft); border-radius: 8px; border: 1px solid #D8E2EA;
         }
 
         .tech-pill {
-            background-color: var(--light-gray); color: var(--primary); border: 1px solid var(--border);
-            padding: 4px 10px; border-radius: 20px; font-size: 10px;
-            display: inline-flex; align-items: center; gap: 8px;
+            background-color: #EDF3F8; color: var(--primary); border: 1px solid #C9D8E3;
+            padding: 3px 9px; border-radius: 16px; font-size: 10px;
+            display: inline-flex; align-items: center; gap: 7px;
         }
         
         .tech-pill span.tech-name { line-height: 1; }
@@ -222,28 +264,37 @@
         
         .document-header { 
             font-size: 1.2em; font-weight: 800; color: var(--primary); margin: 0; 
-            text-align: center; display: flex; flex-direction: column; 
+            text-align: center; display: flex; flex-direction: column; gap: 2px;
             align-items: center; justify-content: center; width: 100%;
-            padding: 0 110px; box-sizing: border-box;
+            padding: 0 110px; box-sizing: border-box; letter-spacing: 0.1px;
         }
+        .document-header > span:first-child { font-size: 1.08em; font-weight: 900; }
+        .document-header > span:not(:first-child) { line-height: 1.3; }
         
-        .avion-section { margin-bottom: 15px; border-radius: 20px 0 20px 0; box-shadow: 0 1px 3px rgba(0,0,0,0.07), 0 2px 8px rgba(0,0,0,0.05); }
+        .avion-section {
+            margin-bottom: 10px; border: 1px solid rgba(192, 208, 220, 0.6);
+            border-radius: 14px 0 14px 0; background: var(--surface); box-shadow: var(--shadow-card);
+            overflow: hidden; transition: box-shadow 0.25s ease, transform 0.25s ease;
+        }
 
         .avion-title {
-            font-size: 1.05em; font-weight: bold; display: flex; align-items: center; justify-content: space-between;
-            background: var(--gradient-primary); color: white; padding: 10px 14px; border-radius: 20px 0 0 0; 
-            flex-wrap: wrap; gap: 10px; transition: filter 0.5s ease;
+            font-size: 1.05em; font-weight: 700; display: flex; align-items: center; justify-content: space-between;
+            background: var(--gradient-primary); color: white;
+            padding: 8px 14px; border-radius: 13px 0 0 0; min-height: 0;
+            box-shadow: inset 4px 0 0 var(--accent);
+            flex-wrap: wrap; gap: 10px; transition: filter 0.5s ease, background 0.3s ease;
         }
         
-        .avion-title.activity-header { background: var(--gradient-accent); }
-        .avion-title.all-done { background: linear-gradient(135deg, #6b7280, #4b5563) !important; }
-        .avion-title.all-done.activity-header { background: linear-gradient(135deg, #6b7280, #4b5563) !important; }
+        .avion-title.activity-header { background: linear-gradient(105deg, #2A0087 0%, #4C1196 100%); box-shadow: inset 4px 0 0 var(--accent); }
+        .avion-title.all-done { background: linear-gradient(105deg, #64748B, #475569) !important; box-shadow: inset 4px 0 0 #94A3B8; }
+        .avion-title.all-done.activity-header { background: linear-gradient(105deg, #64748B, #475569) !important; }
 
-        .avion-info-main { flex: 1; min-width: 250px; display: flex; align-items: center; flex-wrap: wrap; gap: 8px; }
+        .avion-info-main { flex: 1; min-width: 250px; display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
+        .avion-identity { font-weight: 800; letter-spacing: 0.2px; }
         
         .avion-pos, .avion-times { 
-            background: rgba(255,255,255,0.2); color: white; 
-            padding: 3px 8px; border-radius: 4px; font-size: 0.85em; 
+            background: rgba(255,255,255,0.14); color: white; border: 1px solid rgba(255,255,255,0.12);
+            padding: 3px 7px; border-radius: 5px; font-size: 0.78em; font-weight: 600;
         }
         
         .activity-time-badge {
@@ -261,53 +312,61 @@
         .task-item .tango-link:hover { color: #B8123E; }
 
         .task-container {
-            border: 1px solid var(--border); border-top: none;
-            border-radius: 0 0 20px 0; background: white;
+            border: 0; border-radius: 0 0 13px 0; background: var(--surface);
         }
 
         .task-item {
-            display: flex; padding: 10px 14px; align-items: flex-start;
-            border-bottom: 1px solid var(--light-gray); transition: background-color 0.5s ease, opacity 0.5s ease;
-            background-color: transparent;
+            display: flex; padding: 8px 12px; align-items: flex-start; position: relative;
+            border-bottom: 1px solid #E4EBF1; transition: background-color 0.25s ease, opacity 0.3s ease, box-shadow 0.2s ease;
+            background-color: var(--surface);
         }
         
-        .task-item:last-child { border-bottom: none; border-radius: 0 0 20px 0; }
+        .task-item:last-child { border-bottom: none; border-radius: 0 0 13px 0; }
         .task-item:nth-child(even) { background-color: var(--light-gray); }
 
-        .task-item.alerta-tl { background-color: #FFEBEE; border-left: 4px solid #D32F2F; }
-        .task-item.alerta-tech { background-color: #FFF3E0; border-left: 4px solid #F57C00; }
+        .task-item.alerta-tl { background: linear-gradient(90deg, #FFF0F2 0%, #FFF8F9 100%); border-left: 4px solid #D32F2F; }
+        .task-item.alerta-tech { background: linear-gradient(90deg, #FFF4E5 0%, #FFFAF2 100%); border-left: 4px solid #F57C00; }
 
-        .atencion-badge { font-weight: 800; font-size: 0.8em; margin-left: 6px; padding: 2px 6px; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
-        .alerta-tl { color: #fff; background: #D32F2F; border: 1px solid #B71C1C; }
-        .alerta-tech { color: #fff; background: #F57C00; border: 1px solid #E65100; }
+        .atencion-badge { font-weight: 800; font-size: 0.76em; margin-left: 7px; padding: 3px 7px; border-radius: 999px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; vertical-align: middle; }
+        .alerta-tl { color: #fff; background: #C62828; border: 1px solid #B71C1C; box-shadow: 0 2px 5px rgba(198, 40, 40, 0.18); }
+        .alerta-tech { color: #fff; background: #E65100; border: 1px solid #BF360C; box-shadow: 0 2px 5px rgba(230, 81, 0, 0.18); }
 
         .status-toggle {
-            width: 20px; height: 20px; min-width: 20px; min-height: 20px;
+            width: 21px; height: 21px; min-width: 21px; min-height: 21px;
             box-sizing: border-box; border: 2px solid var(--primary);
-            background-color: white; margin-right: 12px; margin-top: 0;
+            background-color: white; margin: 1px 12px 0 0;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-weight: bold; color: transparent; font-size: 12px; transition: all 0.2s; user-select: none; border-radius: 50%;
+            font-weight: 900; color: transparent; font-size: 12px; transition: all 0.2s; user-select: none; border-radius: 50%;
+            box-shadow: 0 0 0 3px rgba(42, 0, 135, 0.06);
         }
+        .status-toggle:hover { background: #F0ECFA; box-shadow: 0 0 0 4px rgba(42, 0, 135, 0.1); }
 
         .task-item.completed .action-bar { display: none !important; }
 
-        .task-item.completed .status-toggle { background-color: #9ca3af; border-color: #9ca3af; color: white; }
-        .task-item.completed { border-left: none; opacity: 0.6; }
+        .task-item.completed .status-toggle { background-color: #94A3B8; border-color: #94A3B8; color: white; box-shadow: none; }
+        .task-item.completed { border-left: none; opacity: 0.62; }
         .task-item.completed:nth-child(even) { background-color: #f0f0f0; }
         .task-item.completed:nth-child(odd) { background-color: #ffffff; }
         
-        .task-main { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
-        .task-info { flex: 1; transition: all 0.3s ease; }
+        .task-main { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+        .task-info { flex: 1; min-width: 0; transition: all 0.3s ease; }
         
         .task-item.completed .task-desc,
-        .task-item.completed .task-techs,
-        .task-item.completed .task-comment,
-        .task-item.completed .tango-link { text-decoration: line-through; color: #9ca3af; }
-        .task-desc { font-weight: 400; font-size: 1em; line-height: 1.3; color: var(--primary); }
-        .task-techs { font-size: 0.85em; font-weight: 700; color: #5C4D7A; margin-top: 6px; }
-        .task-comment { font-size: 0.85em; color: var(--comment); margin-top: 3px; font-style: italic; font-weight: 600; }
+        .task-item.completed .tango-link { text-decoration: line-through; text-decoration-thickness: 1px; color: #8A96A3; }
+        .task-item.completed .task-techs { text-decoration: none; color: #8A96A3; }
+        .task-item.completed .task-comment { text-decoration: none; color: #9AA4AF; }
+        .task-desc { font-weight: 500; font-size: 0.96em; line-height: 1.35; color: var(--primary); letter-spacing: 0.05px; }
+        .task-techs {
+            display: inline-flex; align-items: center; gap: 4px; font-size: 0.76em; font-weight: 700;
+            color: #5C4D7A; margin-top: 4px; padding: 1px 6px; background: #F0ECF8;
+            border-radius: 5px; letter-spacing: 0.2px;
+        }
+        .task-comment {
+            font-size: 0.8em; color: var(--comment); margin-top: 3px; font-style: italic;
+            font-weight: 500; line-height: 1.35; padding-left: 8px; border-left: 2px solid #D8D0E4;
+        }
 
-        .action-bar { display: flex; flex-wrap: wrap; gap: 5px; align-items: stretch; }
+        .action-bar { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; flex: none; }
         
         .action-bar.avion-bar .action-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); }
         .action-bar.avion-bar .action-btn:hover { background: rgba(255,255,255,0.25); }
@@ -315,9 +374,10 @@
         .action-bar.avion-bar .btn-highlight:hover { background: var(--light-gray); }
 
         .action-btn {
-            padding: 0 8px; font-size: 9px; font-weight: 700; height: 24px; 
-            border-radius: 4px; border: 1px solid var(--border);
+            padding: 0 9px; font-size: 9px; font-weight: 700; height: 25px;
+            border-radius: 6px; border: 1px solid var(--border);
             background: #ffffff; color: var(--primary); gap: 4px;
+            box-shadow: 0 1px 2px rgba(42, 0, 135, 0.05);
         }
         .btn-action-small { 
             background-color: var(--light-gray); color: var(--primary); border: 1px solid var(--border); 
@@ -369,6 +429,46 @@
 
         .modal-footer { display: flex; gap: 10px; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border); }
         .btn-modal-action { flex: 1; padding: 0; height: 30px; font-size: 10px; border-radius: 4px;}
+        .admin-modal-content { padding: 0 !important; width: 95%; max-width: 860px; min-height: 460px; border-radius: 14px; overflow-x: hidden; overflow-y: auto; }
+        .admin-modal-header { margin: 0; padding: 14px 18px; background: var(--gradient-primary); color: white; border: 0; border-bottom: 3px solid var(--accent); font-size: 12px; letter-spacing: 0.35px; }
+        .admin-modal-layout { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 14px; padding: 14px; align-items: start; }
+        .admin-side { display: flex; flex-direction: column; gap: 10px; }
+        .admin-login-toggle { display: none; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #D8E2EA; border-radius: 8px; padding: 9px 10px; background: var(--surface-soft); }
+        .admin-login-toggle > span { font-weight: 800; font-size: 9px; color: var(--leader-color); }
+        .admin-login-toggle .btn-action-small { min-width: 105px; }
+        .admin-card { border: 1px solid #D8E2EA; border-radius: 10px; padding: 11px; background: var(--surface-soft); }
+        .admin-card-title { color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: 0.35px; }
+        .modal-content .admin-field { width: 100%; height: 34px; margin: 7px 0 0; background: white; }
+        .admin-role-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 8px; }
+        .admin-role-option { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 30px; padding: 4px; border: 1px solid #D8E2EA; border-radius: 6px; background: white; color: var(--primary); font-size: 8px; font-weight: 800; cursor: pointer; }
+        .admin-role-option:has(input:checked) { border-color: var(--primary); background: #F0ECF8; color: var(--primary); }
+        .admin-role-option input { margin: 0; accent-color: var(--primary); }
+        .admin-add-button { width: 100%; height: 34px; border-radius: 7px; font-size: 9px; box-shadow: 0 3px 8px rgba(42, 0, 135, 0.14); }
+        .admin-list-panel { min-width: 0; }
+        .admin-list-title { margin-bottom: 6px; color: var(--text-soft); font-size: 9px; font-weight: 800; letter-spacing: 0.3px; }
+        .modal-content .admin-search { width: 100%; height: 34px; flex: none; box-sizing: border-box; margin: 0 0 8px; background: white; }
+        .admin-user-list { height: 322px; max-height: 48vh; overflow-y: auto; font-size: 10px; border: 1px solid #D8E2EA; border-radius: 10px; padding: 7px; background: var(--surface-soft); }
+        .admin-empty { padding: 14px 8px; text-align: center; color: var(--comment); font-size: 9px; font-weight: 800; }
+        .admin-user-row { display: flex; align-items: center; gap: 6px; padding: 7px 8px; border: 1px solid #E1E8EF; border-radius: 8px; margin-bottom: 5px; background: white; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .admin-user-row:last-child { margin-bottom: 0; }
+        .admin-user-row:hover { border-color: #B9C9D6; box-shadow: 0 2px 7px rgba(42, 0, 135, 0.07); }
+        .admin-user-row.no-access { background: #F3F4F6; }
+        .admin-user-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
+        .admin-user-copy { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+        .admin-username { color: var(--primary); font-size: 10px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .admin-user-row.no-access .admin-username { color: var(--comment); }
+        .admin-realname { color: var(--comment); font-size: 9px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .admin-role-badge { flex: none; padding: 2px 5px; border-radius: 10px; color: white; font-size: 7px; font-weight: 800; letter-spacing: 0.25px; }
+        .admin-role-badge.admin { background: var(--danger); }
+        .admin-user-actions { display: flex; flex: none; gap: 3px; }
+        .admin-user-actions .btn-action-small { width: 25px; min-width: 25px; height: 25px; padding: 0; border-radius: 5px; font-size: 8px; }
+        .admin-user-actions .admin-action-wide { width: 38px; }
+        .admin-user-action.active-user { background: var(--primary); border-color: var(--primary); color: white; }
+        .admin-user-action.active-tl { background: var(--comment); border-color: var(--comment); color: white; }
+        .admin-user-action.active-admin { background: var(--danger); border-color: var(--danger); color: white; }
+        .admin-user-action.delete-user:hover { background: var(--danger); border-color: var(--danger); color: white; }
+        .admin-modal-footer { justify-content: flex-end; margin: 0; padding: 11px 14px; background: var(--surface-soft); border-top: 1px solid #D8E2EA; }
+        .admin-modal-footer button { height: 30px; padding: 0 18px; border-radius: 6px; font-size: 9px; }
 
         /* AJUSTES PARA CELULARES */
         @media (max-width: 900px) {
@@ -379,7 +479,9 @@
             .top-bar-left { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 5px; }
             .top-bar-left > * { flex: 1; min-width: 0; }
             #btn-mode-toggle { flex: 1 1 0; max-width: none; min-width: 0; }
-            .live-clock { width: 100%; justify-content: center; height: auto; padding: 6px; position: static; transform: none; }
+            .live-clock { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); width: 100%; height: auto; padding: 0; position: static; transform: none; gap: 4px; }
+            .clock-zone { min-width: 0; gap: 7px; padding: 4px 5px; }
+            .clock-divider { height: 28px; }
             
             .view-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
             .view-controls > div { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; }
@@ -389,12 +491,19 @@
             .view-filters-wrap { grid-column: 1 / -1; display: grid !important; grid-template-columns: 1fr 1fr; gap: 4px; align-items: start; }
             .view-filters-wrap > button { grid-column: 1 / -1; justify-self: center; margin-top: 2px; }
             
-            .header-controls { padding: 12px; }
-            .leader-panel-header { flex-direction: column; gap: 10px; text-align: center; }
-            .leader-panel-header div, .leader-panel-header button { width: 100%; }
+            .header-controls { padding: 0; }
+            .leader-panel-header { padding: 9px 12px; }
+            .leader-grid { padding: 10px 12px 0; }
+            .leader-search-row { margin: 0 12px; }
+            .leader-search-results { margin-left: 12px !important; margin-right: 12px !important; }
+            .leader-add-buttons { padding: 10px 12px 12px; }
+            .admin-modal-content { width: 98% !important; min-height: 0; max-height: 92vh; margin: 4% auto; }
+            .admin-modal-layout { grid-template-columns: minmax(0, 1fr); }
+            .admin-user-list { height: 260px; max-height: 36vh; }
             
             .control-group { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; }
             .control-group span { width: auto !important; white-space: nowrap; text-align: left; margin-bottom: 0px; }
+            .control-label { flex: 0 0 auto; }
             .control-group input[type="date"] { width: 130px !important; flex: none !important; max-width: none !important; }
             .control-group input[type="text"], 
             .control-group input[list] { flex: 1 !important; min-width: 100px !important; width: auto !important; }
@@ -415,13 +524,16 @@
             .logo-container { position: relative; transform: none; top: auto; left: auto; }
             .document-header { padding: 0; }
             
-            .avion-title { flex-direction: column; text-align: center; gap: 8px; }
-            .avion-info-main { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; }
+            .avion-section { margin-bottom: 9px; }
+            .avion-title { flex-direction: column; text-align: center; gap: 6px; padding: 8px 12px; }
+            .avion-info-main { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 5px; }
             .action-bar.avion-bar { justify-content: center; width: 100%; margin-top: 4px; }
             
-            .task-item { position: relative; padding: 10px 10px 10px 35px; }
-            .status-toggle { position: absolute; left: 8px; top: 10px; margin: 0; }
-            .task-main { flex-direction: column; align-items: stretch; gap: 10px; }
+            .task-item { position: relative; padding: 8px 10px 8px 34px; }
+            .task-item.alerta-tl, .task-item.alerta-tech { padding-left: 38px; }
+            .status-toggle { position: absolute; left: 9px; top: 9px; margin: 0; }
+            .task-item.alerta-tl .status-toggle, .task-item.alerta-tech .status-toggle { left: 13px; }
+            .task-main { flex-direction: column; align-items: stretch; gap: 7px; }
             
             .action-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); width: 100%; gap: 6px; }
             .action-bar .action-btn { width: 100%; box-sizing: border-box; }
@@ -432,6 +544,17 @@
 
         /* Pantalla muy pequeña: FECHA y TURNO en columnas individuales */
         @media (max-width: 500px) {
+            .live-clock { grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: 3px; }
+            .clock-divider { display: block; height: 26px; }
+            .clock-zone { justify-content: center; gap: 5px; padding: 4px; }
+            .clock-time { font-size: 10px; }
+            .task-desc { font-size: 0.94em; }
+            .task-comment { font-size: 0.78em; }
+            .admin-modal-layout { padding: 10px; gap: 10px; }
+            .admin-role-option { padding: 3px 2px; font-size: 7px; }
+            .admin-user-row { align-items: flex-start; flex-wrap: wrap; }
+            .admin-user-main { width: 100%; }
+            .admin-user-actions { width: 100%; justify-content: flex-end; }
             .view-controls { grid-template-columns: 1fr; }
             .view-filters-wrap { grid-template-columns: 1fr !important; }
         }
@@ -498,8 +621,8 @@
         /* Mensajes para el grupo */
         .group-message {
             display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-            background: #ECE6F7; border-left: 5px solid var(--primary);
-            padding: 10px 14px; margin-bottom: 10px; border-radius: 6px;
+            background: #F1EDF9; border: 1px solid #E3DBF2; border-left: 4px solid var(--primary);
+            padding: 11px 14px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 7px rgba(42, 0, 135, 0.05);
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
         #group-messages-top .group-message { margin-top: 10px; }
@@ -547,22 +670,22 @@
             body { padding: 0 !important; background-color: white; font-size: var(--print-font-size); line-height: 1.15; }
             .container { padding: 0 3px 0 0 !important; box-shadow: none; max-width: 100%; }
             
-            .main-header-wrapper { flex-direction: row !important; text-align: center !important; gap: normal !important; padding: 6px 0 8px 0 !important; margin-bottom: 8px; min-height: 36px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--cyan)) no-repeat bottom / 100% 3px !important; overflow: visible !important; }
+            .main-header-wrapper { flex-direction: row !important; text-align: center !important; gap: normal !important; padding: 4px 0 6px 0 !important; margin-bottom: 5px; min-height: 32px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--accent)) no-repeat bottom / 100% 3px !important; overflow: visible !important; }
             .main-header-wrapper::after { display: none !important; }
             .logo-container img { height: 28px !important; width: auto !important; }
             .logo-container { position: absolute !important; left: 0 !important; top: 50% !important; transform: translateY(-50%) !important; }
             .document-header { font-size: 1.1em; padding: 0 85px !important; } 
             
-            .avion-section { margin-bottom: 0.9em; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .avion-section { margin-bottom: 0.5em; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .avion-title { 
                 background: var(--gradient-primary) !important; color: white !important; 
-                padding: 0.6em 0.9em; border-bottom: 1px solid var(--border); gap: 0.6em !important;
+                padding: 0.38em 0.7em; border-bottom: 1px solid var(--border); gap: 0.4em !important;
                 flex-direction: row !important; text-align: left !important;
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
             .avion-title.activity-header { background: var(--gradient-accent) !important; }
             .avion-title.all-done { background: linear-gradient(135deg, #6b7280, #4b5563) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .avion-pos, .avion-times { background: rgba(255,255,255,0.2); color: white; padding: 3px 8px; font-weight: bold; font-size: 0.9em; border-radius: 4px; }
+            .avion-pos, .avion-times { background: rgba(255,255,255,0.2); color: white; padding: 2px 6px; font-weight: bold; font-size: 0.85em; border-radius: 4px; }
             .avion-comment { color: #C4B8D0; font-size: 0.85em; white-space: nowrap; }
             .avion-info-main { flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 8px !important; }
             .tango-link { color: #F4729E; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -570,7 +693,7 @@
             .task-item .tango-link { color: #EE1750; }
             
             .task-container { padding-left: 0 !important; }
-            .task-item { padding: 0.4em 0.6em !important; position: static !important; border-bottom: 1px solid var(--border); page-break-inside: avoid; }
+            .task-item { padding: 0.24em 0.5em !important; position: static !important; border-bottom: 1px solid var(--border); page-break-inside: avoid; }
             .task-item:nth-child(even) { background-color: var(--light-gray); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .task-item.completed:nth-child(even) { background-color: #f0f0f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .task-item.completed:nth-child(odd) { background-color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
@@ -583,11 +706,11 @@
             .task-item.completed .tango-link { text-decoration: line-through; color: #9ca3af; }
             .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #9ca3af !important; border-color: #9ca3af !important; color: white !important; }
             .status-toggle { margin-top: 0px; margin-right: 6px; width: 12px; min-width: 12px; height: 12px; min-height: 12px; font-size: 8px; border-width: 1px; position: static !important; margin: 0 6px 0 0 !important; }
-            .task-desc { font-size: 1em; }
-            .task-techs, .task-comment { font-size: 0.85em; margin-top: 0.25em; }
+            .task-desc { font-size: 1em; line-height: 1.2; }
+            .task-techs, .task-comment { font-size: 0.82em; margin-top: 0.12em; }
             .atencion-badge { padding: 1px 4px; font-size: 0.75em; }
             
-            .task-main { flex-direction: row !important; align-items: center !important; gap: 12px !important; }
+            .task-main { flex-direction: row !important; align-items: center !important; gap: 8px !important; }
             .action-bar { display: flex !important; flex-wrap: wrap !important; gap: 5px !important; width: auto !important; }
             .action-bar .action-btn { width: auto !important; }
             .view-controls, .view-controls > div { flex-direction: row !important; align-items: center !important; }
@@ -696,15 +819,15 @@
         </div>
 
         <div class="leader-grid" id="leader-controls-grid">
-            <div class="control-group">
-                <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">TEAM LEADER:</span>
+            <div class="control-group leader-field">
+                <span class="control-label">TEAM LEADER:</span>
                 <input type="text" id="in-jefe" placeholder="NOMBRE DEL TEAM LEADER" oninput="updateHeader()">
                 <button id="btn-lock-shift-mobile" class="btn-danger-outline btn-shift" onclick="toggleLockShift()" style="padding: 0 10px; display:none; align-items:center; gap:2px;"><span class="btn-ico">🔒</span><span class="btn-lbl">CERRAR TURNO</span></button>
                 <button class="btn-outline btn-shift" onclick="openManageShiftModal()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">⚠️</span><span class="btn-lbl">GESTIONAR TURNO</span></button>
             </div>
             
-            <div class="control-group" style="margin-bottom: 5px;">
-                <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">TÉCNICOS:</span>
+            <div class="control-group leader-field">
+                <span class="control-label">TÉCNICOS:</span>
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()" onchange="addTech()">
                 <button class="btn-leader btn-agregar" onclick="addTech()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">+</span><span class="btn-lbl">AGREGAR <span style="white-space:nowrap">AL TURNO</span></span></button>
                 <button class="btn-outline btn-listado" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px; display:inline-flex; align-items:center; gap:2px;" title="Editar Base Global de Técnicos"><span class="btn-ico">👥</span><span class="btn-lbl">LISTADO DE TECNICOS</span></button>
@@ -713,17 +836,17 @@
             <div id="tech-pills-container"></div>
         </div>
 
-        <div class="control-group" style="margin-top: 8px;">
-            <span style="font-size: 10px; font-weight: bold; color: var(--primary); width: 65px;">🔍 BUSCAR:</span>
+        <div class="control-group leader-search-row">
+            <span class="control-label">🔍 BUSCAR:</span>
             <input type="text" id="global-search-input" placeholder="🔍 BUSCAR SOLO ÚLTIMOS 30 DÍAS - TAREA, TANGO, WP, COMENTARIO..." style="flex:1;">
             <button class="btn-outline" onclick="clearSearch()" style="padding: 0 10px; font-size: 14px; display:none; height:28px;" id="btn-clear-search">✖</button>
         </div>
-        <div id="search-results" style="display:none; margin-top: 8px; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: white; padding: 10px;"></div>
+        <div id="search-results" class="leader-search-results" style="display:none; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: white; padding: 10px;"></div>
         
-        <div id="leader-add-buttons" class="leader-only no-print" style="margin-top: 15px; display: flex; gap: 12px; flex-wrap: wrap;">
-            <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">✈️ AGREGAR AVIÓN</button>
-            <button class="btn-accent" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">⭐ AGREGAR ACTIVIDAD EXTRA</button>
-            <button class="btn-accent" onclick="openAddMessageModal()" style="flex: 1; min-width: 200px; padding: 12px; font-size: 11px; border-radius: 6px; height: auto;">💬 AGREGAR MENSAJE</button>
+        <div id="leader-add-buttons" class="leader-add-buttons leader-only no-print">
+            <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 10px; font-size: 10px; border-radius: 6px; height: auto;">✈️ AGREGAR AVIÓN</button>
+            <button class="btn-panel-secondary" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 10px; font-size: 10px; border-radius: 6px; height: auto;">⭐ AGREGAR ACTIVIDAD EXTRA</button>
+            <button class="btn-panel-secondary" onclick="openAddMessageModal()" style="flex: 1; min-width: 200px; padding: 10px; font-size: 10px; border-radius: 6px; height: auto;">💬 AGREGAR MENSAJE</button>
         </div>
     </div>
 
@@ -1003,35 +1126,34 @@
 </div>
 
 <div id="admin-modal" class="modal">
-    <div class="modal-content" style="max-width: 820px; width: 95%; min-height: 460px;">
-        <div class="modal-header" style="border:none; padding-bottom:0; margin-bottom:12px;">⚙ ADMIN · USUARIOS AUTORIZADOS</div>
-        <div style="display:flex; gap:16px; align-items:stretch; flex-wrap:wrap;">
-            <!-- IZQUIERDA: controles -->
-            <div style="flex:1 1 300px; min-width:280px; display:flex; flex-direction:column; gap:12px;">
-                <div id="admin-login-toggle" style="display:none; align-items:center; justify-content:space-between; gap:8px; border:1px solid var(--border); border-radius:6px; padding:10px 12px; background:var(--light-gray);">
-                    <span style="font-weight:800; font-size:11px; color:var(--leader-color);">🔒 INICIO DE SESIÓN</span>
+    <div class="modal-content admin-modal-content">
+        <div class="modal-header admin-modal-header">⚙ ADMIN · USUARIOS AUTORIZADOS</div>
+        <div class="admin-modal-layout">
+            <div class="admin-side">
+                <div id="admin-login-toggle" class="admin-login-toggle">
+                    <span>🔒 INICIO DE SESIÓN</span>
                     <button id="btn-login-obligatorio" class="btn-action-small" onclick="toggleLoginObligatorio()">🔓 DESACTIVADO</button>
                 </div>
-                <div style="border:1px solid var(--border); border-radius:6px; padding:12px; background:var(--light-gray);">
-                    <strong style="font-size: 10px; color: var(--primary);">AGREGAR NUEVO USUARIO:</strong>
-                    <input type="text" id="admin-name" placeholder="USUARIO · EJ: juan.perez" autocomplete="off" style="width:100%; margin:8px 0 8px; height:32px;" onkeypress="if(event.key === 'Enter') adminAddUser()">
-                    <input type="text" id="admin-realname" placeholder="NOMBRE REAL · EJ: JUAN PEREZ" autocomplete="off" style="width:100%; margin:0 0 10px; height:32px;" onkeypress="if(event.key === 'Enter') adminAddUser()">
-                    <div style="display:flex; gap:15px; margin-bottom:5px; flex-wrap:wrap;">
-                        <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-user" checked> USUARIO (👤)</label>
-                        <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-tl"> TEAM LEADER</label>
-                        <label style="font-size:10px; font-weight:bold; color:var(--primary); display:flex; align-items:center; gap:5px;"><input type="checkbox" id="admin-is-admin"> ADMIN</label>
+                <div class="admin-card">
+                    <div class="admin-card-title">AGREGAR NUEVO USUARIO</div>
+                    <input type="text" id="admin-name" class="admin-field" placeholder="USUARIO · EJ: juan.perez" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
+                    <input type="text" id="admin-realname" class="admin-field" placeholder="NOMBRE REAL · EJ: JUAN PEREZ" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
+                    <div class="admin-role-grid">
+                        <label class="admin-role-option"><input type="checkbox" id="admin-is-user" checked> USUARIO</label>
+                        <label class="admin-role-option"><input type="checkbox" id="admin-is-tl"> TL</label>
+                        <label class="admin-role-option"><input type="checkbox" id="admin-is-admin"> ADMIN</label>
                     </div>
                 </div>
-                <button class="btn-leader" onclick="adminAddUser()" style="width:100%; height:36px; font-size:10px; border-radius:6px;">AGREGAR USUARIO</button>
+                <button class="btn-leader admin-add-button" onclick="adminAddUser()">AGREGAR USUARIO</button>
             </div>
-            <!-- DERECHA: lista -->
-            <div style="flex:1 1 320px; min-width:280px; display:flex; flex-direction:column; gap:12px; justify-content:flex-start;">
-                <input type="text" id="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE REAL..." autocomplete="off" oninput="refreshAdminList()" style="width:100%; height:32px; flex:none; box-sizing:border-box; margin:0;">
-                <div id="admin-list" style="height: 300px; max-height: 48vh; overflow-y: auto; font-size: 11px; border:1px solid var(--border); border-radius:6px; padding:8px; background:white;"></div>
+            <div class="admin-list-panel">
+                <div class="admin-list-title">USUARIOS DEL SISTEMA</div>
+                <input type="text" id="admin-search" class="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE REAL..." autocomplete="off" oninput="refreshAdminList()">
+                <div id="admin-list" class="admin-user-list"></div>
             </div>
         </div>
-        <div class="modal-footer" style="justify-content:flex-end; margin-top:12px;">
-            <button class="btn-outline" onclick="closeModal('admin-modal')" style="height:32px; padding:0 18px; font-size:10px;">CERRAR</button>
+        <div class="modal-footer admin-modal-footer">
+            <button class="btn-outline" onclick="closeModal('admin-modal')">CERRAR</button>
         </div>
     </div>
 </div>
@@ -1266,19 +1388,25 @@
         const clockEl = document.getElementById('live-clock');
         if (clockEl) {
             clockEl.innerHTML = `
-            <div style="display:flex; align-items:center; gap:4px;">
-                <span style="font-size:13px;">🇨🇱</span>
-                <div style="display:flex; flex-direction:column; align-items:center; gap:0; line-height:1.3;">
-                    <span style="color:var(--primary); font-weight:bold; white-space:nowrap;">CLT: ${localDate}</span>
-                    <span style="color:var(--primary); font-weight:600; white-space:nowrap;">${localTime}</span>
+            <div class="clock-zone local">
+                <div class="clock-zone-identity">
+                    <span class="clock-zone-icon">🇨🇱</span>
+                    <span class="clock-zone-label">CLT</span>
+                </div>
+                <div class="clock-zone-details">
+                    <span class="clock-time">${localTime}</span>
+                    <span class="clock-date">${localDate}</span>
                 </div>
             </div>
-            <div style="width:1px; height:28px; background:var(--border); margin:0 6px;"></div>
-            <div style="display:flex; align-items:center; gap:4px;">
-                <span style="font-size:13px;">🌎</span>
-                <div style="display:flex; flex-direction:column; align-items:center; gap:0; line-height:1.3;">
-                    <span style="color:var(--comment); font-weight:bold; white-space:nowrap;">UTC: ${utcDate}</span>
-                    <span style="color:var(--comment); font-weight:600; white-space:nowrap;">${utcTime}Z</span>
+            <div class="clock-divider"></div>
+            <div class="clock-zone utc">
+                <div class="clock-zone-identity">
+                    <span class="clock-zone-icon">🌎</span>
+                    <span class="clock-zone-label">UTC</span>
+                </div>
+                <div class="clock-zone-details">
+                    <span class="clock-time">${utcTime}<span class="clock-z">z</span></span>
+                    <span class="clock-date">${utcDate}</span>
                 </div>
             </div>
             `;
@@ -1689,7 +1817,7 @@
         const q = (document.getElementById('admin-search')?.value || '').trim().toLowerCase();
         const all = new Set([...Object.keys(usuariosDB), ...correosAutorizados, ...adminList].filter(u => !isSuperAdmin(u)));
         if (all.size === 0) {
-            listEl.innerHTML = '<div style="font-weight:800; color:var(--comment); padding:8px 0;">SIN USUARIOS AÚN</div>';
+            listEl.innerHTML = '<div class="admin-empty">SIN USUARIOS AÚN</div>';
             updateAdminUI();
             updateLoginToggleUI();
             return;
@@ -1704,23 +1832,25 @@
             const isAdm = adminList.includes(user);
             const esUsuario = !!info.usuario;
             const sinAcceso = !isTl && !isAdm && !esUsuario;
-            html += `<div style="display:flex; align-items:center; gap:6px; padding:6px 8px; border:1px solid var(--light-gray); border-radius:4px; margin-bottom:5px; background:${sinAcceso ? '#f8f8f8' : 'white'};">
-                <span style="flex:1; display:flex; align-items:center; gap:8px; flex-wrap:wrap;">
-                    <span style="display:flex; flex-direction:column; gap:1px; min-width:0;">
-                        <span style="font-weight:700; color:${sinAcceso ? 'var(--comment)' : 'var(--primary)'}; font-size:11px;">${user.toUpperCase()}</span>
-                        ${nombreReal ? `<span style="font-weight:600; color:var(--comment); font-size:10px;">${nombreReal}</span>` : ''}
-                    </span>
-                    ${isAdm ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--danger); padding:1px 5px; border-radius:3px;">ADMIN</span>' : ''}
-                    ${sinAcceso ? '<span style="font-size:9px; font-weight:700; color:white; background:var(--comment); padding:1px 5px; border-radius:3px;">SIN ACCESO</span>' : ''}
-                </span>
-                <button class="btn-action-small" onclick="adminToggleUsuario('${user}')" title="Quitar/Dar acceso de usuario (quitarlo también quita TL y ADMIN)" style="${esUsuario ? 'background:var(--leader-color); color:white;' : ''}">👤</button>
-                <button class="btn-action-small" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" style="${isTl ? 'background:var(--leader-color); color:white;' : ''}">TL</button>
-                <button class="btn-action-small" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" style="${isAdm ? 'background:var(--danger); color:white;' : ''}">ADMIN</button>
-                <button class="btn-action-small" onclick="adminEditNombre('${user}')" title="Editar nombre real">✎</button>
-                <button class="btn-action-small" onclick="adminRemoveUser('${user}')" title="Eliminar usuario definitivamente">✖</button>
+            const userBadge = isAdm ? '<span class="admin-role-badge admin">ADMIN</span>' : '';
+            html += `<div class="admin-user-row ${sinAcceso ? 'no-access' : ''}">
+                <div class="admin-user-main">
+                    <div class="admin-user-copy">
+                        <span class="admin-username">${user.toUpperCase()}</span>
+                        ${nombreReal ? `<span class="admin-realname">${nombreReal}</span>` : ''}
+                    </div>
+                    ${userBadge}
+                </div>
+                <div class="admin-user-actions">
+                    <button class="btn-action-small admin-user-action ${esUsuario ? 'active-user' : ''}" onclick="adminToggleUsuario('${user}')" title="Quitar/Dar acceso de usuario" aria-pressed="${esUsuario}">👤</button>
+                    <button class="btn-action-small admin-user-action ${isTl ? 'active-tl' : ''}" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" aria-pressed="${isTl}">TL</button>
+                    <button class="btn-action-small admin-user-action admin-action-wide ${isAdm ? 'active-admin' : ''}" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" aria-pressed="${isAdm}">ADMIN</button>
+                    <button class="btn-action-small admin-user-action" onclick="adminEditNombre('${user}')" title="Editar nombre real">✎</button>
+                    <button class="btn-action-small admin-user-action delete-user" onclick="adminRemoveUser('${user}')" title="Eliminar usuario definitivamente">✖</button>
+                </div>
             </div>`;
         }
-            listEl.innerHTML = html || '<div style="font-weight:800; color:var(--comment); padding:8px 0;">SIN COINCIDENCIAS PARA LA BÚSQUEDA</div>';
+            listEl.innerHTML = html || '<div class="admin-empty">SIN COINCIDENCIAS PARA LA BÚSQUEDA</div>';
             updateAdminUI();
             updateLoginToggleUI();
         }
@@ -1951,14 +2081,14 @@
             let fechaDisplay = displayDateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
             const fechaCorta = `${partesFecha[2]}/${partesFecha[1]}/${partesFecha[0].slice(2)}`;
             
-            const turnoInfo = `${turno.toUpperCase()} | ${fechaDisplay}`;
+            const turnoInfo = `${turno.toUpperCase()} <span style="color:var(--accent);">|</span> ${fechaDisplay}`;
             const jefeInfo = data.jefe ? `TL: ${data.jefe}` : '';
-            const lockInfo = shiftState.estado === 'cerrado' ? `<span class="no-print" style="color:var(--danger); font-weight:bold;">🔒 TURNO CERRADO POR ${shiftState.cerradoPor.toUpperCase()}</span>` : '';
+            const lockInfo = shiftState.estado === 'cerrado' ? `<span class="no-print" style="color:var(--danger); font-weight:700;">🔒 TURNO CERRADO POR ${shiftState.cerradoPor.toUpperCase()}</span>` : '';
 
             document.getElementById('display-header').innerHTML = `
                 <span>${turnoInfo}</span>
-                ${jefeInfo ? `<span style="margin-top: 4px; color: var(--leader-color);">${jefeInfo}</span>` : ''}
-                ${lockInfo ? `<span style="margin-top: 4px; font-size: 0.8em;">${lockInfo}</span>` : ''}
+                ${jefeInfo ? `<span style="color: var(--leader-color); font-size: 0.82em; font-weight: 700;">${jefeInfo}</span>` : ''}
+                ${lockInfo ? `<span style="font-size: 0.76em;">${lockInfo}</span>` : ''}
             `;
             document.title = `${turno.toUpperCase()} - ${fechaCorta}`;
             
@@ -2404,7 +2534,7 @@
                     <div class="task-info">
                         <div class="task-desc">${planePrefix}${activityTime}${cleanDesc}${tangoDisplay} ${atencionLabel}</div>
                         ${t.techs ? `<div class="task-techs">${escapeHtml(t.techs)}</div>` : ''}
-                        ${t.comment ? `<div class="task-comment">↳ NOTA: ${escapeHtml(t.comment)}</div>` : ''}
+                        ${t.comment ? `<div class="task-comment"><strong>NOTA:</strong> ${escapeHtml(t.comment)}</div>` : ''}
                     </div>
                     <div class="action-bar no-print">
                         ${actionButtonsHtml}
@@ -2577,7 +2707,7 @@
             let html = `
                 <div class="avion-title ${headerClass}">
                     <div class="avion-info-main">
-                        <span>• ${escapeHtml(avion.reg)} ${wpDisplay}</span> ${posDisplay} ${timesDisplay}
+                        <span class="avion-identity">• ${escapeHtml(avion.reg)}</span> ${wpDisplay} ${posDisplay} ${timesDisplay}
                         ${avion.comment ? `<span class="avion-comment">NOTA: ${escapeHtml(avion.comment)}</span>` : ''}
                     </div>
                     <div class="action-bar avion-bar no-print">
@@ -2613,7 +2743,7 @@
             let gHtml = `
                 <div class="avion-title activity-header">
                     <div class="avion-info-main">
-                        <span>${actividadGrupoTitulo}</span>
+                        <span class="avion-identity">${actividadGrupoTitulo}</span>
                     </div>
                     <div class="action-bar avion-bar no-print">
                         ${!locked ? `<div class="leader-only leader-wrapper">
