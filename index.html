@@ -8,25 +8,76 @@
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
 
         :root {
-            --primary: #2A0087; 
-            --accent: #EE1750; 
+            --primary: #2A0087;
+            --primary-dark: #1A0055;
+            --primary-light: #3D0DA8;
+            --accent: #EE1750;
+            --accent-dark: #B8123E;
             --cyan: #00E5FF;
-            --magenta: #D500F9;
-            --orange: #FF5252;
-            --bg: #F5F7FA;
-            --light-gray: #E6F0F8;
-            --border: #C0D0DC;
-            --leader-color: #2A0087;
-            --danger: #e53e3e;
+            --success: #10B981;
+            --danger: #E53E3E;
             --help: #FF9900;
             --comment: #6B5E8A;
-            --gradient-accent: linear-gradient(135deg, #2A0087, #3D0DA8);
-            --gradient-primary: linear-gradient(135deg, #2A0087, #1A0055);
+            --celeste: #E6F0F8;
+            --button-height: 29px;
+            --button-height-banner: 24px;
+            --button-height-admin: 20px;
+            --button-radius: 7px;
+            --black: #000000;
+            --slate-900: #1E293B;
+            --border: #C0D0DC;
+            --leader-color: var(--primary);
             --surface: #FFFFFF;
-            --surface-soft: #F8FAFC;
+            --surface-alt: #F0F0F0;
+            --surface-soft: color-mix(in srgb, var(--celeste) 22%, #FFFFFF);
+            --surface-muted: #F3F4F6;
+            --surface-red: #FFEBEE;
+            --surface-red-soft: #FFF5F5;
+            --surface-orange: #FFF3E0;
+            --surface-lavender: #ECE6F7;
+            --surface-violet: #F0ECF8;
+            --surface-highlight: #EDE6F5;
+            --surface-idle: #FFF8E1;
+            --surface-idle-hover: #FFECB3;
+            --red: #D32F2F;
+            --red-dark: #B71C1C;
+            --orange-alert: #F57C00;
+            --orange-alert-dark: #E65100;
             --text-soft: #526176;
-            --shadow-soft: 0 8px 24px rgba(31, 41, 55, 0.07);
-            --shadow-card: 0 3px 12px rgba(42, 0, 135, 0.08);
+            --text-muted: #8A96A3;
+            --text-muted-light: #9AA4AF;
+            --text-violet: #5C4D7A;
+            --text-idle: #8D4A00;
+            --text-lavender: #C4B8D0;
+            --gray-400: #9CA3AF;
+            --gray-500: #6B7280;
+            --gray-600: #4B5563;
+            --border-soft: #D8E2EA;
+            --border-subtle: #E1E8EF;
+            --border-lavender: #E0D6ED;
+            --border-violet: #D8D0E4;
+            --border-tech: #C9D8E3;
+            --border-alt: #CBD5E0;
+            --border-hover: #9E8FB5;
+            --border-hover-soft: #B9C9D6;
+            --border-idle: #FFB74D;
+            --border-idle-soft: #FFCC80;
+            --border-idle-active: #FFA726;
+            --tango: #F4729E;
+            --message-blue: #1976D2;
+            --message-green: #2E7D32;
+            --google-blue: #4285F4;
+            --google-green: #34A853;
+            --google-yellow: #FBBC05;
+            --google-red: #EA4335;
+            --animation-red: #FCA5A5;
+            --bg: color-mix(in srgb, var(--celeste) 55%, #FFFFFF);
+            --light-gray: var(--celeste);
+            --gradient-accent: linear-gradient(135deg, var(--primary), var(--primary-light));
+            --gradient-primary: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            --gradient-completed: linear-gradient(135deg, var(--gray-500), var(--gray-600));
+            --gradient-brand: linear-gradient(135deg, var(--primary), var(--primary-dark), var(--primary));
+            --gradient-boot: linear-gradient(135deg, var(--primary-dark), var(--primary), var(--primary-dark));
             --print-font-size: 15px;
         }
 
@@ -36,57 +87,52 @@
         }
 
         body {
-            background: linear-gradient(135deg, #F7F9FC 0%, #EEF3F9 100%);
+            background-color: var(--bg);
             color: var(--primary);
             margin: 0;
             padding: 20px;
         }
 
-        .container {
-            max-width: 1000px; margin: 0 auto; background: var(--surface); padding: 25px;
-            border: 1px solid rgba(192, 208, 220, 0.55); border-radius: 24px 0 24px 0;
-            box-shadow: var(--shadow-soft);
-        }
+        .container { max-width: 1000px; margin: 0 auto; background: var(--surface); padding: 25px; border-radius: 24px 0 24px 0; box-shadow: 0 4px 12px color-mix(in srgb, var(--black) 5%, transparent); }
 
         /* Barra superior general */
         .top-bar {
-            display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px;
-            background: linear-gradient(90deg, #EDF3FA, #F7F9FC); padding: 7px 15px;
-            border: 1px solid rgba(192, 208, 220, 0.75); border-radius: 16px 0 16px 0;
-            align-items: center; position: relative;
+            display: flex; justify-content: space-between; margin-bottom: 8px; min-height: 32px;
+            background-color: var(--light-gray); padding: 4px 10px;
+            border-radius: 12px 0 12px 0; align-items: center; position: relative;
         }
 
         .top-bar-left { display: flex; gap: 5px; }
 
         /* Reloj Inteligente (Mejorado) */
         .live-clock {
-            display: flex; gap: 8px; font-size: 11px; font-weight: normal;
+            display: flex; gap: 6px; font-size: 10px; font-weight: normal;
             background: transparent; padding: 0; border-radius: 0;
             border: 0; box-shadow: none;
-            align-items: stretch; justify-content: center; height: 36px; box-sizing: border-box;
+            align-items: stretch; justify-content: center; height: 32px; box-sizing: border-box;
         }
         .clock-zone {
             display: flex; flex: 1; min-width: 0; align-items: center; justify-content: center; gap: 9px;
-            padding: 2px 10px; border-radius: 14px; background: var(--surface);
+            padding: 1px 8px; border-radius: 12px; background: var(--surface);
         }
-        .clock-zone.local { border: 1px solid rgba(42, 0, 135, 0.12); }
-        .clock-zone.utc { border: 1px solid rgba(107, 94, 138, 0.16); }
+        .clock-zone.local { border: 1px solid color-mix(in srgb, var(--primary) 12%, transparent); }
+        .clock-zone.utc { border: 1px solid color-mix(in srgb, var(--comment) 16%, transparent); }
         .clock-zone-identity { display: flex; flex-direction: column; align-items: center; line-height: 1.05; }
-        .clock-zone-icon { font-size: 13px; line-height: 1.1; }
-        .clock-zone-label { font-size: 9px; line-height: 1.05; letter-spacing: 0.7px; }
+        .clock-zone-icon { font-size: 12px; line-height: 1.1; }
+        .clock-zone-label { font-size: 8px; line-height: 1.05; letter-spacing: 0.6px; }
         .clock-zone.local .clock-zone-label { color: var(--primary); font-weight: 800; }
         .clock-zone.utc .clock-zone-label { color: var(--comment); font-weight: 800; }
         .clock-zone-details { display: flex; flex-direction: column; align-items: center; line-height: 1.3; }
-        .clock-time { font-size: 12px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
-        .clock-date { font-size: 9px; font-weight: 500; white-space: nowrap; }
+        .clock-time { font-size: 11px; font-weight: 700; font-variant-numeric: tabular-nums; white-space: nowrap; }
+        .clock-date { font-size: 10px; font-weight: 500; white-space: nowrap; }
         .clock-zone.local .clock-time, .clock-zone.local .clock-date { color: var(--primary); }
         .clock-zone.utc .clock-time, .clock-zone.utc .clock-date { color: var(--comment); }
         .clock-z { text-transform: lowercase; }
-        .clock-divider { align-self: center; width: 1px; height: 24px; background: var(--border); margin: 0 1px; }
+        .clock-divider { align-self: center; width: 1px; height: 21px; background: var(--border); margin: 0 1px; }
 
         .btn-top {
-            width: 140px; height: 28px; font-size: 10px; padding: 0; font-weight: bold;
-            border-radius: 4px; border: none; cursor: pointer; transition: opacity 0.2s;
+            width: 140px; height: var(--button-height); font-size: 10px; padding: 0; font-weight: bold;
+            border-radius: var(--button-radius); border: none; cursor: pointer; transition: opacity 0.2s;
         }
         .btn-top:hover { opacity: 0.9; }
         #btn-mode-toggle {
@@ -103,46 +149,40 @@
 
         /* Controles de vista y filtros locales */
         .view-controls {
-            display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 10px; 
-            background: #ffffff; padding: 10px 15px; border-radius: 16px 0 16px 0; 
+            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;
+            background: var(--surface); padding: 6px 10px; border-radius: 12px 0 12px 0;
             border: 1px solid var(--border); align-items: center; justify-content: space-between;
         }
+        .view-controls input, .view-controls select, .view-controls button { height: var(--button-height); }
         .view-filters-wrap { flex: 1; min-width: 0; }
 
         /* PANEL DE CONTROL TEAM LEADER */
         .header-controls {
-            background: linear-gradient(90deg, #EDF3FA, #F7F9FC); border: 1px solid #CFC3E4;
-            border-top: 3px solid var(--leader-color); padding: 0; overflow: hidden;
-            border-radius: 14px 0 14px 0; margin-bottom: 10px; box-shadow: 0 7px 20px rgba(42, 0, 135, 0.13);
-            transition: opacity 0.3s, box-shadow 0.25s ease;
+            background-color: var(--light-gray); border: 1px solid var(--border);
+            border-left: 6px solid var(--leader-color); padding: 10px;
+            border-radius: 12px 0 12px 0; margin-bottom: 8px; transition: opacity 0.3s;
         }
 
         .leader-panel-header {
             display: flex; justify-content: space-between; align-items: center;
-            background: var(--gradient-primary);
-            padding: 10px 14px; margin: 0;
+            border-bottom: 1px solid var(--border-lavender); padding-bottom: 7px; margin-bottom: 8px;
         }
 
-        .leader-title {
-            font-size: 10px; font-weight: 800; color: white; display: flex; align-items: center; gap: 8px;
-            letter-spacing: 0.55px;
-        }
-        .leader-title::after { content: ''; width: 34px; height: 2px; border-radius: 2px; background: var(--accent); }
-        .leader-grid { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px 0; }
-        .control-group { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
-        .control-label { flex: 0 0 92px; width: 92px; color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: 0.2px; }
-        .leader-search-row { margin: 0 14px; padding: 10px 0; border-top: 1px solid #E2E8F0; }
-        .leader-search-results { margin: 0 14px 10px !important; }
-        .leader-add-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin: 0 !important; padding: 10px 14px 14px; border-top: 1px solid #E2E8F0; background: #FBFCFE; }
-        .leader-add-buttons button { box-shadow: 0 3px 8px rgba(42, 0, 135, 0.12); }
-        .leader-add-buttons .btn-panel-secondary { background: white; color: var(--primary); border: 1px solid rgba(42, 0, 135, 0.3); }
-        .leader-add-buttons .btn-panel-secondary:hover { background: #F0ECF8; }
+        .leader-title { font-size: 0.95em; font-weight: 800; color: var(--leader-color); display: flex; align-items: center; gap: 7px; }
+        .leader-grid { display: flex; flex-direction: column; gap: 7px; }
+        .control-group { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
+        .control-label { flex: 0 0 62px; width: 62px; color: var(--primary); font-size: 9px; font-weight: bold; }
+        .leader-search-row { margin-top: 6px; }
+        .leader-search-results { margin-top: 6px !important; }
+        .leader-add-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 0 !important; }
+        .leader-add-buttons button { box-shadow: none; gap: 4px; }
+        .leader-add-buttons .btn-txt { font-size: 9px; }
 
         /* Estilos generales corregidos para altura uniforme de controles */
         input[type="text"], input[type="date"], select, button, textarea {
             padding: 6px 10px; border: 1px solid var(--border);
-            border-radius: 4px; font-size: 10px; outline: none; box-sizing: border-box;
-            height: 28px;
+            border-radius: var(--button-radius); font-size: 10px; outline: none; box-sizing: border-box;
+            height: var(--button-height);
         }
 
         /* Texto escrito en azul, como en CRT */
@@ -153,46 +193,49 @@
         input[type="date"] {
             -webkit-appearance: none;
             appearance: none;
-            background-color: #fff;
+            background-color: var(--surface);
             color: var(--primary);
             text-transform: none; 
             cursor: pointer;
         }
         
-        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(27, 0, 136, 0.1); }
+        input:focus, select:focus { border-color: var(--primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 10%, transparent); }
         input[type="text"], input[type="date"] { flex: 1; min-width: 130px; }
         input.time-input { min-width: auto; width: 85px; text-align: center; font-weight: bold; flex: none; }
         
         button { 
-            background-color: var(--primary); color: white; border: none; cursor: pointer; 
+            background-color: var(--primary); color: var(--surface); border: none; cursor: pointer; 
             font-weight: 700; transition: all 0.2s; 
             display: inline-flex; align-items: center; justify-content: center; 
             text-align: center; line-height: 1; margin: 0; box-sizing: border-box;
+            height: var(--button-height);
         }
         button:hover:not(:disabled) { opacity: 0.9; }
         button:disabled { cursor: not-allowed; opacity: 0.5; }
         
         .btn-accent { background: var(--gradient-primary); }
-        .btn-leader { background: var(--gradient-primary); color: #fff; }
-        .btn-clear { background-color: var(--danger); color: white; }
+        .btn-leader { background: var(--gradient-primary); color: var(--surface); }
+        .btn-clear { background-color: var(--danger); color: var(--surface); }
         .btn-accent.btn-top, .btn-mode-leader,
         .btn-leader.btn-agregar { border: 1px solid transparent; }
         .btn-accent.btn-top:hover, .btn-mode-leader.btn-top:hover,
         .btn-leader.btn-agregar:hover { background: transparent; color: var(--primary); border-color: var(--primary); opacity: 1; }
-        .btn-mode-leader { background: var(--gradient-primary); color: #fff; }
+        .btn-mode-leader { background: var(--gradient-primary); color: var(--surface); }
         .btn-outline { background-color: transparent; border: 1px solid var(--comment); color: var(--comment); }
-        .btn-outline:hover:not(:disabled) { background-color: var(--comment); color: white; }
+        .btn-outline:hover:not(:disabled) { background-color: var(--comment); color: var(--surface); }
         .btn-danger-outline { background: transparent; color: var(--danger); border: 1px solid var(--danger); }
-        .btn-danger-outline:hover:not(:disabled) { background: var(--danger); color: white; }
+        .btn-danger-outline:hover:not(:disabled) { background: var(--danger); color: var(--surface); }
+        .btn-primary-light-outline { background: transparent; color: var(--primary-light); border: 1px solid var(--primary-light); }
+        .btn-primary-light-outline:hover:not(:disabled) { background: var(--primary-light); color: var(--surface); }
 
         #tech-pills-container {
             display: flex; flex-wrap: wrap; gap: 6px; width: auto;
-            padding: 8px; background: var(--surface-soft); border-radius: 8px; border: 1px solid #D8E2EA;
+            padding: 6px; background: var(--surface-soft); border-radius: 7px; border: 1px solid var(--border-soft);
         }
 
         .tech-pill {
-            background-color: #EDF3F8; color: var(--primary); border: 1px solid #C9D8E3;
-            padding: 3px 9px; border-radius: 16px; font-size: 10px;
+            background-color: var(--light-gray); color: var(--primary); border: 1px solid var(--border-tech);
+            padding: 2px 8px; border-radius: 14px; font-size: 10px;
             display: inline-flex; align-items: center; gap: 7px;
         }
         
@@ -206,24 +249,24 @@
 
         /* Técnico sin tareas asignadas en el turno: ámbar / naranja suave */
         .tech-pill.tech-idle {
-            background-color: #FFF8E1;
-            border-color: #FFB74D;
-            color: #8D4A00;
+            background-color: var(--surface-idle);
+            border-color: var(--border-idle);
+            color: var(--text-idle);
         }
         .tech-checkbox-label.tech-idle span {
-            background: #FFF8E1;
-            border-color: #FFCC80;
-            color: #8D4A00;
+            background: var(--surface-idle);
+            border-color: var(--border-idle-soft);
+            color: var(--text-idle);
         }
         .tech-checkbox-label.tech-idle:hover span {
-            border-color: #FFA726;
-            background: #FFECB3;
+            border-color: var(--border-idle-active);
+            background: var(--surface-idle-hover);
         }
         /* Si está seleccionado, prima el estilo de seleccionado por encima del idle */
         .tech-checkbox-label.tech-idle input:checked + span {
             background: var(--primary);
             border-color: var(--primary);
-            color: white;
+            color: var(--surface);
         }
 
         /* Título de documento mejorado y centrado matemáticamente */
@@ -241,163 +284,150 @@
             position: absolute;
             bottom: 0;
             left: 0;
-            width: 200%;
-            height: 3px;
-            background: linear-gradient(90deg, 
-                var(--primary) 0%, 
-                var(--accent) 25%, 
-                var(--primary) 50%, 
-                var(--accent) 75%, 
-                var(--primary) 100%);
-            animation: headerSlide 1.5s linear infinite;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
             pointer-events: none;
-        }
-        @keyframes headerSlide {
-            0% { transform: translateX(-50%); }
-            100% { transform: translateX(0); }
         }
         
         .logo-container {
             position: absolute; left: 0; top: 50%; transform: translateY(-50%);
         }
-        .logo-container img { height: 48px; width: auto; }
+        .logo-container img { height: 32px; width: auto; }
         
         .document-header { 
-            font-size: 1.2em; font-weight: 800; color: var(--primary); margin: 0; 
-            text-align: center; display: flex; flex-direction: column; gap: 2px;
+            font-size: 18px; font-weight: 700; color: var(--primary); margin: 0;
+            text-align: center; display: flex; flex-direction: column; gap: 3px;
             align-items: center; justify-content: center; width: 100%;
-            padding: 0 110px; box-sizing: border-box; letter-spacing: 0.1px;
+            padding: 0 110px; box-sizing: border-box; letter-spacing: 0.2px;
         }
-        .document-header > span:first-child { font-size: 1.08em; font-weight: 900; }
-        .document-header > span:not(:first-child) { line-height: 1.3; }
+        .header-main { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: center; gap: 6px; }
+        .header-turno { color: var(--primary); font-weight: 800; }
+        .header-divider { color: var(--accent); font-weight: 400; }
+        .header-date { color: var(--text-soft); font-weight: 500; }
+        .header-team-lead { color: var(--primary); font-size: 16px; font-weight: 800; letter-spacing: 0.3px; }
+        .header-lock { color: var(--danger); font-size: 8px; font-weight: 700; letter-spacing: 0.4px; }
         
-        .avion-section {
-            margin-bottom: 10px; border: 1px solid rgba(192, 208, 220, 0.6);
-            border-radius: 14px 0 14px 0; background: var(--surface); box-shadow: var(--shadow-card);
-            overflow: hidden; transition: box-shadow 0.25s ease, transform 0.25s ease;
-        }
+        .avion-section { margin-bottom: 10px; border-radius: 20px 0 20px 0; box-shadow: 0 1px 3px color-mix(in srgb, var(--black) 7%, transparent), 0 2px 8px color-mix(in srgb, var(--black) 5%, transparent); }
 
         .avion-title {
-            font-size: 1.05em; font-weight: 700; display: flex; align-items: center; justify-content: space-between;
-            background: var(--gradient-primary); color: white;
-            padding: 8px 14px; border-radius: 13px 0 0 0; min-height: 0;
-            box-shadow: inset 4px 0 0 var(--accent);
-            flex-wrap: wrap; gap: 10px; transition: filter 0.5s ease, background 0.3s ease;
+            font-size: 1em; font-weight: 700; display: flex; align-items: center; justify-content: space-between;
+            background: var(--gradient-primary); color: var(--surface); padding: 8px 12px; border-radius: 20px 0 0 0;
+            flex-wrap: wrap; gap: 7px; transition: filter 0.5s ease;
         }
         
-        .avion-title.activity-header { background: linear-gradient(105deg, #2A0087 0%, #4C1196 100%); box-shadow: inset 4px 0 0 var(--accent); }
-        .avion-title.all-done { background: linear-gradient(105deg, #64748B, #475569) !important; box-shadow: inset 4px 0 0 #94A3B8; }
-        .avion-title.all-done.activity-header { background: linear-gradient(105deg, #64748B, #475569) !important; }
+        .avion-title.activity-header { background: var(--gradient-accent); }
+        .avion-title.all-done { background: var(--gradient-completed) !important; }
+        .avion-title.all-done.activity-header { background: var(--gradient-completed) !important; }
 
-        .avion-info-main { flex: 1; min-width: 250px; display: flex; align-items: center; flex-wrap: wrap; gap: 7px; }
-        .avion-identity { font-weight: 800; letter-spacing: 0.2px; }
+        .avion-info-main { flex: 1; min-width: 230px; display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
         
         .avion-pos, .avion-times { 
-            background: rgba(255,255,255,0.14); color: white; border: 1px solid rgba(255,255,255,0.12);
-            padding: 3px 7px; border-radius: 5px; font-size: 0.78em; font-weight: 600;
+            background: color-mix(in srgb, var(--surface) 14%, transparent); color: var(--surface); border: 1px solid color-mix(in srgb, var(--surface) 12%, transparent);
+            padding: 2px 6px; border-radius: 5px; font-size: 0.75em; font-weight: 600;
         }
         
         .activity-time-badge {
-            background: var(--primary); color: white; font-size: 0.8em; font-weight: 700;
-            padding: 2px 8px; border-radius: 4px; margin-right: 6px; white-space: nowrap;
+            background: var(--primary); color: var(--surface); font-size: 0.75em; font-weight: 700;
+            padding: 1px 6px; border-radius: 4px; margin-right: 4px; white-space: nowrap;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
         
-        .avion-comment { font-size: 0.85em; color: #FFFFFF; font-weight: normal; font-style: italic; white-space: nowrap; }
-        .avion-comment::before { content: "| "; color: rgba(255,255,255,0.35); font-weight: bold; }
+        .avion-comment { font-size: 0.85em; color: var(--surface); font-weight: normal; font-style: italic; white-space: nowrap; }
+        .avion-comment::before { content: "| "; color: color-mix(in srgb, var(--surface) 35%, transparent); font-weight: bold; }
 
-        .tango-link { color: #F4729E; cursor: pointer; font-weight: bold; transition: color 0.2s; }
-        .tango-link:hover { color: white; }
-        .task-item .tango-link { color: #EE1750; font-weight: 700; }
-        .task-item .tango-link:hover { color: #B8123E; }
+        .tango-link { color: var(--tango); cursor: pointer; font-size: 0.85em; font-weight: bold; transition: color 0.2s; }
+        .tango-link:hover { color: var(--surface); }
+        .task-item .tango-link { color: var(--accent); font-weight: 700; }
+        .task-item .tango-link:hover { color: var(--accent-dark); }
 
         .task-container {
-            border: 0; border-radius: 0 0 13px 0; background: var(--surface);
+            border: 1px solid var(--border); border-top: none;
+            border-radius: 0 0 20px 0; background: var(--surface);
         }
 
         .task-item {
-            display: flex; padding: 8px 12px; align-items: flex-start; position: relative;
-            border-bottom: 1px solid #E4EBF1; transition: background-color 0.25s ease, opacity 0.3s ease, box-shadow 0.2s ease;
-            background-color: var(--surface);
+            display: flex; padding: 6px 10px; align-items: flex-start;
+            border-bottom: 1px solid var(--light-gray); transition: background-color 0.5s ease, opacity 0.5s ease;
+            background-color: transparent;
         }
         
-        .task-item:last-child { border-bottom: none; border-radius: 0 0 13px 0; }
+        .task-item:last-child { border-bottom: none; border-radius: 0 0 20px 0; }
         .task-item:nth-child(even) { background-color: var(--light-gray); }
 
-        .task-item.alerta-tl { background: linear-gradient(90deg, #FFF0F2 0%, #FFF8F9 100%); border-left: 4px solid #D32F2F; }
-        .task-item.alerta-tech { background: linear-gradient(90deg, #FFF4E5 0%, #FFFAF2 100%); border-left: 4px solid #F57C00; }
+        .task-item.alerta-tl { background-color: var(--surface-red); border-left: 4px solid var(--red); }
+        .task-item.alerta-tech { background-color: var(--surface-orange); border-left: 4px solid var(--orange-alert); }
 
-        .atencion-badge { font-weight: 800; font-size: 0.76em; margin-left: 7px; padding: 3px 7px; border-radius: 999px; display: inline-flex; align-items: center; gap: 3px; white-space: nowrap; vertical-align: middle; }
-        .alerta-tl { color: #fff; background: #C62828; border: 1px solid #B71C1C; box-shadow: 0 2px 5px rgba(198, 40, 40, 0.18); }
-        .alerta-tech { color: #fff; background: #E65100; border: 1px solid #BF360C; box-shadow: 0 2px 5px rgba(230, 81, 0, 0.18); }
+        .atencion-badge { font-weight: 800; font-size: 0.76em; margin-left: 5px; padding: 1px 5px; border-radius: 4px; display: inline-flex; align-items: center; gap: 2px; white-space: nowrap; }
+        .alerta-tl { color: var(--surface); background: var(--red); border: 1px solid var(--red-dark); }
+        .alerta-tech { color: var(--surface); background: var(--orange-alert); border: 1px solid var(--orange-alert-dark); }
 
         .status-toggle {
-            width: 21px; height: 21px; min-width: 21px; min-height: 21px;
+            width: 19px; height: 19px; min-width: 19px; min-height: 19px;
             box-sizing: border-box; border: 2px solid var(--primary);
-            background-color: white; margin: 1px 12px 0 0;
+            background-color: var(--surface); margin-right: 9px; margin-top: 0;
             cursor: pointer; display: flex; align-items: center; justify-content: center;
-            font-weight: 900; color: transparent; font-size: 12px; transition: all 0.2s; user-select: none; border-radius: 50%;
-            box-shadow: 0 0 0 3px rgba(42, 0, 135, 0.06);
+            font-weight: bold; color: transparent; font-size: 12px; transition: all 0.2s; user-select: none; border-radius: 50%;
         }
-        .status-toggle:hover { background: #F0ECFA; box-shadow: 0 0 0 4px rgba(42, 0, 135, 0.1); }
 
         .task-item.completed .action-bar { display: none !important; }
 
-        .task-item.completed .status-toggle { background-color: #94A3B8; border-color: #94A3B8; color: white; box-shadow: none; }
-        .task-item.completed { border-left: none; opacity: 0.62; }
-        .task-item.completed:nth-child(even) { background-color: #f0f0f0; }
-        .task-item.completed:nth-child(odd) { background-color: #ffffff; }
+        .task-item.completed .status-toggle { background-color: var(--gray-400); border-color: var(--gray-400); color: var(--surface); }
+        .task-item.completed { border-left: none; opacity: 0.6; }
+        .task-item.completed:nth-child(even) { background-color: var(--surface-alt); }
+        .task-item.completed:nth-child(odd) { background-color: var(--surface); }
         
-        .task-main { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
-        .task-info { flex: 1; min-width: 0; transition: all 0.3s ease; }
+        .task-main { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 9px; }
+        .task-info { flex: 1; transition: all 0.3s ease; }
         
         .task-item.completed .task-desc,
-        .task-item.completed .tango-link { text-decoration: line-through; text-decoration-thickness: 1px; color: #8A96A3; }
-        .task-item.completed .task-techs { text-decoration: none; color: #8A96A3; }
-        .task-item.completed .task-comment { text-decoration: none; color: #9AA4AF; }
-        .task-desc { font-weight: 500; font-size: 0.96em; line-height: 1.35; color: var(--primary); letter-spacing: 0.05px; }
+        .task-item.completed .tango-link { text-decoration: line-through; text-decoration-thickness: 1px; color: var(--text-muted); }
+        .task-item.completed .task-techs { text-decoration: none; color: var(--text-muted); }
+        .task-item.completed .task-comment { text-decoration: none; color: var(--text-muted-light); }
+        .task-desc { font-weight: 500; font-size: 0.94em; line-height: 1.3; color: var(--primary); letter-spacing: 0.05px; }
         .task-techs {
-            display: inline-flex; align-items: center; gap: 4px; font-size: 0.76em; font-weight: 700;
-            color: #5C4D7A; margin-top: 4px; padding: 1px 6px; background: #F0ECF8;
+            display: inline-flex; align-items: center; gap: 3px; font-size: 0.74em; font-weight: 700;
+            color: var(--text-violet); margin-top: 3px; padding: 1px 5px; background: var(--surface-violet);
             border-radius: 5px; letter-spacing: 0.2px;
         }
         .task-comment {
-            font-size: 0.8em; color: var(--comment); margin-top: 3px; font-style: italic;
-            font-weight: 500; line-height: 1.35; padding-left: 8px; border-left: 2px solid #D8D0E4;
+            font-size: 0.78em; color: var(--comment); margin-top: 2px; font-style: italic;
+            font-weight: 500; line-height: 1.35; padding-left: 8px; border-left: 2px solid var(--border-violet);
         }
 
-        .action-bar { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; flex: none; }
-        
-        .action-bar.avion-bar .action-btn { background: rgba(255,255,255,0.1); color: white; border-color: rgba(255,255,255,0.3); }
-        .action-bar.avion-bar .action-btn:hover { background: rgba(255,255,255,0.25); }
-        .action-bar.avion-bar .btn-highlight { background: white; color: var(--primary); border: none; }
-        .action-bar.avion-bar .btn-highlight:hover { background: var(--light-gray); }
+        .action-bar { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+
+        /* Botones del encabezado de avión: una sola clase, sin overrides heredados.
+           El alto y el redondeo los pone la regla global de button con las variables. */
+        .avion-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+        .avion-btn {
+            background: var(--surface); color: var(--primary); border: none;
+            padding: 0 10px; font-size: 9px; cursor: pointer; height: var(--button-height-banner) !important;
+        }
+        .avion-btn:hover { background: var(--light-gray); }
 
         .action-btn {
-            padding: 0 9px; font-size: 9px; font-weight: 700; height: 25px;
-            border-radius: 6px; border: 1px solid var(--border);
-            background: #ffffff; color: var(--primary); gap: 4px;
-            box-shadow: 0 1px 2px rgba(42, 0, 135, 0.05);
+            padding: 0 8px; font-size: 9px; font-weight: 700; height: var(--button-height-banner) !important;
+            border-radius: var(--button-radius); border: 1px solid var(--border);
+            background: var(--surface); color: var(--primary); gap: 4px;
         }
         .btn-action-small { 
             background-color: var(--light-gray); color: var(--primary); border: 1px solid var(--border); 
-            height: 24px; font-size: 9px; padding: 0 8px; border-radius: 4px;
+            height: var(--button-height); font-size: 9px; padding: 0 8px; border-radius: var(--button-radius);
         }
-        .btn-action-small:hover { background-color: var(--primary); color: white; border-color: var(--primary); }
+        .btn-action-small:hover { background-color: var(--primary); color: var(--surface); border-color: var(--primary); }
 
-        .action-btn:hover { background: var(--light-gray); border-color: #9E8FB5; }
-        .action-btn.active-alerta-tl { background: #D32F2F; color: white; border-color: #B71C1C; }
-        .action-btn.active-alerta-tech { background: #F57C00; color: white; border-color: #E65100; }
-        .btn-highlight { color: var(--primary); border-color: var(--primary); background-color: #EDE6F5; }
-        .btn-highlight:hover { background-color: var(--primary); color: white; }
+        .action-btn:hover { background: var(--light-gray); border-color: var(--border-hover); }
+        .action-btn.active-alerta-tl { background: var(--red); color: var(--surface); border-color: var(--red-dark); }
+        .action-btn.active-alerta-tech { background: var(--orange-alert); color: var(--surface); border-color: var(--orange-alert-dark); }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(30, 41, 59, 0.6); backdrop-filter: blur(4px); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: color-mix(in srgb, var(--slate-900) 60%, transparent); backdrop-filter: blur(4px); }
         #confirm-modal, #prompt-modal { z-index: 1050; }
         
         .modal-content {
-            background-color: white; margin: 6% auto; padding: 20px;
+            background-color: var(--surface); margin: 6% auto; padding: 20px;
             border: none; width: 90%; max-width: 450px; border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3); max-height: 85vh; overflow-y: auto;
+            box-shadow: 0 10px 30px color-mix(in srgb, var(--black) 30%, transparent); max-height: 85vh; overflow-y: auto;
         }
         
         .modal-header { font-weight: 800; font-size: 1.1em; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
@@ -416,59 +446,58 @@
         .tech-checkbox-label input { display: none; }
         .tech-checkbox-label span {
             display: flex; align-items: center; justify-content: center;
-            background: white; border: 1px solid var(--border); padding: 6px 12px;
+            background: var(--surface); border: 1px solid var(--border); padding: 6px 12px;
             border-radius: 20px; font-size: 10px; font-weight: 700;
             transition: all 0.2s; user-select: none; color: var(--comment); text-align: center;
             word-wrap: break-word; white-space: normal; line-height: 1.2;
         }
         .tech-checkbox-label:hover span { border-color: var(--primary); color: var(--primary); background: var(--light-gray); }
         .tech-checkbox-label input:checked + span { 
-            border-color: var(--primary); background: var(--primary); color: white; 
-            box-shadow: 0 2px 6px rgba(27, 0, 136, 0.2);
+            border-color: var(--primary); background: var(--primary); color: var(--surface); 
+            box-shadow: 0 2px 6px color-mix(in srgb, var(--primary) 20%, transparent);
         }
 
         .modal-footer { display: flex; gap: 10px; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border); }
-        .btn-modal-action { flex: 1; padding: 0; height: 30px; font-size: 10px; border-radius: 4px;}
-        .admin-modal-content { padding: 0 !important; width: 95%; max-width: 860px; min-height: 460px; border-radius: 14px; overflow-x: hidden; overflow-y: auto; }
-        .admin-modal-header { margin: 0; padding: 14px 18px; background: var(--gradient-primary); color: white; border: 0; border-bottom: 3px solid var(--accent); font-size: 12px; letter-spacing: 0.35px; }
-        .admin-modal-layout { display: grid; grid-template-columns: 310px minmax(0, 1fr); gap: 14px; padding: 14px; align-items: start; }
-        .admin-side { display: flex; flex-direction: column; gap: 10px; }
-        .admin-login-toggle { display: none; align-items: center; justify-content: space-between; gap: 8px; border: 1px solid #D8E2EA; border-radius: 8px; padding: 9px 10px; background: var(--surface-soft); }
-        .admin-login-toggle > span { font-weight: 800; font-size: 9px; color: var(--leader-color); }
-        .admin-login-toggle .btn-action-small { min-width: 105px; }
-        .admin-card { border: 1px solid #D8E2EA; border-radius: 10px; padding: 11px; background: var(--surface-soft); }
-        .admin-card-title { color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: 0.35px; }
-        .modal-content .admin-field { width: 100%; height: 34px; margin: 7px 0 0; background: white; }
-        .admin-role-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 8px; }
-        .admin-role-option { display: flex; align-items: center; justify-content: center; gap: 4px; min-height: 30px; padding: 4px; border: 1px solid #D8E2EA; border-radius: 6px; background: white; color: var(--primary); font-size: 8px; font-weight: 800; cursor: pointer; }
-        .admin-role-option:has(input:checked) { border-color: var(--primary); background: #F0ECF8; color: var(--primary); }
+        .btn-modal-action { flex: 1; padding: 0; height: var(--button-height); font-size: 10px; border-radius: var(--button-radius);}
+        .admin-modal-content { padding: 0 !important; width: 95%; max-width: 860px; min-height: 540px; border-radius: 12px; overflow-x: hidden; overflow-y: auto; background-color: var(--surface); }
+        .admin-modal-header { margin: 0; padding: 10px 14px 8px; background: var(--surface); color: var(--primary); border: 0; border-bottom: 2px solid var(--accent); font-size: 1.05em; font-weight: 800; letter-spacing: 0; }
+        .admin-modal-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 10px; padding: 10px; align-items: start; }
+        .admin-side { display: flex; flex-direction: column; gap: 8px; }
+        .admin-card { border: 1px solid var(--border-soft); border-radius: 7px; padding: 7px; background: var(--light-gray); }
+        .admin-card-title { color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: 0.3px; }
+        .modal-content .admin-field { width: 100%; height: 28px; margin: 4px 0 0; background: var(--surface); }
+        .admin-role-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 3px; margin-top: 5px; }
+        .admin-role-option { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 24px; padding: 2px; border: 1px solid var(--border-soft); border-radius: 4px; background: var(--surface); color: var(--primary); font-size: 8.5px; font-weight: 800; cursor: pointer; }
+        .admin-role-option:has(input:checked) { border-color: var(--primary); background: var(--surface-violet); color: var(--primary); }
         .admin-role-option input { margin: 0; accent-color: var(--primary); }
-        .admin-add-button { width: 100%; height: 34px; border-radius: 7px; font-size: 9px; box-shadow: 0 3px 8px rgba(42, 0, 135, 0.14); }
+        .admin-add-button { width: 100%; height: var(--button-height); border-radius: var(--button-radius); font-size: 9px; box-shadow: none; }
         .admin-list-panel { min-width: 0; }
-        .admin-list-title { margin-bottom: 6px; color: var(--text-soft); font-size: 9px; font-weight: 800; letter-spacing: 0.3px; }
-        .modal-content .admin-search { width: 100%; height: 34px; flex: none; box-sizing: border-box; margin: 0 0 8px; background: white; }
-        .admin-user-list { height: 322px; max-height: 48vh; overflow-y: auto; font-size: 10px; border: 1px solid #D8E2EA; border-radius: 10px; padding: 7px; background: var(--surface-soft); }
-        .admin-empty { padding: 14px 8px; text-align: center; color: var(--comment); font-size: 9px; font-weight: 800; }
-        .admin-user-row { display: flex; align-items: center; gap: 6px; padding: 7px 8px; border: 1px solid #E1E8EF; border-radius: 8px; margin-bottom: 5px; background: white; transition: border-color 0.2s ease, box-shadow 0.2s ease; }
+        .admin-list-title { margin-bottom: 4px; color: var(--text-soft); font-size: 9px; font-weight: 800; letter-spacing: 0.3px; }
+        .modal-content .admin-search { width: 100%; height: 30px; flex: none; box-sizing: border-box; margin: 0 0 6px; background: var(--surface); }
+        .admin-user-list { height: 400px; max-height: 60vh; overflow-y: auto; font-size: 10px; border: 1px solid var(--border-soft); border-radius: 8px; padding: 5px; background: var(--light-gray); }
+        .admin-empty { padding: 12px 6px; text-align: center; color: var(--comment); font-size: 9px; font-weight: 800; }
+        .admin-user-row { display: flex; align-items: center; gap: 5px; padding: 5px 6px; border: 1px solid var(--border-subtle); border-radius: 6px; margin-bottom: 4px; background: var(--surface); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
         .admin-user-row:last-child { margin-bottom: 0; }
-        .admin-user-row:hover { border-color: #B9C9D6; box-shadow: 0 2px 7px rgba(42, 0, 135, 0.07); }
-        .admin-user-row.no-access { background: #F3F4F6; }
-        .admin-user-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 6px; }
-        .admin-user-copy { min-width: 0; display: flex; flex-direction: column; gap: 1px; }
+        .admin-user-row:hover { border-color: var(--border-hover-soft); box-shadow: none; }
+        .admin-user-row.no-access { background: var(--surface-muted); }
+        .admin-user-main { flex: 1; min-width: 0; display: flex; align-items: center; gap: 5px; }
+        .admin-user-copy { min-width: 0; display: flex; flex-direction: column; gap: 0; }
         .admin-username { color: var(--primary); font-size: 10px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .admin-user-row.no-access .admin-username { color: var(--comment); }
         .admin-realname { color: var(--comment); font-size: 9px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .admin-role-badge { flex: none; padding: 2px 5px; border-radius: 10px; color: white; font-size: 7px; font-weight: 800; letter-spacing: 0.25px; }
+        .admin-role-badge { flex: none; padding: 1px 4px; border-radius: 8px; color: var(--surface); font-size: 7px; font-weight: 800; letter-spacing: 0.2px; }
         .admin-role-badge.admin { background: var(--danger); }
-        .admin-user-actions { display: flex; flex: none; gap: 3px; }
-        .admin-user-actions .btn-action-small { width: 25px; min-width: 25px; height: 25px; padding: 0; border-radius: 5px; font-size: 8px; }
+    .admin-role-badge.tech { background: var(--success); }
+    .admin-user-action.active-tech { background: var(--success); border-color: var(--success); color: var(--surface); }
+        .admin-user-actions { display: flex; flex: none; gap: 2px; }
+        .admin-user-actions .btn-action-small { width: 24px; min-width: 24px; height: var(--button-height-admin) !important; padding: 0; border-radius: var(--button-radius); font-size: 8px; }
         .admin-user-actions .admin-action-wide { width: 38px; }
-        .admin-user-action.active-user { background: var(--primary); border-color: var(--primary); color: white; }
-        .admin-user-action.active-tl { background: var(--comment); border-color: var(--comment); color: white; }
-        .admin-user-action.active-admin { background: var(--danger); border-color: var(--danger); color: white; }
-        .admin-user-action.delete-user:hover { background: var(--danger); border-color: var(--danger); color: white; }
-        .admin-modal-footer { justify-content: flex-end; margin: 0; padding: 11px 14px; background: var(--surface-soft); border-top: 1px solid #D8E2EA; }
-        .admin-modal-footer button { height: 30px; padding: 0 18px; border-radius: 6px; font-size: 9px; }
+        .admin-user-action.active-user { background: var(--primary); border-color: var(--primary); color: var(--surface); }
+        .admin-user-action.active-tl { background: var(--comment); border-color: var(--comment); color: var(--surface); }
+        .admin-user-action.active-admin { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+        .admin-user-action.delete-user:hover { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+        .admin-modal-footer { justify-content: flex-end; margin: 0; padding: 8px 10px; background: var(--surface-soft); border-top: 1px solid var(--border-soft); }
+        .admin-modal-footer button { height: var(--button-height); padding: 0 14px; border-radius: var(--button-radius); font-size: 9px; }
 
         /* AJUSTES PARA CELULARES */
         @media (max-width: 900px) {
@@ -481,7 +510,7 @@
             #btn-mode-toggle { flex: 1 1 0; max-width: none; min-width: 0; }
             .live-clock { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); width: 100%; height: auto; padding: 0; position: static; transform: none; gap: 4px; }
             .clock-zone { min-width: 0; gap: 7px; padding: 4px 5px; }
-            .clock-divider { height: 28px; }
+            .clock-divider { height: 24px; }
             
             .view-controls { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; align-items: start; }
             .view-controls > div { display: flex; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 4px; }
@@ -491,15 +520,12 @@
             .view-filters-wrap { grid-column: 1 / -1; display: grid !important; grid-template-columns: 1fr 1fr; gap: 4px; align-items: start; }
             .view-filters-wrap > button { grid-column: 1 / -1; justify-self: center; margin-top: 2px; }
             
-            .header-controls { padding: 0; }
-            .leader-panel-header { padding: 9px 12px; }
-            .leader-grid { padding: 10px 12px 0; }
-            .leader-search-row { margin: 0 12px; }
-            .leader-search-results { margin-left: 12px !important; margin-right: 12px !important; }
-            .leader-add-buttons { padding: 10px 12px 12px; }
+            .header-controls { padding: 10px; }
+            .leader-panel-header { flex-direction: column; gap: 6px; text-align: center; }
+            .leader-panel-header div, .leader-panel-header button { width: 100%; }
             .admin-modal-content { width: 98% !important; min-height: 0; max-height: 92vh; margin: 4% auto; }
             .admin-modal-layout { grid-template-columns: minmax(0, 1fr); }
-            .admin-user-list { height: 260px; max-height: 36vh; }
+            .admin-user-list { height: 300px; max-height: 46vh; }
             
             .control-group { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; }
             .control-group span { width: auto !important; white-space: nowrap; text-align: left; margin-bottom: 0px; }
@@ -508,31 +534,31 @@
             .control-group input[type="text"], 
             .control-group input[list] { flex: 1 !important; min-width: 100px !important; width: auto !important; }
             .control-group button { width: auto !important; flex: 1; min-width: 0; margin: 0 !important; }
-            .btn-agregar { flex: 0 1 auto; max-width: 76px; height: auto; padding: 4px 6px !important; white-space: normal; display: inline-flex; align-items: center; gap: 2px; }
+            .btn-agregar { flex: 0 1 auto; max-width: 76px; height: var(--button-height) !important; padding: 4px 6px !important; white-space: normal; display: inline-flex; align-items: center; gap: 2px; }
             .btn-agregar .btn-ico { font-size: 11px; line-height: 1; }
             .btn-agregar .btn-lbl { font-size: 8px; line-height: 1.15; white-space: normal !important; }
-            .btn-listado { flex: 0 1 auto; max-width: 76px; height: auto; padding: 4px 6px !important; white-space: normal; display: inline-flex; align-items: center; gap: 2px; }
+            .btn-listado { flex: 0 1 auto; max-width: 76px; height: var(--button-height) !important; padding: 4px 6px !important; white-space: normal; display: inline-flex; align-items: center; gap: 2px; }
             .btn-listado .btn-ico { font-size: 11px; line-height: 1; }
             .btn-listado .btn-lbl { font-size: 7px; line-height: 1.15; white-space: normal !important; }
             .hide-mobile { display: none !important; }
             .hide-desktop { display: flex !important; }
-            .btn-shift { flex: 0 1 auto; max-width: 76px; height: auto; padding: 4px 6px !important; white-space: normal; display: inline-flex; align-items: center; gap: 2px; }
+            .btn-shift { flex: 0 1 auto; max-width: 76px; height: var(--button-height) !important; padding: 4px 6px !important; white-space: normal; display: inline-flex; align-items: center; gap: 2px; }
             .btn-shift .btn-ico { font-size: 11px; line-height: 1; }
             .btn-shift .btn-lbl { font-size: 7px; line-height: 1.15; white-space: normal !important; }
             
             .main-header-wrapper { flex-direction: column; text-align: center; gap: 12px; padding: 15px 0; }
             .logo-container { position: relative; transform: none; top: auto; left: auto; }
-            .document-header { padding: 0; }
+            .document-header { padding: 0; font-size: 15px; }
+            .header-team-lead { font-size: 14px; }
+            .header-lock { font-size: 7px; }
             
-            .avion-section { margin-bottom: 9px; }
-            .avion-title { flex-direction: column; text-align: center; gap: 6px; padding: 8px 12px; }
-            .avion-info-main { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 5px; }
-            .action-bar.avion-bar { justify-content: center; width: 100%; margin-top: 4px; }
+            .avion-title { flex-direction: column; text-align: center; gap: 6px; }
+            .avion-info-main { flex-direction: row; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px; }
+            .avion-info-main > .avion-reg { flex: 0 0 100%; }
+            .avion-actions { justify-content: center; width: 100%; margin-top: 3px; }
             
-            .task-item { position: relative; padding: 8px 10px 8px 34px; }
-            .task-item.alerta-tl, .task-item.alerta-tech { padding-left: 38px; }
-            .status-toggle { position: absolute; left: 9px; top: 9px; margin: 0; }
-            .task-item.alerta-tl .status-toggle, .task-item.alerta-tech .status-toggle { left: 13px; }
+            .task-item { position: relative; padding: 6px 8px 6px 30px; }
+            .status-toggle { position: absolute; left: 6px; top: 7px; margin: 0; }
             .task-main { flex-direction: column; align-items: stretch; gap: 7px; }
             
             .action-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); width: 100%; gap: 6px; }
@@ -545,13 +571,11 @@
         /* Pantalla muy pequeña: FECHA y TURNO en columnas individuales */
         @media (max-width: 500px) {
             .live-clock { grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: 3px; }
-            .clock-divider { display: block; height: 26px; }
+            .clock-divider { display: block; height: 23px; }
             .clock-zone { justify-content: center; gap: 5px; padding: 4px; }
             .clock-time { font-size: 10px; }
-            .task-desc { font-size: 0.94em; }
-            .task-comment { font-size: 0.78em; }
             .admin-modal-layout { padding: 10px; gap: 10px; }
-            .admin-role-option { padding: 3px 2px; font-size: 7px; }
+            .admin-role-option { padding: 2px; font-size: 8px; }
             .admin-user-row { align-items: flex-start; flex-wrap: wrap; }
             .admin-user-main { width: 100%; }
             .admin-user-actions { width: 100%; justify-content: flex-end; }
@@ -568,7 +592,7 @@
         .search-results-wrap { display: flex; flex-direction: column; gap: 0; }
         .search-result-group { margin-bottom: 6px; }
         .search-group-header {
-            font-weight: 800; color: white; font-size: 11px; padding: 6px 10px;
+            font-weight: 800; color: var(--surface); font-size: 11px; padding: 6px 10px;
             background: var(--gradient-primary); border-radius: 6px 6px 0 0;
             display: flex; align-items: center; gap: 8px;
         }
@@ -585,17 +609,17 @@
         .search-result-avion .ra-icon { font-size: 12px; }
         .search-result-match { color: var(--primary); font-size: 11px; padding-left: 18px; display: flex; align-items: baseline; flex-wrap: wrap; gap: 4px; }
         .srm-type {
-            font-size: 8px; font-weight: 800; color: white; padding: 1px 5px;
+            font-size: 8px; font-weight: 800; color: var(--surface); padding: 1px 5px;
             border-radius: 3px; letter-spacing: 0.5px; flex: none;
         }
-        .srm-type.type-tarea { background: #2A0087; }
-        .srm-type.type-tango { background: #EE1750; }
-        .srm-type.type-wp { background: #EE1750; }
-        .srm-type.type-nota { background: #FF9900; }
-        .srm-type.type-tecnico { background: #6B5E8A; }
-        .srm-type.type-titulo { background: #4b5563; }
-        .srm-type.type-matricula { background: #10b981; }
-        .srm-tango { color: #EE1750; font-weight: 700; }
+        .srm-type.type-tarea { background: var(--primary); }
+        .srm-type.type-tango { background: var(--accent); }
+        .srm-type.type-wp { background: var(--accent); }
+        .srm-type.type-nota { background: var(--help); }
+        .srm-type.type-tecnico { background: var(--comment); }
+        .srm-type.type-titulo { background: var(--gray-600); }
+        .srm-type.type-matricula { background: var(--success); }
+        .srm-tango { color: var(--accent); font-weight: 700; }
         #search-loading { text-align: center; padding: 20px; color: var(--comment); font-size: 11px; }
         #search-no-results { text-align: center; padding: 30px; color: var(--comment); font-size: 11px; }
 
@@ -607,7 +631,7 @@
             opacity: 0.75; transition: opacity 0.2s;
         }
         .drag-handle:hover, .drag-handle:active { opacity: 1; cursor: grabbing; }
-        .avion-title .drag-handle { color: rgba(255,255,255,0.9); }
+        .avion-title .drag-handle { color: color-mix(in srgb, var(--surface) 90%, transparent); }
         .task-item .drag-handle { color: var(--primary); }
         .dragging { opacity: 0.45; }
         body.dragging-active { cursor: grabbing; }
@@ -615,14 +639,14 @@
             position: fixed; z-index: 99999; pointer-events: none;
             height: 3px; border-radius: 2px;
             background: var(--primary);
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+            box-shadow: 0 1px 3px color-mix(in srgb, var(--black) 25%, transparent);
         }
 
         /* Mensajes para el grupo */
         .group-message {
             display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;
-            background: #F1EDF9; border: 1px solid #E3DBF2; border-left: 4px solid var(--primary);
-            padding: 11px 14px; margin-bottom: 10px; border-radius: 8px; box-shadow: 0 2px 7px rgba(42, 0, 135, 0.05);
+            background: var(--surface-lavender); border-left: 5px solid var(--primary);
+            padding: 10px 14px; margin-bottom: 10px; border-radius: 6px;
             -webkit-print-color-adjust: exact; print-color-adjust: exact;
         }
         #group-messages-top .group-message { margin-top: 10px; }
@@ -633,11 +657,11 @@
         }
         .group-message .gm-actions { display: inline-flex; gap: 4px; flex: none; }
         .gm-btn {
-            width: 24px; min-width: 24px; height: 24px; padding: 0; font-size: 11px;
-            border-radius: 4px; background: transparent; border: 1px solid var(--border);
-            color: var(--primary); cursor: pointer;
+            width: 24px; min-width: 24px; height: var(--button-height); padding: 0;
+            border-radius: var(--button-radius); background: transparent; border: 1px solid var(--border);
+            color: var(--primary); cursor: pointer; font-size: 11px;
         }
-        .gm-btn:hover { background: var(--primary); color: white; }
+        .gm-btn:hover { background: var(--primary); color: var(--surface); }
         .color-swatch { display: inline-flex; cursor: pointer; }
         .color-swatch input { display: none; }
         .color-swatch span {
@@ -646,71 +670,76 @@
             border: 3px solid transparent; transition: all 0.2s;
         }
         .color-swatch input:checked + span {
-            border-color: #fff;
+            border-color: var(--surface);
             box-shadow: 0 0 0 2px var(--primary);
         }
         .drag-ghost {
             position: fixed; z-index: 99999; pointer-events: none;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.28); opacity: 0.95;
+            box-shadow: 0 10px 30px color-mix(in srgb, var(--black) 28%, transparent); opacity: 0.95;
             border-radius: 12px 0 12px 0; overflow: hidden;
         }
 
         #toast {
-            visibility: hidden; min-width: 250px; background-color: var(--primary); color: #fff;
+            visibility: hidden; min-width: 250px; background-color: var(--primary); color: var(--surface);
             text-align: center; border-radius: 4px; padding: 10px; position: fixed; z-index: 1001;
-            bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; box-shadow: 0 4px 12px color-mix(in srgb, var(--black) 20%, transparent);
             opacity: 0; transition: opacity 0.3s, visibility 0.3s; border-left: 4px solid var(--accent);
         }
         #toast.show { visibility: visible; opacity: 1; }
+
+        button {
+            height: var(--button-height) !important;
+            border-radius: var(--button-radius) !important;
+        }
 
         /* Ultra-Comprimido para Imprimir en una sola hoja carta 216x279mm */
         @media print {
             @page { size: 216mm 279mm; margin: 1.2cm; } 
             body .no-print { display: none !important; }
-            body { padding: 0 !important; background-color: white; font-size: var(--print-font-size); line-height: 1.15; }
+            body { padding: 0 !important; background-color: var(--surface); font-size: var(--print-font-size); line-height: 1.15; }
             .container { padding: 0 3px 0 0 !important; box-shadow: none; max-width: 100%; }
             
-            .main-header-wrapper { flex-direction: row !important; text-align: center !important; gap: normal !important; padding: 4px 0 6px 0 !important; margin-bottom: 5px; min-height: 32px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--accent)) no-repeat bottom / 100% 3px !important; overflow: visible !important; }
+            .main-header-wrapper { flex-direction: row !important; text-align: center !important; gap: normal !important; padding: 6px 0 8px 0 !important; margin-bottom: 8px; min-height: 36px; background: linear-gradient(90deg, var(--primary), var(--accent), var(--cyan)) no-repeat bottom / 100% 3px !important; overflow: visible !important; }
             .main-header-wrapper::after { display: none !important; }
             .logo-container img { height: 28px !important; width: auto !important; }
             .logo-container { position: absolute !important; left: 0 !important; top: 50% !important; transform: translateY(-50%) !important; }
             .document-header { font-size: 1.1em; padding: 0 85px !important; } 
             
-            .avion-section { margin-bottom: 0.5em; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .avion-section { margin-bottom: 0.65em; box-shadow: none; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .avion-title { 
-                background: var(--gradient-primary) !important; color: white !important; 
-                padding: 0.38em 0.7em; border-bottom: 1px solid var(--border); gap: 0.4em !important;
+                background: var(--gradient-primary) !important; color: var(--surface) !important; 
+                padding: 0.42em 0.7em; border-bottom: 1px solid var(--border); gap: 0.4em !important;
                 flex-direction: row !important; text-align: left !important;
                 -webkit-print-color-adjust: exact; print-color-adjust: exact;
             }
             .avion-title.activity-header { background: var(--gradient-accent) !important; }
-            .avion-title.all-done { background: linear-gradient(135deg, #6b7280, #4b5563) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .avion-pos, .avion-times { background: rgba(255,255,255,0.2); color: white; padding: 2px 6px; font-weight: bold; font-size: 0.85em; border-radius: 4px; }
-            .avion-comment { color: #C4B8D0; font-size: 0.85em; white-space: nowrap; }
+            .avion-title.all-done { background: var(--gradient-completed) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .avion-pos, .avion-times { background: color-mix(in srgb, var(--surface) 20%, transparent); color: var(--surface); padding: 2px 6px; font-weight: bold; font-size: 0.8em; border-radius: 4px; }
+            .avion-comment { color: var(--text-lavender); font-size: 0.85em; white-space: nowrap; }
             .avion-info-main { flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 8px !important; }
-            .tango-link { color: #F4729E; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .avion-title .tango-link { color: #F4729E; }
-            .task-item .tango-link { color: #EE1750; }
+            .tango-link { color: var(--tango); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .avion-title .tango-link { color: var(--tango); }
+            .task-item .tango-link { color: var(--accent); }
             
             .task-container { padding-left: 0 !important; }
-            .task-item { padding: 0.24em 0.5em !important; position: static !important; border-bottom: 1px solid var(--border); page-break-inside: avoid; }
+            .task-item { padding: 0.28em 0.5em !important; position: static !important; border-bottom: 1px solid var(--border); page-break-inside: avoid; }
             .task-item:nth-child(even) { background-color: var(--light-gray); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .task-item.completed:nth-child(even) { background-color: #f0f0f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .task-item.completed:nth-child(odd) { background-color: #ffffff; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .task-item.alerta-tl { border-left: 3px solid #D32F2F !important; background-color: #FFEBEE !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .task-item.alerta-tech { border-left: 3px solid #F57C00 !important; background-color: #FFF3E0 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .task-item.completed:nth-child(even) { background-color: var(--surface-alt); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .task-item.completed:nth-child(odd) { background-color: var(--surface); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .task-item.alerta-tl { border-left: 3px solid var(--red) !important; background-color: var(--surface-red) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .task-item.alerta-tech { border-left: 3px solid var(--orange-alert) !important; background-color: var(--surface-orange) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             
             .task-item.completed .task-desc,
             .task-item.completed .task-techs,
-            .task-item.completed .task-comment { opacity: 0.85 !important; text-decoration: line-through; color: #9ca3af; }
-            .task-item.completed .tango-link { text-decoration: line-through; color: #9ca3af; }
-            .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: #9ca3af !important; border-color: #9ca3af !important; color: white !important; }
+            .task-item.completed .task-comment { opacity: 0.85 !important; text-decoration: line-through; color: var(--gray-400); }
+            .task-item.completed .tango-link { text-decoration: line-through; color: var(--gray-400); }
+            .task-item.completed .status-toggle { -webkit-print-color-adjust: exact; print-color-adjust: exact; background-color: var(--gray-400) !important; border-color: var(--gray-400) !important; color: var(--surface) !important; }
             .status-toggle { margin-top: 0px; margin-right: 6px; width: 12px; min-width: 12px; height: 12px; min-height: 12px; font-size: 8px; border-width: 1px; position: static !important; margin: 0 6px 0 0 !important; }
-            .task-desc { font-size: 1em; line-height: 1.2; }
-            .task-techs, .task-comment { font-size: 0.82em; margin-top: 0.12em; }
+            .task-desc { font-size: 1em; }
+            .task-techs, .task-comment { font-size: 0.8em; margin-top: 0.15em; }
             .atencion-badge { padding: 1px 4px; font-size: 0.75em; }
             
-            .task-main { flex-direction: row !important; align-items: center !important; gap: 8px !important; }
+            .task-main { flex-direction: row !important; align-items: center !important; gap: 9px !important; }
             .action-bar { display: flex !important; flex-wrap: wrap !important; gap: 5px !important; width: auto !important; }
             .action-bar .action-btn { width: auto !important; }
             .view-controls, .view-controls > div { flex-direction: row !important; align-items: center !important; }
@@ -718,28 +747,28 @@
     </style>
     <style>
         /* Pantalla de inicio de sesión obligatorio */
-        .login-screen { position: fixed; inset: 0; z-index: 9999; background: linear-gradient(135deg, #2A0087, #1A0055, #2A0087); display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: white; border-radius: 16px 0 16px 0; box-shadow: 0 20px 60px rgba(0,0,0,0.35); padding: 32px 28px 24px; width: 100%; max-width: 360px; text-align: center; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+        .login-screen { position: fixed; inset: 0; z-index: 9999; background: var(--gradient-brand); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: var(--surface); border-radius: 16px 0 16px 0; box-shadow: 0 20px 60px color-mix(in srgb, var(--black) 35%, transparent); padding: 32px 28px 24px; width: 100%; max-width: 360px; text-align: center; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
         .login-card img { height: 52px; width: auto; margin: 0 auto; }
         .login-title { font-size: 1.15em; font-weight: 900; color: var(--primary); }
         .login-sub { font-size: 10px; font-weight: 700; color: var(--comment); margin-bottom: 6px; }
         .login-card input { width: 100%; height: 40px; font-size: 12px; padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; flex: none; }
-        .login-card input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px rgba(42,0,135,0.1); outline: none; }
-        .login-btn { width: 100%; height: 40px; border: none; border-radius: 6px; cursor: pointer; font-size: 11px; font-weight: 800; color: white; transition: opacity 0.2s; flex: none; }
+        .login-card input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 10%, transparent); outline: none; }
+        .login-btn { width: 100%; height: 40px !important; border: none; border-radius: var(--button-radius); cursor: pointer; font-size: 11px; font-weight: 800; color: var(--surface); transition: opacity 0.2s; flex: none; }
         .login-btn:hover { opacity: 0.88; }
         .login-btn-primary { background: var(--gradient-primary); }
-        .login-btn-google { background: #4285F4; display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; box-shadow: 0 2px 6px rgba(66,133,244,.35); }
-        .login-btn-google .g-icon { background: white; border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+        .login-btn-google { background: var(--google-blue); display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; box-shadow: 0 2px 6px color-mix(in srgb, var(--google-blue) 35%, transparent); }
+        .login-btn-google .g-icon { background: var(--surface); border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
         .login-btn-danger { background: var(--danger); }
         .login-error { color: var(--danger); font-size: 10px; font-weight: 700; min-height: 14px; }
 
         /* Pantalla de carga profesional */
-        #boot-splash { position: fixed; inset: 0; z-index: 10000; background: linear-gradient(135deg, #1A0055, #2A0087, #1A0055); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: opacity .35s ease; }
+        #boot-splash { position: fixed; inset: 0; z-index: 10000; background: var(--gradient-boot); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: opacity .35s ease; }
         #boot-splash.hide { opacity: 0; pointer-events: none; }
-        #boot-splash img { height: 56px; width: auto; filter: drop-shadow(0 4px 12px rgba(0,0,0,.4)); }
-        #boot-splash .boot-title { color: white; font-weight: 900; font-size: 1.05em; letter-spacing: 2px; }
-        #boot-splash .boot-sub { color: #C4B8D0; font-size: 10px; font-weight: 700; letter-spacing: 1px; }
-        .boot-spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid rgba(255,255,255,.15); border-top-color: var(--cyan); animation: bootspin .8s linear infinite; }
+        #boot-splash img { height: 56px; width: auto; filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--black) 40%, transparent)); }
+        #boot-splash .boot-title { color: var(--surface); font-weight: 900; font-size: 1.05em; letter-spacing: 2px; }
+        #boot-splash .boot-sub { color: var(--text-lavender); font-size: 10px; font-weight: 700; letter-spacing: 1px; }
+        .boot-spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid color-mix(in srgb, var(--surface) 15%, transparent); border-top-color: var(--cyan); animation: bootspin .8s linear infinite; }
         @keyframes bootspin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -759,7 +788,7 @@
         <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines">
         <div id="login-card-title" class="login-title">PROGRAMACIÓN DIARIA</div>
         <div class="login-sub">ACCESO RESTRINGIDO · PERSONAL AUTORIZADO</div>
-        <button id="login-google-btn" class="login-btn login-btn-google" onclick="doGoogleLogin()"><span class="g-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></span> ENTRAR CON GOOGLE</button>
+        <button id="login-google-btn" class="login-btn login-btn-google" onclick="doGoogleLogin()"><span class="g-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"><path fill="var(--google-blue)" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="var(--google-green)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="var(--google-yellow)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="var(--google-red)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></span> ENTRAR CON GOOGLE</button>
         <div id="login-google-sub" class="login-sub" style="font-size: 9px; margin-top: 2px;">USA TU CUENTA CORPORATIVA DE GOOGLE</div>
         <div id="login-error-msg" class="login-error"></div>
     </div>
@@ -768,9 +797,9 @@
 <div class="container">
     <div class="top-bar no-print">
         <div class="top-bar-left">
-            <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">MODO TÉCNICO</button>
-            <span id="logged-user" class="leader-only" style="font-size: 10px; font-weight: bold; color: var(--primary); border: 1px solid var(--primary); padding: 0 10px; border-radius: 4px; background: #e0f2fe; display: none; align-items: center; height: 28px; box-sizing: border-box; margin: 0;"></span>
-            <button type="button" id="btn-logout" class="btn-danger-outline" onclick="logoutLeader()" style="width:28px; min-width:28px; padding:0; display:none; font-size:14px; flex:none;">✖</button>
+            <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">👤 USUARIO</button>
+            <span id="logged-user" class="leader-only" style="font-size: 10px; font-weight: bold; color: var(--primary); border: 1px solid var(--primary); padding: 0 10px; border-radius: var(--button-radius); background: var(--surface-soft); display: none; align-items: center; height: var(--button-height); box-sizing: border-box; margin: 0;"></span>
+            <button type="button" id="btn-logout" class="btn-danger-outline" onclick="logoutFull()" style="width:28px; min-width:28px; padding:0; display:none; font-size:14px; flex:none;">✖</button>
             <button class="btn-outline" onclick="window.print()" title="Imprimir" style="width:28px; min-width:28px; padding:0; font-size:14px; flex:none;">🖨️</button>
             <button type="button" id="btn-admin" class="btn-outline" onclick="openAdminModal()" title="Administrar usuarios autorizados" style="display:none; padding:0 10px; font-size:10px;">⚙ ADMIN</button>
         </div>
@@ -779,14 +808,14 @@
 
     <div class="view-controls no-print">
         <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 10px; font-weight: bold; color: var(--accent);">FECHA:</span>
-            <input type="date" id="global-date-select" onchange="changeDate()" style="font-weight: bold; border: 2px solid var(--accent); color: var(--accent); min-width: 130px;" title="Ver programación de otro día">
-            <button class="btn-danger-outline" onclick="goToToday()" style="padding: 0 10px; font-size: 9px;" title="Ir al día de hoy">📅 HOY</button>
+            <span style="font-size: 9px; font-weight: bold; color: var(--primary-light);">FECHA:</span>
+            <input type="date" id="global-date-select" onchange="changeDate()" style="font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light); min-width: 130px;" title="Ver programación de otro día">
+            <button class="btn-primary-light-outline" onclick="goToToday()" style="padding: 0 10px; font-size: 9px;" title="Ir al día de hoy">📅 HOY</button>
         </div>
 
         <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 10px; font-weight: bold; color: var(--accent);">TURNO:</span>
-            <select id="global-turno-select" onchange="changeTurno()" style="min-width: 100px; font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
+            <span style="font-size: 9px; font-weight: bold; color: var(--primary-light);">TURNO:</span>
+            <select id="global-turno-select" onchange="changeTurno()" style="min-width: 100px; font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light);">
                 <option value="Turno Día">DÍA</option>
                 <option value="Turno Tarde">TARDE</option>
                 <option value="Turno Noche">NOCHE</option>
@@ -795,7 +824,7 @@
         
         <div class="view-filters-wrap" style="display:flex; gap:8px; align-items:center;">
             <div style="display: flex; gap: 8px; align-items: center;">
-                <span style="font-size: 10px; font-weight: bold; color: var(--comment);">ORGANIZAR POR:</span>
+                <span style="font-size: 9px; font-weight: bold; color: var(--comment);">ORGANIZAR POR:</span>
                 <select id="view-mode-select" onchange="changeViewMode()" style="min-width: 130px;">
                     <option value="default">✈️ AVIÓN</option>
                     <option value="time">🕒 HORA DE INICIO</option>
@@ -804,7 +833,7 @@
                 </select>
             </div>
             <div style="display: flex; gap: 8px; align-items: center;">
-                <span style="font-size: 10px; font-weight: bold; color: var(--comment);">VER A:</span>
+                <span style="font-size: 9px; font-weight: bold; color: var(--comment);">VER A:</span>
                 <select id="local-tech-filter" onchange="applyLocalFilter()" style="min-width: 150px;">
                     <option value="">TODOS LOS TÉCNICOS</option>
                 </select>
@@ -839,14 +868,14 @@
         <div class="control-group leader-search-row">
             <span class="control-label">🔍 BUSCAR:</span>
             <input type="text" id="global-search-input" placeholder="🔍 BUSCAR SOLO ÚLTIMOS 30 DÍAS - TAREA, TANGO, WP, COMENTARIO..." style="flex:1;">
-            <button class="btn-outline" onclick="clearSearch()" style="padding: 0 10px; font-size: 14px; display:none; height:28px;" id="btn-clear-search">✖</button>
+            <button class="btn-outline" onclick="clearSearch()" style="padding: 0 10px; font-size: 14px; display:none; height:var(--button-height);" id="btn-clear-search">✖</button>
         </div>
-        <div id="search-results" class="leader-search-results" style="display:none; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: white; padding: 10px;"></div>
+        <div id="search-results" class="leader-search-results" style="display:none; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 10px;"></div>
         
         <div id="leader-add-buttons" class="leader-add-buttons leader-only no-print">
-            <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 10px; font-size: 10px; border-radius: 6px; height: auto;">✈️ AGREGAR AVIÓN</button>
-            <button class="btn-panel-secondary" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 10px; font-size: 10px; border-radius: 6px; height: auto;">⭐ AGREGAR ACTIVIDAD EXTRA</button>
-            <button class="btn-panel-secondary" onclick="openAddMessageModal()" style="flex: 1; min-width: 200px; padding: 10px; font-size: 10px; border-radius: 6px; height: auto;">💬 AGREGAR MENSAJE</button>
+            <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 0 12px; font-size: 11px; border-radius: var(--button-radius); height: var(--button-height);">✈️<span class="btn-txt">AGREGAR AVIÓN</span></button>
+            <button class="btn-accent" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 0 12px; font-size: 11px; border-radius: var(--button-radius); height: var(--button-height);">⭐<span class="btn-txt">AGREGAR ACTIVIDAD EXTRA</span></button>
+            <button class="btn-accent" onclick="openAddMessageModal()" style="flex: 1; min-width: 200px; padding: 0 12px; font-size: 11px; border-radius: var(--button-radius); height: var(--button-height);">💬<span class="btn-txt">AGREGAR MENSAJE</span></button>
         </div>
     </div>
 
@@ -869,9 +898,9 @@
 <div id="toast">✅ Acción realizada con éxito</div>
 
 <div id="confirm-modal" class="modal">
-    <div class="modal-content" style="max-width: 380px; text-align: center;">
-        <div class="modal-header" style="border:none; margin-bottom:10px; color:var(--leader-color);">⚠️ CONFIRMACIÓN</div>
-        <div id="confirm-message" style="margin-bottom: 25px; font-size: 12px; font-weight: bold; color: var(--primary);">¿ESTÁS SEGURO?</div>
+    <div class="modal-content" style="max-width: 380px;">
+        <div class="modal-header">⚠️ CONFIRMACIÓN</div>
+        <div id="confirm-message" style="margin-bottom: 25px; font-size: 12px; font-weight: bold; color: var(--primary); text-align: center;">¿ESTÁS SEGURO?</div>
         <div class="modal-footer" style="border:none; padding-top:0;">
             <button class="btn-outline btn-modal-action" onclick="closeConfirmModal()">CANCELAR</button>
             <button class="btn-leader btn-modal-action" id="confirm-yes-btn">CONFIRMAR</button>
@@ -881,7 +910,7 @@
 
 <div id="prompt-modal" class="modal">
     <div class="modal-content" style="max-width: 420px;">
-        <div class="modal-header" id="prompt-title" style="margin-bottom:15px; border:none; padding-bottom:0;">INGRESA LA NOTA</div>
+        <div class="modal-header" id="prompt-title">INGRESA LA NOTA</div>
         <input type="text" id="prompt-input" autocomplete="off" placeholder="Escribe aquí... (Dejar en blanco para borrar)">
         <div class="modal-footer">
             <button class="btn-outline btn-modal-action" onclick="closePromptModal()">CANCELAR</button>
@@ -892,7 +921,7 @@
 
 <div id="manage-shift-modal" class="modal">
     <div class="modal-content">
-        <div class="modal-header" style="color: var(--danger);">⚠️ ADMINISTRAR TURNO</div>
+        <div class="modal-header">⚠️ ADMINISTRAR TURNO</div>
         <div style="font-size: 11px; margin-bottom: 15px; color: var(--primary);">
             Puedes borrar por completo el turno actual (aviones, técnicos, y líder) o trasladar toda la programación a otra fecha y turno.
         </div>
@@ -900,8 +929,8 @@
         <div style="border: 1px solid var(--border); padding: 10px; border-radius: 6px; margin-bottom: 15px;">
             <strong style="font-size: 10px; color: var(--primary);">TRASLADAR PROGRAMACIÓN A:</strong>
             <div class="modal-row" style="margin-top: 8px;">
-                <input type="date" id="manage-shift-date" style="font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
-                <select id="manage-shift-turno" style="font-weight: bold; border: 2px solid var(--accent); color: var(--accent);">
+                <input type="date" id="manage-shift-date" style="font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light);">
+                <select id="manage-shift-turno" style="font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light);">
                     <option value="Turno Día">DÍA</option>
                     <option value="Turno Tarde">TARDE</option>
                     <option value="Turno Noche">NOCHE</option>
@@ -910,9 +939,9 @@
             <button class="btn-leader" style="width: 100%; margin-top: 8px;" onclick="moveShift()">➡️ TRASLADAR TODO</button>
         </div>
 
-        <div style="border: 1px solid var(--danger); padding: 10px; border-radius: 6px; background-color: #fff5f5;">
+        <div style="border: 1px solid var(--danger); padding: 10px; border-radius: 6px; background-color: var(--surface-red-soft);">
             <strong style="font-size: 10px; color: var(--danger);">BORRAR PROGRAMACIÓN:</strong>
-            <button class="btn-danger-outline" style="width: 100%; margin-top: 8px; background: var(--danger); color: white;" onclick="deleteEntireShift()">🗑️ BORRAR TURNO COMPLETO</button>
+            <button class="btn-danger-outline" style="width: 100%; margin-top: 8px; background: var(--danger); color: var(--surface);" onclick="deleteEntireShift()">🗑️ BORRAR TURNO COMPLETO</button>
         </div>
 
         <div class="modal-footer">
@@ -950,7 +979,7 @@
 
 <div id="add-activity-modal" class="modal">
     <div class="modal-content">
-        <div class="modal-header" style="color: var(--leader-color);">⭐ AGREGAR ACTIVIDAD EXTRA</div>
+        <div class="modal-header">⭐ AGREGAR ACTIVIDAD EXTRA</div>
         <input type="text" id="add-act-title" placeholder="TÍTULO (EJ: REUNIÓN, CURSO, INVENTARIO)">
         <div class="modal-row" style="display: flex; gap: 15px;">
             <div style="flex: 1; display: flex; flex-direction: column;">
@@ -1071,7 +1100,7 @@
 
 <div id="edit-activity-group-modal" class="modal">
     <div class="modal-content">
-        <div class="modal-header" style="color: var(--leader-color);">⭐ EDITAR ACTIVIDADES EXTRA</div>
+        <div class="modal-header">⭐ EDITAR ACTIVIDADES EXTRA</div>
         <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">TÍTULO DEL GRUPO:</div>
         <input type="text" id="edit-act-group-title" placeholder="⭐ ACTIVIDADES EXTRA">
         <div style="font-size: 10px; color: var(--comment); margin-bottom: 8px;">Se eliminarán todas las actividades extra del turno.</div>
@@ -1085,7 +1114,7 @@
 
 <div id="message-modal" class="modal">
     <div class="modal-content">
-        <div class="modal-header" style="color: var(--leader-color);">💬 MENSAJE PARA EL GRUPO</div>
+        <div class="modal-header">💬 MENSAJE PARA EL GRUPO</div>
         <textarea id="message-text" placeholder="ESCRIBE EL MENSAJE..." style="width:100%; height:60px; resize:none; text-transform: uppercase;"></textarea>
         <div style="font-size: 10px; font-weight: bold; color: var(--primary); margin-bottom: 4px;">POSICIÓN:</div>
         <select id="message-position" style="width:100%;">
@@ -1110,12 +1139,12 @@
         </div>
         <div style="font-size:10px; font-weight:bold; color:var(--primary); margin-bottom:6px;">COLOR:</div>
         <div id="message-color-select" style="display:flex; gap:8px; flex-wrap:wrap; margin-bottom:4px;">
-            <label class="color-swatch" style="--sw:#2A0087;"><input type="radio" name="msg-color" value="#2A0087"><span></span></label>
-            <label class="color-swatch" style="--sw:#D32F2F;"><input type="radio" name="msg-color" value="#D32F2F"><span></span></label>
-            <label class="color-swatch" style="--sw:#1976D2;"><input type="radio" name="msg-color" value="#1976D2"><span></span></label>
-            <label class="color-swatch" style="--sw:#2E7D32;"><input type="radio" name="msg-color" value="#2E7D32"><span></span></label>
-            <label class="color-swatch" style="--sw:#E65100;"><input type="radio" name="msg-color" value="#E65100"><span></span></label>
-            <label class="color-swatch" style="--sw:#6B5E8A;"><input type="radio" name="msg-color" value="#6B5E8A"><span></span></label>
+            <label class="color-swatch" style="--sw:var(--primary);"><input type="radio" name="msg-color" value="#2A0087"><span></span></label>
+            <label class="color-swatch" style="--sw:var(--red);"><input type="radio" name="msg-color" value="#D32F2F"><span></span></label>
+            <label class="color-swatch" style="--sw:var(--message-blue);"><input type="radio" name="msg-color" value="#1976D2"><span></span></label>
+            <label class="color-swatch" style="--sw:var(--message-green);"><input type="radio" name="msg-color" value="#2E7D32"><span></span></label>
+            <label class="color-swatch" style="--sw:var(--orange-alert-dark);"><input type="radio" name="msg-color" value="#E65100"><span></span></label>
+            <label class="color-swatch" style="--sw:var(--comment);"><input type="radio" name="msg-color" value="#6B5E8A"><span></span></label>
         </div>
         <div class="modal-footer">
             <button class="btn-danger-outline btn-modal-action" id="message-delete-btn" onclick="deleteMessageFromModal()" style="display:none;">ELIMINAR</button>
@@ -1130,16 +1159,13 @@
         <div class="modal-header admin-modal-header">⚙ ADMIN · USUARIOS AUTORIZADOS</div>
         <div class="admin-modal-layout">
             <div class="admin-side">
-                <div id="admin-login-toggle" class="admin-login-toggle">
-                    <span>🔒 INICIO DE SESIÓN</span>
-                    <button id="btn-login-obligatorio" class="btn-action-small" onclick="toggleLoginObligatorio()">🔓 DESACTIVADO</button>
-                </div>
                 <div class="admin-card">
                     <div class="admin-card-title">AGREGAR NUEVO USUARIO</div>
-                    <input type="text" id="admin-name" class="admin-field" placeholder="USUARIO · EJ: juan.perez" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
+                    <input type="text" id="admin-name" class="admin-field" placeholder="USUARIO · EJ: juan.perez@latam.cl" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <input type="text" id="admin-realname" class="admin-field" placeholder="NOMBRE REAL · EJ: JUAN PEREZ" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <div class="admin-role-grid">
                         <label class="admin-role-option"><input type="checkbox" id="admin-is-user" checked> USUARIO</label>
+                        <label class="admin-role-option"><input type="checkbox" id="admin-is-tech" checked> 🛠️ TÉCNICO</label>
                         <label class="admin-role-option"><input type="checkbox" id="admin-is-tl"> TL</label>
                         <label class="admin-role-option"><input type="checkbox" id="admin-is-admin"> ADMIN</label>
                     </div>
@@ -1160,7 +1186,7 @@
 
 <div id="manage-techs-modal" class="modal">
     <div class="modal-content">
-        <div class="modal-header" style="color: var(--leader-color);">👥 BASE GLOBAL DE TÉCNICOS</div>
+        <div class="modal-header">👥 BASE GLOBAL DE TÉCNICOS</div>
         <div style="font-size:10px; color:var(--comment); margin-bottom:12px;">
             Agrega o elimina nombres del listado de tecnicos.
         </div>
@@ -1183,7 +1209,7 @@
     // import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app-check.js";
     
     // Añadimos setPersistence y browserLocalPersistence como hicimos en el CRT
-    import { getAuth, signInAnonymously, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getAuth, GoogleAuthProvider, signInWithPopup, signOut, onAuthStateChanged, setPersistence, browserLocalPersistence } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
 
     // C4 CORREGIDO: Tu número real es 449926089536
     const firebaseConfig = {
@@ -1201,30 +1227,9 @@
     const db = getDatabase(app);
     const auth = getAuth(app);
 
-    // Pase temporal anónimo con persistencia local forzada (Solución F5)
-    let ensuringAuth = false;
-    async function ensureAuth() {
-        try { 
-            await setPersistence(auth, browserLocalPersistence); 
-        } catch (e) { 
-            console.error("Error al fijar persistencia:", e); 
-        }
-        
-        try { await auth.authStateReady(); } catch (e) {} // ESPERA la sesión guardada antes de decidir
-        
-        if (auth.currentUser || ensuringAuth) return;
-        ensuringAuth = true;
-        
-        try {
-            await signInAnonymously(auth);
-            console.log("Conectado a la Base de Datos de forma segura 🔒");
-        } catch (error) {
-            console.error("Error al obtener el pase de Firebase:", error);
-            setTimeout(ensureAuth, 10000);
-        }
-        ensuringAuth = false;
-    }
-    ensureAuth();
+    // El acceso es SIEMPRE con Google (obligatorio y permanente).
+    // Solo fijamos la persistencia para que la sesión de Google sobreviva a la recarga.
+    setPersistence(auth, browserLocalPersistence).catch(e => console.warn('Persistencia de sesión:', e));
 
     let correosAutorizados = [];
     let adminList = [];
@@ -1233,22 +1238,73 @@
     // SUPER ADMINS (gestionados directamente en Firebase, no en el código)
     const superAdminsRef = ref(db, 'mantenimiento/super_admin');
 
+    // La identidad es SIEMPRE el correo completo. Se aceptan también el alias sin
+    // dominio para no dejar fuera cuentas antiguas ni listas ya cargadas en Firebase.
+    function normalizeEmail(email) {
+        return (email || '').trim().toLowerCase();
+    }
+    function aliasCandidates(id) {
+        const n = normalizeEmail(id);
+        return n.includes('@') ? [n, n.split('@')[0]] : [n];
+    }
     function isSuperAdmin(name) {
-        return Array.isArray(superAdmins) ? superAdmins.includes(name) : Object.values(superAdmins||{}).includes(name);
+        if (!name) return false;
+        const lista = Array.isArray(superAdmins) ? superAdmins : Object.values(superAdmins||{});
+        const correo = normalizeEmail(name);
+        if (!correo.includes('@')) return false; // el super admin solo se reconoce por su correo completo, nunca por el alias
+        return lista.some(v => {
+            const superCorreo = normalizeEmail(v);
+            return superCorreo === correo || sanitizeKey(superCorreo) === sanitizeKey(correo);
+        });
     }
 
     // REGISTRO ÚNICO DE USUARIOS: acceso, roles y nombre real viven aquí.
     // ej en Firebase: hector_vargas: { u: "hector.vargas", nombre: "...", usuario: true, tl: false, admin: false }
+    let techUsers = [];
+    let uidLinked = false;   // el indice de uids solo se escribe una vez por carga
     let usuariosDB = {};
+    // Resuelve la clave del registro: correo completo y, si la cuenta viene del formato
+    // antiguo (guardada sin dominio), su alias. Evita que nadie quede fuera tras el cambio.
+    function sanitizeKey(k) {
+        return String(k).replace(/[.#$\[\]\/]/g, '_');
+    }
+    function userKeyFor(id) {
+        const n = normalizeEmail(id);
+        const alias = n.split('@')[0];
+        // las claves guardadas en firebase van sanitizadas: hay que probar ambas formas
+        const cands = (alias && alias !== n) ? [n, sanitizeKey(n), alias, sanitizeKey(alias)] : [n, sanitizeKey(n)];
+        return cands.find(k => usuariosDB[k]) || cands[0];
+    }
+    function displayNameFor(id) {
+        const rec = usuariosDB[userKeyFor(id)];
+        if (rec && rec.nombre) return rec.nombre.trim().toUpperCase();
+        return normalizeEmail(id).split('@')[0].replace(/[._]+/g, ' ').toUpperCase();
+    }
+    function updateUserButton() {
+        const btn = document.getElementById('btn-mode-toggle');
+        if (!btn) return;
+        const connected = sessionUser() || '';
+        const alias = displayNameFor(connected) || 'USUARIO';
+        const superAdmin = isSuperAdmin(connected);
+        if (isTeamLeader) {
+            btn.innerText = superAdmin ? `🛡️ ${alias}` : `👤 ${alias}`;
+            btn.title = `TEAM LEADER: ${alias}${superAdmin ? ' (SUPER ADMIN)' : ''}`;
+        } else {
+            btn.innerText = `👤 ${alias}`;
+            btn.title = connected ? `CONECTADO: ${alias}` : '';
+        }
+    }
     function userRec(user) {
-        if (!usuariosDB[user]) usuariosDB[user] = { nombre: '', usuario: false, tl: false, admin: false };
-        return usuariosDB[user];
+        const key = userKeyFor(user);
+        if (!usuariosDB[key]) usuariosDB[key] = { nombre: '', usuario: false, tech: false, tl: false, admin: false, uid: '', email: normalizeEmail(user) };
+        return usuariosDB[key];
     }
     function syncRoleArrays() {
+        techUsers = Object.keys(usuariosDB).filter(u => usuariosDB[u].tech);
         correosAutorizados = Object.keys(usuariosDB).filter(u => usuariosDB[u].tl);
         adminList = Object.keys(usuariosDB).filter(u => usuariosDB[u].admin);
     }
-    function saveUsuarios() {
+    function buildUsuarios() {
         const out = {};
         Object.keys(usuariosDB).sort().forEach(u => {
             const rec = usuariosDB[u];
@@ -1256,14 +1312,18 @@
                 u,
                 nombre: rec.nombre || '',
                 usuario: !!rec.usuario,
+                tech: !!rec.tech,
                 tl: !!rec.tl,
                 admin: !!rec.admin
             };
             if (rec.uid) item.uid = rec.uid;
             if (rec.email) item.email = rec.email;
-            out[u.replace(/\./g, '_')] = item;
+            out[sanitizeKey(u)] = item;
         });
-        dbSet(ref(db, 'mantenimiento/pd/usuarios'), out, 'GUARDAR USUARIOS');
+        return out;
+    }
+    function saveUsuarios() {
+        dbSet(ref(db, 'mantenimiento/pd/usuarios'), buildUsuarios(), 'GUARDAR USUARIOS');
     }
     const tlUsersRef = ref(db, 'mantenimiento/pd/usuarios');
 
@@ -1284,7 +1344,6 @@
             if(Array.isArray(v)) superAdmins = v;
             else if(v && typeof v==='object') superAdmins = Object.values(v);
             else superAdmins = [];
-            checkSession();
             updateAdminUI();
             refreshAdminListIfOpen();
             if (typeof evaluateGate === 'function') evaluateGate();
@@ -1294,15 +1353,22 @@
             usuariosLoaded = true;
         usuariosDB = {};
         const ingest = (name, e) => {
-            if (!name || isSuperAdmin(name)) return;
+            if (!name) return;
             if (typeof e === 'string') e = {};
-            usuariosDB[name] = {
+            const email = normalizeEmail(e.email || '');
+            const legacy = normalizeEmail(name);
+            const key = email || legacy;   // clave canónica = correo completo
+            if (isSuperAdmin(key)) return;
+            // Si el registro antiguo traía correo, su clave vieja se sustituye por la nueva
+            if (email && legacy !== email && usuariosDB[legacy]) delete usuariosDB[legacy];
+            usuariosDB[key] = {
                 nombre: e.nombre || '',
                 usuario: !!(e.usuario || e.acceso), // acceso = campo del formato anterior
+                tech: !!e.tech,
                 tl: !!e.tl,
                 admin: !!e.admin,
                 uid: e.uid || '',
-                email: e.email || ''
+                email: email
             };
         };
         if (Array.isArray(raw)) { // formato antiguo: lista de strings o de registros
@@ -1315,22 +1381,13 @@
             });
         }
         syncRoleArrays();
-        checkSession();
         updateAdminUI();
         refreshAdminListIfOpen();
         evaluateGate();
         }, (e) => console.warn('usuarios:', e.code)));
     }
-    // P4 FIX: Esperar a que Firebase restaure sesión antes de suscribir roles - evita carrera ensureAuth vs subscribe
+    // P4 FIX: Esperar a que Firebase restaure la sesión de Google antes de suscribir roles (evita decidir con permisos viejos)
     auth.authStateReady().then(()=> subscribeRoles()).catch(()=> subscribeRoles());
-
-    function isAuthorizedUser(name) {
-        return isSuperAdmin(name) || correosAutorizados.includes(name) || adminList.includes(name);
-    }
-
-    function extractUsername(email) {
-        return email.trim().toLowerCase().split('@')[0];
-    }
 
     let dbRefs = {};
     let unsubAviones, unsubTechs, unsubHeader;
@@ -1347,7 +1404,6 @@
     let editCurrentAvionId = null;
     let editCurrentTaskId = null;
     const MAINTENIX_URL = "https://maintenix.lan.com/maintenix/common/ToDoList.jsp";
-    const SESSION_EXPIRATION_MS = 12 * 60 * 60 * 1000;
 
     let currentViewMode = 'default';
     let currentTechFilter = localStorage.getItem('pd_ver_a_filter') || '';
@@ -1370,7 +1426,7 @@
     let activeTurno = localStorage.getItem('latam_active_turno') || 'Turno Día';
     let viewingDate = getLogicalTodayDate();
     let shiftState = { estado: 'abierto', cerradoPor: '' };
-    let myEmail = localStorage.getItem('tl_email') || '';
+    let myEmail = '';
     let localMutation = false;
 
     document.getElementById('global-turno-select').value = activeTurno;
@@ -1418,35 +1474,12 @@
     const globalTechsRef = ref(db, 'mantenimiento/pd/equipos/cabina/global_techs');
     const predefTasksRef = ref(db, 'mantenimiento/pd/equipos/cabina/predefined_task');
 
-    function checkSession() {
-        const savedEmail = localStorage.getItem('tl_email');
-        const loginTime = localStorage.getItem('tl_login_time');
-
-        if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS) {
-            
-            if (!usuariosLoaded) return; 
-
-            if (isAuthorizedUser(savedEmail)) {
-                activateLeaderUI();
-            } else {
-                logoutLeader();
-            }
-        } else {
-            logoutLeader();
-        }
-    }
-
     function activateLeaderUI() {
         isTeamLeader = true;
-        myEmail = localStorage.getItem('tl_email') || '';
         document.body.classList.add('team-leader-mode');
         
-        const connected = (typeof sessionUser === 'function' ? sessionUser() : null) || myEmail || localStorage.getItem('tl_email') || '';
-        const userAlias = (connected || '').toUpperCase() || 'TEAM LEADER';
-
         const btnToggle = document.getElementById('btn-mode-toggle');
-        btnToggle.innerText = isSuperAdmin(connected || myEmail) ? `🛡️ ${userAlias}` : `👤 ${userAlias}`;
-        btnToggle.title = userAlias ? `TEAM LEADER: ${userAlias}${isSuperAdmin(connected || myEmail) ? ' (SUPER ADMIN)' : ''}` : '';
+        updateUserButton();
         btnToggle.style.background = "";
         btnToggle.style.color = "";
         btnToggle.style.border = "";
@@ -1465,20 +1498,10 @@
 
     function deactivateLeaderUI() {
         isTeamLeader = false;
-        // mantener usuario visible incluso en modo técnico
-        const connected = (typeof sessionUser === 'function' ? sessionUser() : null) || myEmail || localStorage.getItem('tl_email') || '';
-        myEmail = '';
         document.body.classList.remove('team-leader-mode');
-        
+
         const btnToggle = document.getElementById('btn-mode-toggle');
-        if (connected) {
-            const alias = connected.toUpperCase();
-            btnToggle.innerText = `👤 ${alias}`;
-            btnToggle.title = `CONECTADO: ${alias}`;
-        } else {
-            btnToggle.innerText = "MODO TÉCNICO";
-            btnToggle.title = "";
-        }
+        updateUserButton();
         btnToggle.style.background = "";
         btnToggle.style.color = "";
         btnToggle.style.border = "";
@@ -1500,64 +1523,42 @@
             deactivateLeaderUI();
             return;
         }
-        // si ya hay sesión Google, respetar su rol (no pedir login de nuevo)
-        const gUser = (typeof sessionUser === 'function' ? sessionUser() : null);
-        if (gUser) {
-            if (isAuthorizedUser(gUser)) { activateLeaderUI(); return; }
-            return; // sin rol TL: botón sin acción, sin aviso
-        }
-        const savedEmail = localStorage.getItem('tl_email');
-        const loginTime = localStorage.getItem('tl_login_time');
-
-        if (savedEmail && loginTime && (Date.now() - parseInt(loginTime)) < SESSION_EXPIRATION_MS && isAuthorizedUser(savedEmail)) {
-            activateLeaderUI();
-            return;
-        }
-        if (loginObligatorio !== false) {
+        // La identidad viene solo de Google: si no hay sesión, se muestra la pantalla de login.
+        const u = sessionUser();
+        if (!u) {
             showToast('🔒 INICIO DE SESIÓN OBLIGATORIO: USA LA PANTALLA DE LOGIN');
             return;
         }
-        const email = prompt("🔒 ACCESO TEAM LEADER\nIngrese su correo corporativo autorizado:");
-        if (!email) return; 
-
-        const username = extractUsername(email);
-        
-        if (isAuthorizedUser(username)) {
-            localStorage.setItem('tl_email', username);
-            localStorage.setItem('tl_login_time', Date.now().toString());
-            myEmail = username;
-            activateLeaderUI();
-        } else {
-            showConfirm(`ACCESO DENEGADO.\n${email.trim().toLowerCase()} no está autorizado.`, null);
-        }
+        if (hasLeaderRole(u)) activateLeaderUI();
     }
 
-    function logoutLeader() {
-        localStorage.removeItem('tl_email');
-        localStorage.removeItem('tl_login_time');
-        deactivateLeaderUI();
-    }
-
-    // ─── CONTROL CENTRAL DE MODOS Y ARRANQUE ───
-    // null = aún cargando (pantalla de carga); false = modo libre; true = solo Google
-    let loginObligatorio = null;
+    // ─── CONTROL CENTRAL DE ARRANQUE ───
+    // El inicio de sesión con Google es obligatorio y permanente.
     let usuariosLoaded = false;
     let dataAttached = false;
     let splashHidden = false;
     let gateRolesTimer = null;
+    let sesionVigente = '';
     const staticUnsubs = [];
 
-    onValue(ref(db, 'mantenimiento/pd/login_obligatorio'), (snapshot) => {
-        loginObligatorio = !!snapshot.val();
-        evaluateGate();
-        refreshAdminListIfOpen();
-    }, (e) => console.warn('login_obligatorio:', e.code));
-
     onAuthStateChanged(auth, (user) => {
+        sesionVigente = (user && user.email) || '';
         subscribeRoles(); // nueva identidad → re-suscribir roles con permisos reales
-        if (!user) ensureAuth();
         evaluateGate();
     });
+    // La sesion de Google se comparte entre PD y CFR (mismo dominio). Esta app no recibe el aviso
+    // cuando el login o el logout ocurre en la otra, asi que al volver a enfocarla se compara.
+    // Aviso entre PD y CFR: localStorage dispara 'storage' en las OTRAS pestanas del mismo dominio,
+    // que es la unica via fiable (auth.currentUser queda congelado en memoria si la sesion cambia fuera).
+    const AVISO_SESION = 'aviso_sesion_compartida';
+    function avisarCambioSesion() { try { localStorage.setItem(AVISO_SESION, String(Date.now())); } catch (e) {} }
+    function sincronizarSesion() {
+        const actual = (auth.currentUser && auth.currentUser.email) || '';
+        if (actual !== sesionVigente) location.reload();
+    }
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) sincronizarSesion(); });
+    window.addEventListener('focus', sincronizarSesion);
+    window.addEventListener('storage', (e) => { if (e.key === AVISO_SESION) location.reload(); });
 
     function googleUser() {
         try {
@@ -1567,18 +1568,28 @@
         return null;
     }
     function sessionUser() {
-        // En modo obligatorio la identidad SOLO viene de Google (a prueba de suplantación)
+        // La identidad SOLO viene de Google y es el correo completo
         const g = googleUser();
-        return (g && g.email) ? extractUsername(g.email) : null;
+        return (g && g.email) ? normalizeEmail(g.email) : null;
     }
     function canLogin(u) {
         if (!u) return false;
         if (isSuperAdmin(u)) return true;
-        const rec = usuariosDB[u];
-        return !!(rec && (rec.usuario || rec.tl || rec.admin));
+        const rec = usuariosDB[userKeyFor(u)];
+        return !!(rec && (rec.usuario || rec.tech || rec.tl || rec.admin));
+    }
+    // Rol tecnico: puede trabajar (marcar tareas, etc). El rol 'usuario' es solo lectura.
+    function isTechRole(u) {
+        if (!u) return false;
+        if (isSuperAdmin(u)) return true;
+        const rec = usuariosDB[userKeyFor(u)] || {};
+        return !!(rec.tech || rec.tl || rec.admin);
     }
     function hasLeaderRole(u) {
-        return isSuperAdmin(u) || correosAutorizados.includes(u) || adminList.includes(u);
+        if (!u) return false;
+        if (isSuperAdmin(u)) return true;
+        const rec = usuariosDB[userKeyFor(u)] || {};
+        return !!rec.tl || !!rec.admin;
     }
 
     // ── Gestor de listeners de datos: conectados solo cuando hay acceso real ──
@@ -1630,21 +1641,9 @@
     function evaluateGate() {
         const overlay = document.getElementById('login-obligatorio');
         if (!overlay) return;
-        if (loginObligatorio === null) return; // pantalla de carga hasta conocer el modo
         const btnLogout = document.getElementById('btn-logout');
 
-        if (loginObligatorio === false) {
-            // ═══ MODO LIBRE: acceso a la antigua, sin Google ═══
-            overlay.style.display = 'none';
-            if (!auth.currentUser) ensureAuth();
-            attachData();
-            if (btnLogout) btnLogout.onclick = handleLogoutClick;
-            checkSession();
-            updateLoginToggleUI();
-            return; // la pantalla de carga se retira sola al llegar los primeros datos
-        }
-
-        // ═══ MODO INICIO DE SESIÓN OBLIGATORIO: solo cuenta Google verificada ═══
+        // ═══ INICIO DE SESIÓN CON GOOGLE OBLIGATORIO (único modo) ═══
         const u = sessionUser();
         if (u && !usuariosLoaded) {
             // roles aún cargando: espera breve y reintenta (sin parpadeos ni bloqueos falsos)
@@ -1654,21 +1653,21 @@
         if (gateRolesTimer) { clearTimeout(gateRolesTimer); gateRolesTimer = null; }
 
         if (u && canLogin(u)) {
+            // La sesion puede venir restaurada (compartida con la otra app) sin pasar por el boton:
+            // hay que asegurar el indice de uids o las reglas no dareian permisos.
+            const g = googleUser();
+            if (g && !uidLinked) { uidLinked = true; linkUid(g, u).catch(() => {}); }
             overlay.style.display = 'none';
             attachData();
+            myEmail = u;
             if (hasLeaderRole(u)) {
-                localStorage.setItem('tl_email', u);
-                localStorage.setItem('tl_login_time', Date.now().toString());
-                myEmail = u;
                 activateLeaderUI();
-            } else if (isTeamLeader) {
-                logoutLeader();
+            } else {
+                if (isTeamLeader) deactivateLeaderUI();
+                updateUserButton();
             }
             updateAdminUI();
-            if (btnLogout) {
-                btnLogout.style.display = 'inline-flex';
-                btnLogout.onclick = handleLogoutClick;
-            }
+            if (btnLogout) btnLogout.style.display = 'inline-flex';
             return; // la pantalla de carga se retira sola al llegar los primeros datos
         }
 
@@ -1678,10 +1677,7 @@
         const denied = !!u;
         document.getElementById('login-card-title').innerText = denied ? 'ACCESO NO AUTORIZADO' : 'PROGRAMACIÓN DIARIA';
         document.getElementById('login-error-msg').innerText = denied ? `${u.toUpperCase()} NO TIENE ACCESO HABILITADO` : '';
-        const sw = document.getElementById('login-switch-btn');
-        if (sw) sw.style.display = auth.currentUser ? 'block' : 'none';
         overlay.style.display = 'flex';
-        updateLoginToggleUI();
         hideSplash();
     }
     async function doGoogleLogin() {
@@ -1692,63 +1688,39 @@
             provider.setCustomParameters({ prompt: 'select_account' });
             const result = await signInWithPopup(auth, provider);
             err.innerText = 'VERIFICANDO PERMISOS...';
-            const email = ((result.user && result.user.email) || '').toLowerCase();
-            const username = extractUsername(email);
-            if (!username) throw new Error('SIN CORREO EN LA CUENTA GOOGLE');
-            await linkUid(result.user, username); // registra el uid si tiene acceso; la puerta decide tras recargar
+            const email = normalizeEmail(result.user && result.user.email);
+            if (!email || !email.includes('@')) throw new Error('SIN CORREO EN LA CUENTA GOOGLE');
+            await linkUid(result.user, email); // registra el uid si tiene acceso; la puerta decide tras recargar
+            avisarCambioSesion();
             location.reload();
         } catch (e) {
             err.innerText = 'NO SE PUDO INICIAR SESIÓN (' + (e.code || e.message) + '). INTENTA DE NUEVO.';
         }
     }
-    async function linkUid(fu, username) {
-        await dbSet(ref(db, 'mantenimiento/uids/' + fu.uid), username.replace(/\./g, '_'), 'REGISTRAR UID: PIDE QUE TE DEN USUARIO EN PANEL ADMIN'); // índice para reglas de seguridad
-        const rec = usuariosDB[username];
+    async function linkUid(fu, email) {
+        const correo = normalizeEmail(fu.email || email);
+        const key = userKeyFor(correo);
+        // el indice de las reglas debe apuntar siempre a la clave real del registro
+        await dbSet(ref(db, 'mantenimiento/uids/' + fu.uid), sanitizeKey(key), 'REGISTRAR UID: PIDE QUE TE DEN USUARIO EN PANEL ADMIN');
+        const rec = usuariosDB[key];
         if (!rec) return;
         let dirty = false;
         if (fu.uid && rec.uid !== fu.uid) { rec.uid = fu.uid; dirty = true; }
-        if (fu.email && rec.email !== fu.email.toLowerCase()) { rec.email = fu.email.toLowerCase(); dirty = true; }
-        if (dirty) await saveUsuarios();
+        if (rec.email !== correo) { rec.email = correo; dirty = true; }
+        if (dirty) {
+            // solo un admin puede escribir usuarios: si no lo es, el indice ya quedo listo
+            try { await set(ref(db, 'mantenimiento/pd/usuarios'), buildUsuarios()); } catch (e) {}
+        }
     }
     let loggingOut = false;
     async function logoutFull() {
         if (loggingOut) return; // ignora clics repetidos mientras se cierra
         loggingOut = true;
-        ['tl_email', 'tl_login_time', 'login_email', 'login_time'].forEach(k => localStorage.removeItem(k));
-        try { await signOut(auth); } catch (e) {} // ESPERA a que la sesión se cierre de verdad antes de recargar
+        try { await signOut(auth); } catch (e) {} // ESPERA a que la sesión de Google se cierre de verdad antes de recargar
         myEmail = '';
         deactivateLeaderUI();
+        avisarCambioSesion();
         location.reload(); // arranque limpio: pantalla de login + listeners nuevos
-    }
-    function handleLogoutClick() {
-        if (sessionUser() && loginObligatorio !== false) { logoutFull(); return; }
-        logoutLeader();
-    }
-    function toggleLoginObligatorio() {
-        if (!isAdminUser() || !isSuperAdmin(myEmail)) return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE CAMBIAR ESTO');
-        if (loginObligatorio === null) return showToast('⏳ ESPERA: CARGANDO ESTADO DEL INICIO DE SESIÓN...');
-        const nuevo = !loginObligatorio;
-        showConfirm(nuevo
-            ? '¿ACTIVAR INICIO DE SESIÓN OBLIGATORIO PARA TODOS? Nadie podrá ver la app sin iniciar sesión.'
-            : '¿DESACTIVAR EL INICIO DE SESIÓN OBLIGATORIO? Volverá al acceso libre como siempre.', () => {
-            loginObligatorio = nuevo; // cambio optimista: la UI reacciona al instante
-            updateLoginToggleUI();
-            evaluateGate();
-            set(ref(db, 'mantenimiento/pd/login_obligatorio'), nuevo)
-                .catch(() => showToast('⚠️ ERROR AL GUARDAR EL CAMBIO'));
-            showToast(nuevo ? '🔒 LOGIN OBLIGATORIO ACTIVADO' : '🔓 LOGIN OBLIGATORIO DESACTIVADO');
-        });
-    }
-    function updateLoginToggleUI() {
-        const sec = document.getElementById('admin-login-toggle');
-        if (!sec) return;
-        sec.style.display = isAdminUser() && isSuperAdmin(myEmail) ? 'flex' : 'none';
-        const b = document.getElementById('btn-login-obligatorio');
-        if (b) {
-            b.innerText = loginObligatorio === null ? '⏳ CARGANDO...' : (loginObligatorio ? '🔒 ACTIVADO' : '🔓 DESACTIVADO');
-            b.style.background = loginObligatorio ? 'var(--danger)' : '';
-            b.style.color = loginObligatorio ? 'white' : '';
-        }
     }
 
     // ─── PANEL ADMIN (SOLO PARA ADMINISTRADORES) ───
@@ -1781,7 +1753,7 @@
             console.error('FIREBASE WRITE ERROR', e);
             let msg = '⚠️ NO SE GUARDÓ' + (label ? ' (' + label + ')' : '') + ': ' + (e.code || e.message);
             if ((e.code || '').includes('permission')) {
-                msg = loginObligatorio && !googleUser()
+                msg = !googleUser()
                     ? '🔒 SIN PERMISO DE ESCRITURA: CIERRA SESIÓN Y ENTRA CON GOOGLE'
                     : '🔒 SIN PERMISO DE ESCRITURA (' + (e.code || '') + ')';
             }
@@ -1791,7 +1763,7 @@
 
     function readErr(err) {
         console.error('FIREBASE READ ERROR', err);
-        if ((err.code || '').includes('permission') && !auth.currentUser) ensureAuth(); // sesión caída: reintenta
+        if ((err.code || '').includes('permission') && !googleUser()) evaluateGate(); // sesión caída: vuelve a la puerta de Google
         toastThrottled('⚠️ SIN ACCESO DE LECTURA (' + err.code + ')');
     }
 
@@ -1806,24 +1778,38 @@
         document.getElementById('admin-realname').value = '';
         document.getElementById('admin-search').value = '';
         document.getElementById('admin-is-user').checked = true;
+        document.getElementById('admin-is-tech').checked = true;
         document.getElementById('admin-is-tl').checked = false;
         document.getElementById('admin-is-admin').checked = false;
         document.getElementById('admin-modal').style.display = 'block';
         refreshAdminList();
     }
 
-    function refreshAdminList() {
+        // Orden del panel: admin, TL, tecnico y despues solo lectura; dentro de cada grupo por nombre
+    function rangoUsuario(u) {
+        const r = usuariosDB[u] || {};
+        return r.admin ? 0 : r.tl ? 1 : r.tech ? 2 : r.usuario ? 3 : 4;
+    }
+    function ordenUsuarios(lista) {
+        return lista.slice().sort((a, b) => {
+            const d = rangoUsuario(a) - rangoUsuario(b);
+            if (d) return d;
+            const na = ((usuariosDB[a] || {}).nombre || a).toLowerCase();
+            const nb = ((usuariosDB[b] || {}).nombre || b).toLowerCase();
+            return na.localeCompare(nb) || a.localeCompare(b);
+        });
+    }
+function refreshAdminList() {
         const listEl = document.getElementById('admin-list');
         const q = (document.getElementById('admin-search')?.value || '').trim().toLowerCase();
         const all = new Set([...Object.keys(usuariosDB), ...correosAutorizados, ...adminList].filter(u => !isSuperAdmin(u)));
         if (all.size === 0) {
             listEl.innerHTML = '<div class="admin-empty">SIN USUARIOS AÚN</div>';
             updateAdminUI();
-            updateLoginToggleUI();
             return;
         }
         let html = '';
-        for (const user of Array.from(all).sort()) {
+        for (const user of ordenUsuarios(Array.from(all))) {
             if (!user) continue;
             const info = usuariosDB[user] || {};
             if (q && !user.toLowerCase().includes(q) && !(info.nombre || '').toLowerCase().includes(q)) continue;
@@ -1831,8 +1817,9 @@
             const isTl = correosAutorizados.includes(user);
             const isAdm = adminList.includes(user);
             const esUsuario = !!info.usuario;
+            const esTech = !!info.tech;
             const sinAcceso = !isTl && !isAdm && !esUsuario;
-            const userBadge = isAdm ? '<span class="admin-role-badge admin">ADMIN</span>' : '';
+            const userBadge = isAdm ? '<span class="admin-role-badge admin">ADMIN</span>' : (esTech ? '<span class="admin-role-badge tech">TÉCNICO</span>' : '');
             html += `<div class="admin-user-row ${sinAcceso ? 'no-access' : ''}">
                 <div class="admin-user-main">
                     <div class="admin-user-copy">
@@ -1842,7 +1829,8 @@
                     ${userBadge}
                 </div>
                 <div class="admin-user-actions">
-                    <button class="btn-action-small admin-user-action ${esUsuario ? 'active-user' : ''}" onclick="adminToggleUsuario('${user}')" title="Quitar/Dar acceso de usuario" aria-pressed="${esUsuario}">👤</button>
+                    <button class="btn-action-small admin-user-action ${esUsuario ? 'active-user' : ''}" onclick="adminToggleUsuario('${user}')" title="Quitar/Dar acceso (sin roles queda solo lectura)" aria-pressed="${esUsuario}">👤</button>
+                    <button class="btn-action-small admin-user-action ${esTech ? 'active-tech' : ''}" onclick="adminToggleTech('${user}')" title="Quitar/Dar rol de Técnico" aria-pressed="${esTech}">🛠️</button>
                     <button class="btn-action-small admin-user-action ${isTl ? 'active-tl' : ''}" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" aria-pressed="${isTl}">TL</button>
                     <button class="btn-action-small admin-user-action admin-action-wide ${isAdm ? 'active-admin' : ''}" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" aria-pressed="${isAdm}">ADMIN</button>
                     <button class="btn-action-small admin-user-action" onclick="adminEditNombre('${user}')" title="Editar nombre real">✎</button>
@@ -1852,30 +1840,35 @@
         }
             listEl.innerHTML = html || '<div class="admin-empty">SIN COINCIDENCIAS PARA LA BÚSQUEDA</div>';
             updateAdminUI();
-            updateLoginToggleUI();
         }
 
     function adminAddUser() {
         if (!isAdminUser()) return;
-        const name = extractUsername(document.getElementById('admin-name').value);
-        if (!name) return showConfirm("INGRESE EL NOMBRE DEL USUARIO (EJ: juan.perez).", null);
+        const name = normalizeEmail(document.getElementById('admin-name').value);
+        if (!name) return showConfirm("INGRESE EL CORREO DEL USUARIO (EJ: juan.perez@latam.cl).", null);
+        if (!name.includes('@')) return showConfirm("INGRESE EL CORREO COMPLETO, INCLUYENDO EL DOMINIO (EJ: juan.perez@latam.cl).", null);
         if (isSuperAdmin(name)) return showToast('⚠️ ESE USUARIO YA ES SUPER ADMIN');
         const asUser = document.getElementById('admin-is-user').checked;
+        const asTech = document.getElementById('admin-is-tech').checked;
         const asTl = document.getElementById('admin-is-tl').checked;
         const asAdmin = document.getElementById('admin-is-admin').checked;
-        if (!asUser && !asTl && !asAdmin) return showConfirm("SELECCIONE AL MENOS UN ROL (👤, TL O ADMIN).", null);
-        const prev = usuariosDB[name] || {};
+        if (!asUser && !asTech && !asTl && !asAdmin) return showConfirm("SELECCIONE AL MENOS UN ROL (👤, 🛠️, TL O ADMIN).", null);
+        const key = userKeyFor(name);
+        const prev = usuariosDB[key] || {};
         const yaEsUsuario = !!prev.usuario;
+        const yaEsTech = !!prev.tech;
         const alreadyTl = !!prev.tl;
         const alreadyAdm = !!prev.admin;
-        if ((!asUser || yaEsUsuario) && (!asTl || alreadyTl) && (!asAdmin || alreadyAdm)) return showConfirm("EL USUARIO YA TIENE ESOS ROLES.", null);
-        userRec(name);
+        if ((!asUser || yaEsUsuario) && (!asTech || yaEsTech) && (!asTl || alreadyTl) && (!asAdmin || alreadyAdm)) return showConfirm("EL USUARIO YA TIENE ESOS ROLES.", null);
+        const rec = userRec(name);
+        rec.email = name;
         const nombreReal = document.getElementById('admin-realname').value.trim();
-        if (nombreReal && !usuariosDB[name].nombre) usuariosDB[name].nombre = nombreReal;
-        // TL/ADMIN implican usuario
-        if (asUser || asTl || asAdmin) usuariosDB[name].usuario = true;
-        if (asTl) usuariosDB[name].tl = true;
-        if (asAdmin) usuariosDB[name].admin = true;
+        if (nombreReal && !rec.nombre) rec.nombre = nombreReal;
+        // Ver el sistema exige 'usuario'; trabajar exige 'tecnico'
+        if (asUser || asTech || asTl || asAdmin) rec.usuario = true;
+        if (asTech || asTl || asAdmin) rec.tech = true;
+        if (asTl) rec.tl = true;
+        if (asAdmin) rec.admin = true;
         syncRoleArrays();
         document.getElementById('admin-name').value = '';
         document.getElementById('admin-realname').value = '';
@@ -1884,21 +1877,26 @@
         saveUsuarios();
     }
 
+        // Jerarquia de roles: usuario < tecnico < TL < admin.
+    // Activar un rol activa todos los inferiores; quitarlo arrastra a los superiores que lo necesitan.
+    const ROLES_ORDEN = ['usuario', 'tech', 'tl', 'admin'];
+    function activarRol(rec, rol) {
+        for (const r of ROLES_ORDEN) { if (r === rol) break; rec[r] = true; }
+        rec[rol] = true;
+    }
+    function quitarRol(rec, rol) {
+        const i = ROLES_ORDEN.indexOf(rol);
+        for (let k = i; k < ROLES_ORDEN.length; k++) rec[ROLES_ORDEN[k]] = false;
+    }
     function adminToggleUsuario(user) {
         if (!isAdminUser()) return;
         if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
         const rec = userRec(user);
         const nuevoEstado = !rec.usuario;
-        rec.usuario = nuevoEstado;
-        let quitoRoles = false;
-        if (!nuevoEstado && (rec.tl || rec.admin)) {
-            rec.tl = false;
-            rec.admin = false;
-            quitoRoles = true;
-        }
+        if (nuevoEstado) activarRol(rec, 'usuario'); else quitarRol(rec, 'usuario');
         syncRoleArrays();
         refreshAdminList();
-        showToast(nuevoEstado ? `✅ USUARIO ACTIVADO: ${user.toUpperCase()}` : quitoRoles ? `⚠️ ${user.toUpperCase()} SE QUEDÓ SIN NINGÚN ACCESO` : `⚠️ ACCESO DE USUARIO QUITADO A ${user.toUpperCase()}`);
+        showToast(nuevoEstado ? `✅ ACCESO ACTIVADO: ${user.toUpperCase()}` : `⚠️ ${user.toUpperCase()} SE QUEDÓ SIN NINGÚN ACCESO`);
         saveUsuarios();
     }
 
@@ -1912,29 +1910,44 @@
         }, 'GUARDAR NOMBRE', 'EJ: JUAN PEREZ');
     }
 
-    function adminToggleTl(user) {
+        function adminToggleTech(user) {
         if (!isAdminUser()) return;
         if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
         const rec = userRec(user);
-        const isTl = !!rec.tl;
-        rec.tl = !isTl;
-        if (!isTl) rec.usuario = true; // TL implica usuario
+        const nuevoEstado = !rec.tech;
+        const teniaSuperior = !!(rec.tl || rec.admin);
+        if (nuevoEstado) activarRol(rec, 'tech'); else quitarRol(rec, 'tech');
         syncRoleArrays();
         refreshAdminList();
-        showToast(isTl ? `⚠️ TL QUITADO A ${user.toUpperCase()}` : `✅ TL OTORGADO: ${user.toUpperCase()}`);
+        showToast(nuevoEstado ? `✅ ROL TÉCNICO ASIGNADO A ${user.toUpperCase()}`
+            : teniaSuperior ? `⚠️ SE QUITARON TÉCNICO, TL Y ADMIN A ${user.toUpperCase()}`
+            : `⚠️ ROL TÉCNICO QUITADO A ${user.toUpperCase()}: QUEDA SOLO LECTURA`);
+        saveUsuarios();
+    }
+        function adminToggleTl(user) {
+        if (!isAdminUser()) return;
+        if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
+        const rec = userRec(user);
+        const nuevoEstado = !rec.tl;
+        const teniaAdmin = !!rec.admin;
+        if (nuevoEstado) activarRol(rec, 'tl'); else quitarRol(rec, 'tl');
+        syncRoleArrays();
+        refreshAdminList();
+        showToast(nuevoEstado ? `✅ TL OTORGADO A ${user.toUpperCase()}`
+            : teniaAdmin ? `⚠️ SE QUITARON TL Y ADMIN A ${user.toUpperCase()}`
+            : `⚠️ TL QUITADO A ${user.toUpperCase()}`);
         saveUsuarios();
     }
 
-    function adminToggleAdmin(user) {
+        function adminToggleAdmin(user) {
         if (!isAdminUser()) return;
         if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
         const rec = userRec(user);
-        const isAdm = !!rec.admin;
-        rec.admin = !isAdm;
-        if (!isAdm) rec.usuario = true; // ADMIN implica usuario
+        const nuevoEstado = !rec.admin;
+        if (nuevoEstado) activarRol(rec, 'admin'); else quitarRol(rec, 'admin');
         syncRoleArrays();
         refreshAdminList();
-        showToast(isAdm ? `⚠️ ADMIN QUITADO A ${user.toUpperCase()}` : `✅ ADMIN OTORGADO: ${user.toUpperCase()}`);
+        showToast(nuevoEstado ? `✅ ADMIN OTORGADO A ${user.toUpperCase()}` : `⚠️ ADMIN QUITADO A ${user.toUpperCase()}`);
         saveUsuarios();
     }
 
@@ -2048,7 +2061,7 @@
                         const [aId, tId] = id.split(':');
                         const el = document.querySelector(`.task-item[data-avion-id="${aId}"][data-task-id="${tId}"]`);
                         if (el) {
-                            el.style.backgroundColor = '#fca5a5';
+                            el.style.backgroundColor = 'var(--animation-red)';
                             el.style.opacity = '1';
                             setTimeout(() => {
                                 el.style.backgroundColor = '';
@@ -2078,17 +2091,17 @@
             // Reconstituimos de forma segura la zona horaria dividiendo el string para que se renderice localmente sin desplazarse por defecto al UTC
             const partesFecha = viewingDate.split('-');
             const displayDateObj = new Date(partesFecha[0], partesFecha[1] - 1, partesFecha[2]);
-            let fechaDisplay = displayDateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase();
+            let fechaDisplay = displayDateObj.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).toUpperCase().replace(/\sDE\s(\d{4})$/, ' DEL $1');
             const fechaCorta = `${partesFecha[2]}/${partesFecha[1]}/${partesFecha[0].slice(2)}`;
             
-            const turnoInfo = `${turno.toUpperCase()} <span style="color:var(--accent);">|</span> ${fechaDisplay}`;
-            const jefeInfo = data.jefe ? `TL: ${data.jefe}` : '';
-            const lockInfo = shiftState.estado === 'cerrado' ? `<span class="no-print" style="color:var(--danger); font-weight:700;">🔒 TURNO CERRADO POR ${shiftState.cerradoPor.toUpperCase()}</span>` : '';
+            const turnoInfo = `<span class="header-main"><span class="header-turno">${turno.toUpperCase()}</span><span class="header-divider">|</span><span class="header-date">${fechaDisplay}</span></span>`;
+            const jefeInfo = data.jefe ? `TL · ${escapeHtml(data.jefe)}` : '';
+            const lockInfo = shiftState.estado === 'cerrado' ? `<span class="header-lock no-print">🔒 TURNO CERRADO POR ${escapeHtml(shiftState.cerradoPor.toUpperCase())}</span>` : '';
 
             document.getElementById('display-header').innerHTML = `
                 <span>${turnoInfo}</span>
-                ${jefeInfo ? `<span style="color: var(--leader-color); font-size: 0.82em; font-weight: 700;">${jefeInfo}</span>` : ''}
-                ${lockInfo ? `<span style="font-size: 0.76em;">${lockInfo}</span>` : ''}
+                ${jefeInfo ? `<span class="header-team-lead">${jefeInfo}</span>` : ''}
+                ${lockInfo}
             `;
             document.title = `${turno.toUpperCase()} - ${fechaCorta}`;
             
@@ -2110,7 +2123,7 @@
                     if (shiftState.cerradoPor === myEmail) {
                         btnLock.querySelector('.btn-lbl').innerText = "ABRIR TURNO";
                         btnLock.style.backgroundColor = "var(--help)";
-                        btnLock.style.color = "white";
+                        btnLock.style.color = "var(--surface)";
                         btnLock.style.border = "none";
                         btnLock.style.display = "inline-flex";
                     } else {
@@ -2222,7 +2235,7 @@
             globalTechs.forEach((tech, index) => {
                 container.innerHTML += `
                     <div class="tech-pill">
-                        <span class="tech-name">${tech}</span>
+                        <span class="tech-name">${escapeHtml(tech)}</span>
                         <span class="tech-remove" onclick="removeGlobalTech(${index})" title="Eliminar de la Base">✖</span>
                     </div>
                 `;
@@ -2362,7 +2375,7 @@
             const idle = !assigned.has(tech);
             const pill = document.createElement('div'); pill.className = 'tech-pill' + (idle ? ' tech-idle' : '');
             if (idle) pill.title = `${tech} · SIN TAREAS ASIGNADAS EN ESTE TURNO`;
-            pill.innerHTML = `<span class="tech-name">${tech}</span> <span class="tech-remove" onclick="removeTech(${index})" title="Eliminar">✖</span>`;
+            pill.innerHTML = `<span class="tech-name">${escapeHtml(tech)}</span> <span class="tech-remove" onclick="removeTech(${index})" title="Eliminar">✖</span>`;
             container.appendChild(pill);
         });
     }
@@ -2376,7 +2389,7 @@
         select.innerHTML = '<option value="">TODOS LOS TÉCNICOS</option>';
         shiftTechs.forEach(tech => {
             const selected = tech === currentTechFilter ? 'selected' : '';
-            select.innerHTML += `<option value="${tech}" ${selected}>${tech}</option>`;
+            select.innerHTML += `<option value="${escapeAttr(tech)}" ${selected}>${escapeHtml(tech)}</option>`;
         });
     }
 
@@ -2510,11 +2523,14 @@
             : '';
         
         const locked = isShiftLockedForMe();
-        const toggleClick = locked ? "" : `onclick="toggleTask(${avion.id}, ${t.id})"`;
-        const toggleCursor = locked ? "cursor: default; opacity: 0.6;" : "";
+        const esTecnico = isTechRole(sessionUser());   // el rol 'usuario' es solo lectura: no ve estos controles
+        const puedeOperar = !locked && esTecnico;
+        const toggleClick = puedeOperar ? `onclick="toggleTask(${avion.id}, ${t.id})"` : "";
+        const toggleCursor = puedeOperar ? "" : "cursor: default; opacity: 0.6;";
+        const toggleHtml = esTecnico ? `<div class="status-toggle no-print" ${toggleClick} style="${toggleCursor}">✓</div>` : '';
 
         let actionButtonsHtml = '';
-        if (!locked) {
+        if (!locked && esTecnico) {
             actionButtonsHtml = `
                 <button class="action-btn ${t.atencion ? (t.alertaByTL ? 'active-alerta-tl' : 'active-alerta-tech') : ''}" onclick="toggleAtencion(${avion.id}, ${t.id})">⚠️</button>
                 <div class="leader-only leader-wrapper">
@@ -2529,7 +2545,7 @@
 
         return `
             <div class="task-item ${t.done ? 'completed' : ''} ${t.atencion ? (t.alertaByTL ? 'alerta-tl' : 'alerta-tech') : ''}" data-avion-id="${avion.id}" data-task-id="${t.id}">
-                <div class="status-toggle no-print" ${toggleClick} style="${toggleCursor}">✓</div>
+                ${toggleHtml}
                 <div class="task-main">
                     <div class="task-info">
                         <div class="task-desc">${planePrefix}${activityTime}${cleanDesc}${tangoDisplay} ${atencionLabel}</div>
@@ -2697,9 +2713,9 @@
             if (!locked) {
                 avionActionBtns = `
                     <div class="leader-only leader-wrapper">
-                        <button class="action-btn btn-highlight" onclick="openAddTaskModal(${avion.id})">➕ TAREA</button>
-                        <button class="action-btn btn-highlight" onclick="openPredefModal(${avion.id})" style="background-color: #ffffff; border-color: #cbd5e0;" title="Agregar Tareas Predefinidas / Preventivas">📑 PREDEF.</button>
-                        <button class="action-btn btn-action-small" onclick="openEditAvionModal(${avion.id})">✏️ EDITAR</button>
+                        <button class="avion-btn" onclick="openAddTaskModal(${avion.id})">➕ TAREA</button>
+                        <button class="avion-btn" onclick="openPredefModal(${avion.id})" title="Agregar Tareas Predefinidas / Preventivas">📑 PREDEF.</button>
+                        <button class="avion-btn" onclick="openEditAvionModal(${avion.id})">✏️ EDITAR</button>
                     </div>
                 `;
             }
@@ -2707,10 +2723,10 @@
             let html = `
                 <div class="avion-title ${headerClass}">
                     <div class="avion-info-main">
-                        <span class="avion-identity">• ${escapeHtml(avion.reg)}</span> ${wpDisplay} ${posDisplay} ${timesDisplay}
+                        <span class="avion-reg">• ${escapeHtml(avion.reg)} ${wpDisplay}</span> ${posDisplay} ${timesDisplay}
                         ${avion.comment ? `<span class="avion-comment">NOTA: ${escapeHtml(avion.comment)}</span>` : ''}
                     </div>
-                    <div class="action-bar avion-bar no-print">
+                    <div class="avion-actions no-print">
                         ${avionActionBtns}
                         ${allowOrder ? `<span class="drag-handle leader-only no-print" onpointerdown="startOrderDrag(event, 'avion', ${avion.id})" oncontextmenu="event.preventDefault(); return false;" title="Sostener y arrastrar para ordenar">⋮⋮</span>` : ''}
                     </div>
@@ -2743,12 +2759,12 @@
             let gHtml = `
                 <div class="avion-title activity-header">
                     <div class="avion-info-main">
-                        <span class="avion-identity">${actividadGrupoTitulo}</span>
+                        <span>${actividadGrupoTitulo}</span>
                     </div>
-                    <div class="action-bar avion-bar no-print">
+                    <div class="avion-actions no-print">
                         ${!locked ? `<div class="leader-only leader-wrapper">
-                            <button class="action-btn btn-highlight" onclick="openAddActivityModal()">➕ ACTIVIDAD</button>
-                            <button class="action-btn btn-action-small" onclick="openEditActivityGroupModal()">✏️ EDITAR</button>
+                            <button class="avion-btn" onclick="openAddActivityModal()">➕ ACTIVIDAD</button>
+                            <button class="avion-btn" onclick="openEditActivityGroupModal()">✏️ EDITAR</button>
                         </div>` : ''}
                     </div>
                 </div>
@@ -2782,7 +2798,7 @@
         const el = document.querySelector(`.task-item[data-avion-id="${aId}"][data-task-id="${tId}"]`);
         let delay = 100;
         if (el) {
-            el.style.backgroundColor = '#fca5a5';
+            el.style.backgroundColor = 'var(--animation-red)';
             el.style.opacity = '1';
             el.classList.remove('completed');
             setTimeout(() => {
@@ -2813,7 +2829,7 @@
         const el = document.querySelector(`.task-item[data-avion-id="${aId}"][data-task-id="${tId}"]`);
         let delay = 100;
         if (el) {
-            el.style.backgroundColor = '#fca5a5';
+            el.style.backgroundColor = 'var(--animation-red)';
             el.style.opacity = '1';
             setTimeout(() => {
                 el.classList.remove('completed');
@@ -3106,8 +3122,8 @@
                 const idleTitle = idle ? ' title="SIN TAREAS EN ESTE TURNO · LIBRE"' : '';
                 container.innerHTML += `
                     <label class="tech-checkbox-label${idleClass}"${idleTitle}>
-                        <input type="checkbox" class="${containerId}-cb" value="${tech}" ${isChecked}>
-                        <span>${tech}</span>
+                        <input type="checkbox" class="${containerId}-cb" value="${escapeAttr(tech)}" ${isChecked}>
+                        <span>${escapeHtml(tech)}</span>
                     </label>`;
             });
         }
@@ -3159,7 +3175,7 @@
         }
         predefTasks.forEach((desc, index) => {
             container.innerHTML += `
-                <div class="tech-pill" style="justify-content: space-between; display: flex; width: 100%; box-sizing: border-box; background: white;">
+                <div class="tech-pill" style="justify-content: space-between; display: flex; width: 100%; box-sizing: border-box; background: var(--surface);">
                     <span class="tech-name" onclick="addExistingPredef(${index})" style="flex:1; padding: 6px; cursor: pointer;" title="Haz clic para añadir esta tarea al avión">➕ ${desc}</span>
                     <span class="tech-remove" onclick="removePredefTask(${index})" style="padding: 6px;" title="Eliminar definitivamente de la Base Global">✖</span>
                 </div>
@@ -3532,6 +3548,7 @@
         d.textContent = str;
         return d.innerHTML;
     }
+    function escapeAttr(str) { return escapeHtml(str).replace(/"/g, '&quot;').replace(/'/g, '&#39;'); }
 
     function highlightText(text, query) {
         return escapeHtml(text);
@@ -3647,7 +3664,7 @@
                         <div class="search-result-avion"><span class="ra-icon">✈️</span> ${escapeHtml(avionTitle)}</div>
                         <div class="search-result-match" style="flex-direction:column;gap:3px;">`;
                     if (r.avion.wp) {
-                        html += `<div><span class="srm-type type-wp">WP</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(r.avion.wp)}')" style="color:#EE1750;">${r._wp ? highlightText(`[${escapeHtml(r.avion.wp)}]`, query) : `[${escapeHtml(r.avion.wp)}]`}</span></div>`;
+                        html += `<div><span class="srm-type type-wp">WP</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(r.avion.wp)}')" style="color:var(--accent);">${r._wp ? highlightText(`[${escapeHtml(r.avion.wp)}]`, query) : `[${escapeHtml(r.avion.wp)}]`}</span></div>`;
                     }
                     if (r.avion.comment) {
                         html += `<div><span class="srm-type type-nota">NOTA</span> ${r._comm ? highlightText(r.avion.comment, query) : `<span style="color:var(--comment);">${escapeHtml(r.avion.comment)}</span>`}</div>`;
@@ -3660,7 +3677,7 @@
                         <div class="search-result-avion"><span class="ra-icon">✈️</span> ${escapeHtml(avionTitle)}</div>
                         <div class="search-result-match" style="flex-direction:column;gap:3px;">`;
                     if (g.avion.wp) {
-                        html += `<div><span class="srm-type type-wp">WP</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(g.avion.wp)}')" style="color:#EE1750;">[${escapeHtml(g.avion.wp)}]</span></div>`;
+                        html += `<div><span class="srm-type type-wp">WP</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(g.avion.wp)}')" style="color:var(--accent);">[${escapeHtml(g.avion.wp)}]</span></div>`;
                     }
                     if (g.avion.comment) {
                         html += `<div><span class="srm-type type-nota">NOTA</span> <span style="color:var(--comment);">${escapeHtml(g.avion.comment)}</span></div>`;
@@ -3678,16 +3695,16 @@
                     html += `<div class="search-result-item${altClass}">
                         <div class="search-result-match" style="flex-direction:column;gap:3px;padding-left:14px;">`;
                     if (task.desc) {
-                        const tangoTag = task.tango ? `<span class="tango-link" onclick="handleTangoClick('${escapeHtml(task.tango)}')" style="${tTango ? 'color:#2A0087;' : 'color:var(--comment);'}">[${escapeHtml(task.tango)}]</span> ` : '';
+                        const tangoTag = task.tango ? `<span class="tango-link" onclick="handleTangoClick('${escapeHtml(task.tango)}')" style="${tTango ? 'color:var(--primary);' : 'color:var(--comment);'}">[${escapeHtml(task.tango)}]</span> ` : '';
                         html += `<div><span class="srm-type type-tarea">TAREA</span> ${tangoTag}${tDesc ? highlightText(task.desc, query) : `<span style="color:var(--comment);">${escapeHtml(task.desc)}</span>`}</div>`;
                     } else if (task.tango) {
-                        html += `<div><span class="srm-type type-tarea">TAREA</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(task.tango)}')" style="${tTango ? 'color:#2A0087;' : 'color:var(--comment);'}">[${escapeHtml(task.tango)}]</span></div>`;
+                        html += `<div><span class="srm-type type-tarea">TAREA</span> <span class="tango-link" onclick="handleTangoClick('${escapeHtml(task.tango)}')" style="${tTango ? 'color:var(--primary);' : 'color:var(--comment);'}">[${escapeHtml(task.tango)}]</span></div>`;
                     }
                     if (task.comment) {
                         html += `<div><span class="srm-type type-nota">NOTA</span> ${tComm ? highlightText(task.comment, query) : `<span style="color:var(--comment);">${escapeHtml(task.comment)}</span>`}</div>`;
                     }
                     if (task.techs) {
-                        html += `<div style="color:#6B5E8A;padding-left:0;">👨‍🔧 ${tTech ? highlightText(task.techs, query) : escapeHtml(task.techs)}</div>`;
+                        html += `<div style="color:var(--comment);padding-left:0;">👨‍🔧 ${tTech ? highlightText(task.techs, query) : escapeHtml(task.techs)}</div>`;
                     }
                     html += `</div></div>`;
                 }
@@ -3731,7 +3748,7 @@
         }
     });
     Object.assign(window, {
-        updateHeader, addTech, removeTech, toggleMode, logoutLeader,
+        updateHeader, addTech, removeTech, toggleMode,
         formatMatricula, autoFormatTango, handleTangoClick, closeModal,
         toggleTask, toggleAtencion,
         openAddAvionModal, saveAddAvion, openAddActivityModal, saveAddActivity, 
@@ -3748,7 +3765,7 @@
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
         openAdminModal, adminAddUser, adminToggleTl, adminToggleAdmin, adminRemoveUser,
         adminToggleUsuario, adminEditNombre, refreshAdminList,
-        doGoogleLogin, toggleLoginObligatorio, logoutFull
+        doGoogleLogin, logoutFull
     });
 
 </script>
