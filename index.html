@@ -104,6 +104,18 @@
 
         .top-bar-left { display: flex; gap: 5px; }
 
+        /* Selector de equipo (barra superior) */
+        .team-switcher {
+            display: none; align-items: center; gap: 5px; height: var(--button-height);
+            background: var(--surface); border: 1px solid var(--primary);
+            border-radius: var(--button-radius); padding: 0 6px 0 8px; box-sizing: border-box;
+        }
+        select.team-select {
+            border: none !important; background: transparent !important; box-shadow: none !important;
+            height: auto; padding: 0 16px 0 2px; margin: 0; font-size: 10px; font-weight: 800;
+            color: var(--primary); max-width: 150px; min-width: 90px; flex: 1;
+        }
+
         /* Reloj Inteligente (Mejorado) */
         .live-clock {
             display: flex; gap: 6px; font-size: 10px; font-weight: normal;
@@ -422,7 +434,8 @@
         .action-btn.active-alerta-tech { background: var(--orange-alert); color: var(--surface); border-color: var(--orange-alert-dark); }
 
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: color-mix(in srgb, var(--slate-900) 60%, transparent); backdrop-filter: blur(4px); }
-        #confirm-modal, #prompt-modal { z-index: 1050; }
+        /* por encima del panel admin (1000) y del modal de equipos (1200) */
+        #confirm-modal, #prompt-modal { z-index: 1400; }
         
         .modal-content {
             background-color: var(--surface); margin: 6% auto; padding: 20px;
@@ -496,8 +509,57 @@
         .admin-user-action.active-tl { background: var(--comment); border-color: var(--comment); color: var(--surface); }
         .admin-user-action.active-admin { background: var(--danger); border-color: var(--danger); color: var(--surface); }
         .admin-user-action.delete-user:hover { background: var(--danger); border-color: var(--danger); color: var(--surface); }
+        .admin-team-grid { display: flex; gap: 3px; margin-top: 5px; flex-wrap: wrap; }
+        .admin-team-btn {
+            width: 22px; min-width: 22px; height: var(--button-height-admin) !important; padding: 0;
+            border-radius: var(--button-radius); font-size: 9px; background: var(--surface);
+            border: 1px solid var(--border); color: var(--comment);
+        }
+        .admin-team-btn.active { background: var(--success); border-color: var(--success); color: var(--surface); }
         .admin-modal-footer { justify-content: flex-end; margin: 0; padding: 8px 10px; background: var(--surface-soft); border-top: 1px solid var(--border-soft); }
         .admin-modal-footer button { height: var(--button-height); padding: 0 14px; border-radius: var(--button-radius); font-size: 9px; }
+
+        /* ── PESTANAS DEL PANEL ADMIN ── */
+        /* selector de equipo del panel admin */
+        .admin-team-bar { display: flex; align-items: center; gap: 7px; padding: 8px 10px; background: var(--surface-soft); border-bottom: 1px solid var(--border-soft); flex-wrap: wrap; }
+        .admin-team-bar label { font-size: 9px; font-weight: 800; color: var(--comment); }
+        select.admin-team-select {
+            height: 28px; border: 1px solid var(--primary); border-radius: 6px; padding: 0 8px;
+            font-size: 10px; font-weight: 800; color: var(--primary); background: var(--surface); min-width: 170px;
+        }
+        .admin-team-bar .team-note { margin: 0; }
+        .admin-search-row { display: flex; gap: 5px; align-items: center; }
+        .admin-search-row .admin-search { flex: 1; min-width: 0; }
+        .admin-search-row .team-btn { flex: 0 0 auto; }
+        .admin-team-nombre { display: none; font-size: 11px; font-weight: 800; color: var(--primary); padding: 0 4px; }
+        .admin-new-team-inline { display: inline-flex; gap: 4px; align-items: center; flex-wrap: wrap; }
+        .admin-new-team-inline input { height: 26px; font-size: 10px; border: 1px solid var(--border); border-radius: 6px; padding: 0 7px; background: var(--surface); color: var(--text); width: 130px; }
+        .admin-existente { border-color: var(--success) !important; }
+        .admin-sugerencia-ok { color: var(--success); }
+        .admin-sugerencia-aviso { color: var(--danger); }
+
+        /* ── TARJETA DE EQUIPO ── */
+        .team-card { border: 1px solid var(--border-soft); border-radius: 10px; padding: 9px 10px; margin-bottom: 8px; background: var(--surface); }
+        .team-card.off { opacity: .62; background: var(--surface-soft); }
+        .team-card-head { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; }
+        .team-card-ico { font-size: 17px; line-height: 1; }
+        .team-card-name { font-size: 12px; font-weight: 800; color: var(--primary); }
+        .team-card-id { font-size: 8px; color: var(--comment); }
+        .team-card-input { height: 26px; border: 1px solid var(--border); border-radius: 6px; padding: 0 7px; font-size: 10px; flex: 1; min-width: 120px; background: var(--surface); color: var(--text); }
+        .team-btn { height: 26px; padding: 0 9px; border-radius: 6px; font-size: 9px; font-weight: 800; border: 1px solid var(--border); background: var(--surface); color: var(--text); cursor: pointer; }
+        .team-btn:hover { border-color: var(--primary); color: var(--primary); }
+        .team-btn.on { background: var(--success); border-color: var(--success); color: var(--surface); }
+        .team-btn.warn.on { background: var(--danger); border-color: var(--danger); }
+        .team-members { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 7px; }
+        .team-member {
+            display: inline-flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 700;
+            padding: 3px 6px; border-radius: 20px; background: var(--surface-soft);
+            border: 1px solid var(--border-soft); color: var(--text);
+        }
+        .team-member button { border: 0; background: transparent; color: var(--danger); font-size: 10px; cursor: pointer; padding: 0; line-height: 1; }
+        .team-member.locked { opacity: .8; }
+        .team-add-row { display: flex; gap: 5px; margin-top: 7px; }
+        .team-note { font-size: 8px; color: var(--comment); margin-top: 6px; line-height: 1.4; }
 
         /* AJUSTES PARA CELULARES */
         @media (max-width: 900px) {
@@ -799,6 +861,9 @@
         <div class="top-bar-left">
             <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">👤 USUARIO</button>
             <span id="logged-user" class="leader-only" style="font-size: 10px; font-weight: bold; color: var(--primary); border: 1px solid var(--primary); padding: 0 10px; border-radius: var(--button-radius); background: var(--surface-soft); display: none; align-items: center; height: var(--button-height); box-sizing: border-box; margin: 0;"></span>
+            <div id="team-switcher" class="team-switcher">
+                <select id="team-select" class="team-select" onchange="switchTeam(this.value)" title="Equipo que estás viendo"></select>
+            </div>
             <button type="button" id="btn-logout" class="btn-danger-outline" onclick="logoutFull()" style="width:28px; min-width:28px; padding:0; display:none; font-size:14px; flex:none;">✖</button>
             <button class="btn-outline" onclick="window.print()" title="Imprimir" style="width:28px; min-width:28px; padding:0; font-size:14px; flex:none;">🖨️</button>
             <button type="button" id="btn-admin" class="btn-outline" onclick="openAdminModal()" title="Administrar usuarios autorizados" style="display:none; padding:0 10px; font-size:10px;">⚙ ADMIN</button>
@@ -1156,30 +1221,57 @@
 
 <div id="admin-modal" class="modal">
     <div class="modal-content admin-modal-content">
-        <div class="modal-header admin-modal-header">⚙ ADMIN · USUARIOS AUTORIZADOS</div>
+        <div class="modal-header admin-modal-header">⚙ PANEL ADMIN</div>
+        <div class="admin-team-bar">
+            <label for="admin-team-select">EQUIPO:</label>
+            <select id="admin-team-select" class="admin-team-select" onchange="adminCambiaEquipoPanel(this.value)"></select>
+            <span class="admin-team-nombre" id="admin-team-nombre"></span>
+            <button class="team-btn" id="admin-team-rename" onclick="adminRenombrarEquipoSeleccion()" title="CAMBIAR EL NOMBRE DEL EQUIPO">✎</button>
+            <button class="team-btn warn" id="admin-team-activo" onclick="adminAlternarEquipoSeleccion()" title="ACTIVAR / DESACTIVAR EL EQUIPO">ACTIVO</button>
+            <span class="team-note" id="admin-team-nota"></span>
+            <span id="admin-new-team-box" class="admin-new-team-inline"></span>
+        </div>
         <div class="admin-modal-layout">
             <div class="admin-side">
                 <div class="admin-card">
-                    <div class="admin-card-title">AGREGAR NUEVO USUARIO</div>
-                    <input type="text" id="admin-name" class="admin-field" placeholder="USUARIO · EJ: juan.perez@latam.cl" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
+                    <div class="admin-card-title">AGREGAR USUARIO AL EQUIPO</div>
+                    <input type="text" id="admin-name" class="admin-field" list="admin-sugerencias" placeholder="USUARIO · EJ: juan.perez@latam.cl" autocomplete="off" oninput="adminSugerir()" onkeypress="if(event.key === 'Enter') adminAddUser()">
+                    <datalist id="admin-sugerencias"></datalist>
+                    <div class="team-note" id="admin-sugerencia-nota"></div>
                     <input type="text" id="admin-realname" class="admin-field" placeholder="NOMBRE REAL · EJ: JUAN PEREZ" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <div class="admin-role-grid">
                         <label class="admin-role-option"><input type="checkbox" id="admin-is-user" checked> USUARIO</label>
-                        <label class="admin-role-option"><input type="checkbox" id="admin-is-tech" checked> 🛠️ TÉCNICO</label>
+                        <label class="admin-role-option"><input type="checkbox" id="admin-is-tech" checked> TÉCNICO</label>
                         <label class="admin-role-option"><input type="checkbox" id="admin-is-tl"> TL</label>
                         <label class="admin-role-option"><input type="checkbox" id="admin-is-admin"> ADMIN</label>
                     </div>
+                    <div class="admin-card-title" style="margin-top: 7px;">EQUIPO:</div>
+                    <div class="admin-team-grid" id="admin-new-teams"></div>
                 </div>
-                <button class="btn-leader admin-add-button" onclick="adminAddUser()">AGREGAR USUARIO</button>
+                <button class="btn-leader admin-add-button" onclick="adminAddUser()">AGREGAR AL EQUIPO</button>
             </div>
             <div class="admin-list-panel">
-                <div class="admin-list-title">USUARIOS DEL SISTEMA</div>
-                <input type="text" id="admin-search" class="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE REAL..." autocomplete="off" oninput="refreshAdminList()">
+                <div class="admin-list-title" id="admin-list-title">USUARIOS</div>
+                <div class="admin-search-row">
+                    <input type="text" id="admin-search" class="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE REAL..." autocomplete="off" oninput="refreshAdminList()">
+                    <button class="team-btn" id="admin-filtro-equipo" onclick="adminAlternarFiltroEquipo()" title="MOSTRAR SOLO LOS USUARIOS DE ESTE EQUIPO">SOLO ESTE EQUIPO</button>
+                </div>
                 <div id="admin-list" class="admin-user-list"></div>
             </div>
         </div>
         <div class="modal-footer admin-modal-footer">
             <button class="btn-outline" onclick="closeModal('admin-modal')">CERRAR</button>
+        </div>
+    </div>
+</div>
+
+<div id="team-modal" class="modal" style="z-index: 1200;">
+    <div class="modal-content" style="max-width: 430px;">
+        <div class="modal-header">EQUIPOS DE <span id="team-modal-user">USUARIO</span></div>
+        <div class="admin-team-grid" id="team-modal-list" style="gap: 6px;"></div>
+        <p style="font-size: 9px; color: var(--comment); margin: 12px 0 0;">Solo aparecen los equipos que administras. Toca uno para agregarlo o quitarlo. Para entrar a otro equipo, un admin de ese equipo debe agregarte.</p>
+        <div class="modal-footer">
+            <button class="btn-outline btn-modal-action" onclick="closeModal('team-modal')">CERRAR</button>
         </div>
     </div>
 </div>
@@ -1258,8 +1350,9 @@
         });
     }
 
-    // REGISTRO ÚNICO DE USUARIOS: acceso, roles y nombre real viven aquí.
-    // ej en Firebase: hector_vargas: { u: "hector.vargas", nombre: "...", usuario: true, tl: false, admin: false }
+    // REGISTRO ÚNICO DE USUARIOS. Los roles son POR EQUIPO:
+    //   pd/usuarios/<correo>/{ email, roles: { <equipo>: { nombre, usuario, tech, tl, admin } } }
+    // Un admin solo puede escribir roles/<equipo> de los equipos que administra.
     let techUsers = [];
     let uidLinked = false;   // el indice de uids solo se escribe una vez por carga
     let usuariosDB = {};
@@ -1296,34 +1389,229 @@
     }
     function userRec(user) {
         const key = userKeyFor(user);
-        if (!usuariosDB[key]) usuariosDB[key] = { nombre: '', usuario: false, tech: false, tl: false, admin: false, uid: '', email: normalizeEmail(user) };
+        if (!usuariosDB[key]) usuariosDB[key] = { email: normalizeEmail(user), roles: {} };
         return usuariosDB[key];
     }
-    function syncRoleArrays() {
-        techUsers = Object.keys(usuariosDB).filter(u => usuariosDB[u].tech);
-        correosAutorizados = Object.keys(usuariosDB).filter(u => usuariosDB[u].tl);
-        adminList = Object.keys(usuariosDB).filter(u => usuariosDB[u].admin);
+    // Rol del usuario dentro de un equipo concreto (por defecto, el que se está viendo)
+    function rolDe(user, rol, team) {
+        const rec = usuariosDB[userKeyFor(user)];
+        const r = rec && rec.roles && rec.roles[team || currentTeam];
+        return !!(r && r[rol]);
     }
-    function buildUsuarios() {
-        const out = {};
-        Object.keys(usuariosDB).sort().forEach(u => {
-            const rec = usuariosDB[u];
-            const item = {
-                u,
-                nombre: rec.nombre || '',
-                usuario: !!rec.usuario,
-                tech: !!rec.tech,
-                tl: !!rec.tl,
-                admin: !!rec.admin
-            };
-            if (rec.uid) item.uid = rec.uid;
-            if (rec.email) item.email = rec.email;
-            out[sanitizeKey(u)] = item;
+    function rolesDe(user, team) {
+        const rec = usuariosDB[userKeyFor(user)];
+        return (rec && rec.roles && rec.roles[team || currentTeam]) || null;
+    }
+    // El nombre real es UNO por usuario, vive junto al email (no se duplica por equipo)
+    function nombreDe(user, team) {
+        const rec = usuariosDB[userKeyFor(user)];
+        if (rec && rec.nombre) return rec.nombre;
+        const r = rolesDe(user, team);          // formato anterior: el nombre venia en el rol
+        if (r && r.nombre) return r.nombre;
+        return (rec && rec.email) || user;
+    }
+    // Crea (si hace falta) el registro de roles de un usuario en un equipo
+    function rolRec(user, team) {
+        const rec = userRec(user);
+        if (!rec.roles) rec.roles = {};
+        if (!rec.roles[team]) rec.roles[team] = { usuario: true, tech: false, tl: false, admin: false };
+        return rec.roles[team];
+    }
+    // Un usuario cuenta si tiene algún rol en ALGUN equipo (para poder entrar)
+    function tieneAlgunRol(user) {
+        const rec = usuariosDB[userKeyFor(user)];
+        if (!rec || !rec.roles) return false;
+        return Object.keys(rec.roles).some(t => {
+            const r = rec.roles[t];
+            return r && (r.usuario || r.tech || r.tl || r.admin);
         });
-        return out;
     }
-    function saveUsuarios() {
-        dbSet(ref(db, 'mantenimiento/pd/usuarios'), buildUsuarios(), 'GUARDAR USUARIOS');
+
+    // ─── MULTI-EQUIPOS (solo PD) ──────────────────────────────────────────────
+    //   pd/equipos/<equipo>/{nombre, orden, activo}            ficha del equipo
+    //   pd/datos/<equipo>/{global_techs,predefined_task,historial}
+    //   pd/usuarios/<correo>/roles/<equipo>/{nombre,usuario,tech,tl,admin}
+    // La pertenencia y los roles son la MISMA cosa: estar en roles/<equipo>.
+    const EQUIPO_DEFECTO = 'cabina';
+    const LS_EQUIPO = 'pd_equipo_activo';
+    let equiposCatalogo = {};     // -> pd/equipos
+    let currentTeam = null;       // equipo que se esta viendo ahora
+
+    function sanitizeTeamId(id) { return String(id || '').replace(/[.#$\[\]\/]/g, '_').trim(); }
+    function equipoNombre(id) { const e = equiposCatalogo[id]; return (e && e.nombre) || String(id || '').toUpperCase(); }
+    function equipoOrden(id) { const e = equiposCatalogo[id]; return (e && typeof e.orden === 'number') ? e.orden : 99; }
+    // Sin campo "activo" se considera activo (equipos creados antes de esta version)
+    function equipoActivo(id) { const e = equiposCatalogo[id]; return !e || e.activo !== false; }
+    function ordenarEquipos(lista) {
+        return lista.slice().sort((a, b) => (equipoOrden(a) - equipoOrden(b)) || String(a).localeCompare(String(b)));
+    }
+    // Equipos del usuario = equipos donde tiene registro de roles.
+    // Sin ninguno = usuario antiguo -> CABINA.
+    function equiposDeUsuario(user) {
+        if (isSuperAdmin(user)) {
+            const todos = allTeams();
+            return todos.length ? todos : [EQUIPO_DEFECTO];
+        }
+        const rec = (user && usuariosDB[userKeyFor(user)]) || {};
+        let ids = Object.keys(rec.roles || {}).filter(t => rolesDe(user, t) && (rolesDe(user, t).usuario || rolesDe(user, t).tech || rolesDe(user, t).tl || rolesDe(user, t).admin));
+        if (!ids.length) ids = [EQUIPO_DEFECTO];
+        const existentes = allTeams();
+        const filtrados = existentes.length ? ids.filter(t => existentes.indexOf(t) !== -1) : ids;
+        return ordenarEquipos(filtrados.length ? filtrados : [EQUIPO_DEFECTO]);
+    }
+    // Catalogo completo de equipos (los de la BD + los que aun no estan en la ficha)
+    function allTeams() {
+        const s = new Set(Object.keys(equiposCatalogo));
+        Object.keys(usuariosDB).forEach(u => Object.keys((usuariosDB[u] && usuariosDB[u].roles) || {}).forEach(t => s.add(t)));
+        return ordenarEquipos(Array.from(s));
+    }
+    // Equipos donde TENGO el rol de ADMIN (no basta con pertenecer a ellos).
+    // Incluye los desactivados, para poder volver a activarlos. El super admin: todos.
+    function equiposDondeSoyAdmin(user) {
+        const u = user || sessionUser();
+        if (isSuperAdmin(u)) return allTeams();
+        const rec = (u && usuariosDB[userKeyFor(u)]) || {};
+        const mios = Object.keys(rec.roles || {}).filter(t => { const r = rec.roles[t]; return r && r.admin; });
+        return ordenarEquipos(mios);
+    }
+    // ¿Tengo el rol de admin en ese equipo concreto?
+    function soyAdminDe(user, team) {
+        if (!team) return false;
+        const u = user || sessionUser();
+        if (!u) return false;
+        if (isSuperAdmin(u)) return true;
+        return !!rolDe(u, 'admin', team);
+    }
+    // Permiso real de gestion sobre un equipo: ser admin de ESE equipo (o super admin).
+    // No depende del equipo que se este viendo, ni de ser miembro de otros equipos.
+    function puedoGestionarEquipo(team) {
+        if (!team) return false;
+        return soyAdminDe(sessionUser(), team);
+    }
+    function datosPath() { return 'mantenimiento/pd/datos/' + (currentTeam || EQUIPO_DEFECTO); }
+    function rolesPath(user, team) {
+        return 'mantenimiento/pd/usuarios/' + sanitizeKey(userKeyFor(user)) + '/roles/' + sanitizeTeamId(team || currentTeam);
+    }
+    function esMiembroDe(user, team) {
+        const rec = (user && usuariosDB[userKeyFor(user)]) || {};
+        return !!(rec.roles && rec.roles[team]);
+    }
+    // Usuarios que tienen roles en ese equipo
+    function usuariosDeEquipo(team) {
+        return Object.keys(usuariosDB).filter(u => {
+            const r = rolesDe(u, team);
+            return !!(r && (r.usuario || r.tech || r.tl || r.admin));
+        }).sort();
+    }
+    function resolveCurrentTeam() {
+        const mis = equiposDeUsuario(sessionUser()).filter(t => equipoActivo(t));
+        const lista = mis.length ? mis : [EQUIPO_DEFECTO];
+        if (currentTeam && lista.indexOf(currentTeam) !== -1) return currentTeam;
+        const guardado = localStorage.getItem(LS_EQUIPO);
+        currentTeam = (guardado && lista.indexOf(guardado) !== -1) ? guardado : lista[0];
+        return currentTeam;
+    }
+    function renderTeamSwitcher() {
+        const wrap = document.getElementById('team-switcher');
+        const sel = document.getElementById('team-select');
+        if (!wrap || !sel) return;
+        const mis = equiposDeUsuario(sessionUser()).filter(t => equipoActivo(t));
+        if (mis.length > 1) {
+            sel.innerHTML = mis.map(id => `<option value="${escapeAttr(id)}"${id === currentTeam ? ' selected' : ''}>${escapeHtml(equipoNombre(id))}</option>`).join('');
+            wrap.style.display = 'flex';
+            wrap.title = 'EQUIPO QUE ESTÁS VIENDO: ' + equipoNombre(currentTeam);
+        } else {
+            sel.innerHTML = '';
+            wrap.style.display = 'none';
+        }
+    }
+    function updateTeamSwitcher() { resolveCurrentTeam(); renderTeamSwitcher(); }
+    // Si al recargar los roles el usuario perdio el equipo que estaba viendo,
+    // hay que cambiar de equipo Y volver a suscribir los datos del nuevo.
+    function updateTeamSwitcherYRecargar() {
+        const antes = currentTeam;
+        updateTeamSwitcher();
+        if (currentTeam !== antes && dataAttached) { detachData(); attachData(); }
+    }
+    function switchTeam(id) {
+        if (!id || id === currentTeam) return;
+        if (!equipoActivo(id)) return showToast('⚠️ EQUIPO DESACTIVADO');
+        currentTeam = id;
+        localStorage.setItem(LS_EQUIPO, id);
+        avisarCambioSesion();                       // CFR recarga y se queda en su propio equipo
+        searchCache = null;
+        if (typeof clearSearch === 'function') { try { clearSearch(); } catch (e) {} }
+        // Los roles son por equipo: hay que recalcular SIEMPRE el estado de lider/admin.
+        // Si en un equipo es técnico y en otro es admin, al cambiar debe aparecer el botón.
+        syncRoleArrays();
+        if (hasLeaderRole(sessionUser())) activateLeaderUI();
+        else { if (isTeamLeader) deactivateLeaderUI(); updateUserButton(); }
+        // cerrar sesión depende de la sesión, no del rol del equipo
+        const btnSalir = document.getElementById('btn-logout');
+        if (btnSalir && sessionUser()) btnSalir.style.display = 'inline-flex';
+        updateAdminUI();
+        if (dataAttached) { detachData(); attachData(); }
+        else renderTeamSwitcher();
+        showToast('EQUIPO: ' + equipoNombre(id).toUpperCase());
+    }
+
+    // Los roles se miran SIEMPRE dentro del equipo que se está viendo.
+    function syncRoleArrays() {
+        const t = currentTeam || EQUIPO_DEFECTO;
+        techUsers = Object.keys(usuariosDB).filter(u => rolDe(u, 'tech', t));
+        correosAutorizados = Object.keys(usuariosDB).filter(u => rolDe(u, 'tl', t));
+        adminList = Object.keys(usuariosDB).filter(u => rolDe(u, 'admin', t));
+    }
+    // Escritura de un usuario: ruta por ruta, porque las reglas dan permisos por equipo.
+    // roles/<equipo> solo lo puede escribir un admin de ese equipo (o el super admin).
+    // autorizado: si ya se comprobó el permiso ANTES de tocar el estado local.
+    // Hace falta para que un admin pueda quitarse a sí mismo el rol de admin: si se
+    // comprobará después de mutar, el permiso ya aparecería como perdido.
+    function guardarRol(user, team, rolRecData, autorizado, previo) {
+        if (autorizado === undefined ? !puedoGestionarEquipo(team) : !autorizado) {
+            showToast('⚠️ NO PUEDES GESTIONAR EL EQUIPO ' + String(equipoNombre(team)).toUpperCase());
+            return Promise.resolve(false);
+        }
+        return set(ref(db, rolesPath(user, team)), rolRecData)
+            .then(() => {
+                const rec = userRec(user);
+                rec.roles[team] = rolRecData;
+                syncRoleArrays();
+                updateTeamSwitcher();
+                refreshAdminListIfOpen();
+                renderAdminTeamBar();     // si el usuario se quitó el admin, su lista cambia
+                renderNewTeamsGrid();
+                updateAdminUI();
+                return true;
+            })
+            .catch((e) => {
+                console.error('FIREBASE WRITE ERROR', e);
+                // si falló, se restaura lo que había: la pantalla no puede mostrar un
+                // cambio que no se guardó (y el super admin podría dejarlo sin permisos)
+                if (previo) { const rec = userRec(user); rec.roles[team] = previo; }
+                syncRoleArrays();
+                updateAdminUI();
+                updateTeamSwitcher();
+                refreshAdminListIfOpen();
+                renderAdminTeamBar();
+                showToast('⚠️ NO SE GUARDÓ EL ROL EN ' + String(equipoNombre(team)).toUpperCase() +
+                          (e.code ? ' (' + e.code + ')' : '') + '. Tienes que ser admin de ese equipo.');
+                return false;
+            });
+    }
+    // El nombre real se escribe en pd/usuarios/<correo>/nombre (junto al email)
+    function guardarNombre(user, nombre) {
+        const key = sanitizeKey(userKeyFor(user));
+        const rec = usuariosDB[key] || {};
+        rec.nombre = nombre || '';
+        return set(ref(db, 'mantenimiento/pd/usuarios/' + key + '/nombre'), nombre || '')
+            .catch((e) => { console.warn('nombre no guardado:', e && e.code); });
+    }
+    function guardarEmail(user) {
+        const key = sanitizeKey(userKeyFor(user));
+        const rec = usuariosDB[key] || {};
+        return set(ref(db, 'mantenimiento/pd/usuarios/' + key + '/email'), rec.email || normalizeEmail(user))
+            .catch((e) => { console.warn('email no guardado:', e && e.code); });
     }
     const tlUsersRef = ref(db, 'mantenimiento/pd/usuarios');
 
@@ -1361,15 +1649,26 @@
             if (isSuperAdmin(key)) return;
             // Si el registro antiguo traía correo, su clave vieja se sustituye por la nueva
             if (email && legacy !== email && usuariosDB[legacy]) delete usuariosDB[legacy];
-            usuariosDB[key] = {
-                nombre: e.nombre || '',
-                usuario: !!(e.usuario || e.acceso), // acceso = campo del formato anterior
-                tech: !!e.tech,
-                tl: !!e.tl,
-                admin: !!e.admin,
-                uid: e.uid || '',
-                email: email
-            };
+            // Roles POR EQUIPO: { <equipo>: { usuario, tech, tl, admin } }. El nombre
+            // real es uno solo por usuario y va junto al email.
+            const roles = {};
+            let nombre = e.nombre || '';
+            if (e.roles && typeof e.roles === 'object') {
+                Object.keys(e.roles).forEach(t => {
+                    const r = e.roles[t] || {};
+                    // el nombre ya no se duplica por equipo: si viene aqui es formato anterior
+                    if (!nombre && r.nombre) nombre = r.nombre;
+                    roles[t] = { usuario: !!r.usuario, tech: !!r.tech, tl: !!r.tl, admin: !!r.admin };
+                });
+            } else {
+                // formato antiguo (roles sueltos, sin equipo): secea como CABINA
+                roles[EQUIPO_DEFECTO] = {
+                    nombre: e.nombre || '',
+                    usuario: !!(e.usuario || e.acceso), // acceso = campo del formato anterior
+                    tech: !!e.tech, tl: !!e.tl, admin: !!e.admin
+                };
+            }
+            usuariosDB[key] = { email: email, nombre: nombre, roles: roles };
         };
         if (Array.isArray(raw)) { // formato antiguo: lista de strings o de registros
             raw.filter(Boolean).forEach(e => ingest(typeof e === 'string' ? e : e.u, e));
@@ -1381,6 +1680,7 @@
             });
         }
         syncRoleArrays();
+        updateTeamSwitcherYRecargar();
         updateAdminUI();
         refreshAdminListIfOpen();
         evaluateGate();
@@ -1471,8 +1771,10 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    const globalTechsRef = ref(db, 'mantenimiento/pd/equipos/cabina/global_techs');
-    const predefTasksRef = ref(db, 'mantenimiento/pd/equipos/cabina/predefined_task');
+    // Las referencias dependen del equipo activo: se crean al suscribirse.
+    const equiposRef = ref(db, 'mantenimiento/pd/equipos');
+    const globalTechsRef = () => ref(db, datosPath() + '/global_techs');
+    const predefTasksRef = () => ref(db, datosPath() + '/predefined_task');
 
     function activateLeaderUI() {
         isTeamLeader = true;
@@ -1507,9 +1809,8 @@
         btnToggle.style.border = "";
         btnToggle.classList.remove('btn-mode-leader');
         
-        const btnLogout = document.getElementById('btn-logout');
-        if (btnLogout) btnLogout.style.display = 'none';
-        
+        // OJO: el botón de cerrar sesión NO se oculta aquí. Depende de la sesión, no del
+        // rol: se puede ser técnico en un equipo y aun así necesitar cerrar sesión.
         const loggedUserSpan = document.getElementById('logged-user');
         if (loggedUserSpan) loggedUserSpan.style.display = 'none';
         
@@ -1572,36 +1873,43 @@
         const g = googleUser();
         return (g && g.email) ? normalizeEmail(g.email) : null;
     }
+    // Para entrar basta con tener un rol en ALGUN equipo
     function canLogin(u) {
         if (!u) return false;
         if (isSuperAdmin(u)) return true;
-        const rec = usuariosDB[userKeyFor(u)];
-        return !!(rec && (rec.usuario || rec.tech || rec.tl || rec.admin));
+        return tieneAlgunRol(u);
     }
     // Rol tecnico: puede trabajar (marcar tareas, etc). El rol 'usuario' es solo lectura.
+    // Rol dentro del equipo que se esta viendo
     function isTechRole(u) {
         if (!u) return false;
         if (isSuperAdmin(u)) return true;
-        const rec = usuariosDB[userKeyFor(u)] || {};
-        return !!(rec.tech || rec.tl || rec.admin);
+        return rolDe(u, 'tech') || rolDe(u, 'tl') || rolDe(u, 'admin');
     }
     function hasLeaderRole(u) {
         if (!u) return false;
         if (isSuperAdmin(u)) return true;
-        const rec = usuariosDB[userKeyFor(u)] || {};
-        return !!rec.tl || !!rec.admin;
+        return rolDe(u, 'tl') || rolDe(u, 'admin');
     }
 
     // ── Gestor de listeners de datos: conectados solo cuando hay acceso real ──
     function attachData() {
         if (dataAttached) return;
         dataAttached = true;
+        // El equipo se resuelve ANTES de suscribirse: las rutas dependen de él.
+        updateTeamSwitcher();
         staticUnsubs.push(
-            onValue(globalTechsRef, (snapshot) => {
+            onValue(equiposRef, (snapshot) => {
+                equiposCatalogo = snapshot.val() || {};
+                renderTeamSwitcher();
+                refreshAdminListIfOpen();
+                renderNewTeamsGrid();
+            }, readErr),
+            onValue(globalTechsRef(), (snapshot) => {
                 globalTechs = snapshot.val() || [];
                 updateGlobalTechsUI();
             }, readErr),
-            onValue(predefTasksRef, (snapshot) => {
+            onValue(predefTasksRef(), (snapshot) => {
                 predefTasks = snapshot.val() || [];
                 updatePredefTasksUI();
             }, readErr)
@@ -1660,6 +1968,8 @@
             overlay.style.display = 'none';
             attachData();
             myEmail = u;
+            updateTeamSwitcher();
+            syncRoleArrays();          // los roles son por equipo: el equipo acaba de resolverse
             if (hasLeaderRole(u)) {
                 activateLeaderUI();
             } else {
@@ -1674,6 +1984,10 @@
         // Sin sesión válida → pantalla de acceso con Google
         detachData();
         deactivateLeaderUI();
+        if (btnLogout) btnLogout.style.display = 'none';   // sin sesión no hay nada que cerrar
+        currentTeam = null;                          // el equipo depende de la identidad
+        const switcher = document.getElementById('team-switcher');
+        if (switcher) switcher.style.display = 'none';
         const denied = !!u;
         document.getElementById('login-card-title').innerText = denied ? 'ACCESO NO AUTORIZADO' : 'PROGRAMACIÓN DIARIA';
         document.getElementById('login-error-msg').innerText = denied ? `${u.toUpperCase()} NO TIENE ACCESO HABILITADO` : '';
@@ -1704,13 +2018,8 @@
         await dbSet(ref(db, 'mantenimiento/uids/' + fu.uid), sanitizeKey(key), 'REGISTRAR UID: PIDE QUE TE DEN USUARIO EN PANEL ADMIN');
         const rec = usuariosDB[key];
         if (!rec) return;
-        let dirty = false;
-        if (fu.uid && rec.uid !== fu.uid) { rec.uid = fu.uid; dirty = true; }
-        if (rec.email !== correo) { rec.email = correo; dirty = true; }
-        if (dirty) {
-            // solo un admin puede escribir usuarios: si no lo es, el indice ya quedo listo
-            try { await set(ref(db, 'mantenimiento/pd/usuarios'), buildUsuarios()); } catch (e) {}
-        }
+        // El correo ya lo escribe el admin al crear el usuario; solo un admin puede
+        // tocarlo, asi que aqui no se intenta (el indice de arriba ya quedo listo).
     }
     let loggingOut = false;
     async function logoutFull() {
@@ -1724,8 +2033,10 @@
     }
 
     // ─── PANEL ADMIN (SOLO PARA ADMINISTRADORES) ───
+    // Admin del equipo que se esta viendo (o super admin)
     function isAdminUser() {
-        return isTeamLeader && (isSuperAdmin(myEmail) || adminList.includes(myEmail));
+        if (isSuperAdmin(myEmail)) return isTeamLeader;
+        return isTeamLeader && adminList.includes(myEmail);
     }
 
     function updateAdminUI() {
@@ -1769,9 +2080,24 @@
 
     function refreshAdminListIfOpen() {
         const modal = document.getElementById('admin-modal');
-        if (modal && modal.style.display === 'block') refreshAdminList();
+        if (modal && modal.style.display === 'block') { renderAdminTeamBar(); refreshAdminList(); }
     }
 
+    // ─── PANEL ADMIN: SELECCIÓN DE EQUIPO ───────────────────────────────────
+    // El panel trabaja SIEMPRE sobre un equipo. El admin ve el desplegable con sus
+    // equipos; el super admin ve todos y además puede crear y eliminar (desactivar).
+    let adminEquipoSel = null;
+    // El admin ve solo SUS equipos. Los desactivados tambien aparecen, para poder
+    // volver a activarlos sin pedirle permiso a nadie.
+    function equiposDelPanel() { return equiposDondeSoyAdmin(); }
+    // Cambia el equipo que se está administrando (desplegable del panel)
+    function adminCambiaEquipoPanel(team) {
+        if (!team) return;
+        adminEquipoSel = team;
+        renderAdminTeamBar();
+        renderNewTeamsGrid();
+        refreshAdminList();
+    }
     function openAdminModal() {
         if (!isAdminUser()) return;
         document.getElementById('admin-name').value = '';
@@ -1781,100 +2107,348 @@
         document.getElementById('admin-is-tech').checked = true;
         document.getElementById('admin-is-tl').checked = false;
         document.getElementById('admin-is-admin').checked = false;
+        const nota = document.getElementById('admin-sugerencia-nota');
+        if (nota) { nota.textContent = ''; nota.className = 'team-note'; }
+        adminEquipoSel = currentTeam;
+        adminSoloEquipo = false;
+        const btnFiltro = document.getElementById('admin-filtro-equipo');
+        if (btnFiltro) { btnFiltro.classList.remove('on'); btnFiltro.textContent = 'SOLO ESTE EQUIPO'; }
+        renderAdminTeamBar();
+        renderNewTeamsGrid();
         document.getElementById('admin-modal').style.display = 'block';
         refreshAdminList();
     }
 
-        // Orden del panel: admin, TL, tecnico y despues solo lectura; dentro de cada grupo por nombre
+    // El usuario nuevo se crea en el equipo que está seleccionado en el panel
+    function renderNewTeamsGrid() {
+        const grid = document.getElementById('admin-new-teams');
+        if (!grid) return;
+        const team = equipoDelPanel();
+        grid.innerHTML = `<div class="team-note">EL USUARIO SE CREA EN <b>${escapeHtml(equipoNombre(team).toUpperCase())}</b>. Para agregarlo a otro equipo, cambia el equipo aquí arriba y agrágalo de nuevo.</div>`;
+    }
+    function adminToggleNuevoEquipo() { /* el equipo lo elige el desplegable del panel */ };
+
+    // Resumen del equipo: total de miembros y conteo por rol (cada persona cuenta una
+    // sola vez, por su rol más alto: admin > tl > technician > solo lectura).
+    function resumenEquipo(team) {
+        const miembros = usuariosDeEquipo(team);
+        let admins = 0, tls = 0, techs = 0, soloLectura = 0;
+        miembros.forEach(u => {
+            if (rolDe(u, 'admin', team)) admins++;
+            else if (rolDe(u, 'tl', team)) tls++;
+            else if (rolDe(u, 'tech', team)) techs++;
+            else soloLectura++;
+        });
+        const partes = [miembros.length + ' MIEMBRO(S)'];
+        if (admins) partes.push(admins + (admins === 1 ? ' ADMIN' : ' ADMINS'));
+        else partes.push('SIN ADMIN');
+        if (tls) partes.push(tls + (tls === 1 ? ' TL' : ' TL'));
+        if (techs) partes.push(techs + (techs === 1 ? ' TÉCNICO' : ' TÉCNICOS'));
+        if (soloLectura) partes.push(soloLectura + (soloLectura === 1 ? ' SOLO LECTURA' : ' SOLO LECTURA'));
+        return partes.join(' · ');
+    }
+    // ─── GESTIÓN DEL EQUIPO SELECCIONADO ────────────────────────────────────
+    // Sin pestañas: todo gira en torno al equipo del desplegable.
+    //   ✎  renombra el equipo   ·   ACTIVO lo activa/desactiva   ·   + lo crea (solo super admin)
+    function renderAdminTeamBar() {
+        const sel = document.getElementById('admin-team-select');
+        const nota = document.getElementById('admin-team-nota');
+        const btnActivo = document.getElementById('admin-team-activo');
+        const btnRename = document.getElementById('admin-team-rename');
+        const nuevo = document.getElementById('admin-new-team-box');
+        if (!sel) return;
+        const lista = equiposDelPanel();
+        if (!adminEquipoSel || lista.indexOf(adminEquipoSel) === -1) {
+            adminEquipoSel = lista.indexOf(currentTeam) !== -1 ? currentTeam : (lista[0] || null);
+        }
+        sel.innerHTML = lista.map(t =>
+            `<option value="${escapeAttr(t)}"${t === adminEquipoSel ? ' selected' : ''}>${escapeHtml(equipoNombre(t))}${equipoActivo(t) ? '' : ' (DESACTIVADO)'}</option>`
+        ).join('') || '<option value="">SIN EQUIPOS</option>';
+        // Con un solo equipo no hace falta desplegable: se muestra el nombre fijo
+        const varios = lista.length > 1;
+        const nombreFijo = document.getElementById('admin-team-nombre');
+        sel.style.display = varios ? 'inline-block' : 'none';
+        if (nombreFijo) {
+            nombreFijo.style.display = varios ? 'none' : 'inline-block';
+            nombreFijo.textContent = adminEquipoSel ? equipoNombre(adminEquipoSel) + (equipoActivo(adminEquipoSel) ? '' : ' (DESACTIVADO)') : 'SIN EQUIPOS';
+        }
+        const puedo = puedoGestionarEquipo(adminEquipoSel);
+        if (btnRename) btnRename.style.display = puedo ? 'inline-block' : 'none';
+        if (btnActivo) {
+            const activo = equipoActivo(adminEquipoSel);
+            btnActivo.style.display = puedo ? 'inline-block' : 'none';
+            btnActivo.textContent = activo ? 'ACTIVO' : 'DESACTIVADO';
+            btnActivo.classList.toggle('on', activo);
+        }
+        if (nota) {
+            nota.textContent = adminEquipoSel
+                ? resumenEquipo(adminEquipoSel)
+                  + (isSuperAdmin(sessionUser()) ? ' · VES TODOS LOS EQUIPOS' : (puedo ? '' : ' · NO ERES ADMIN DE ESTE EQUIPO'))
+                : '';
+        }
+        if (nuevo) {
+            nuevo.innerHTML = isSuperAdmin(sessionUser())
+                ? `<input type="text" id="admin-new-team-name" placeholder="NOMBRE DEL EQUIPO NUEVO" autocomplete="off" onkeypress="if(event.key === 'Enter') adminCrearEquipo()">
+                   <button class="team-btn on" onclick="adminCrearEquipo()">+ AGREGAR EQUIPO</button>`
+                : '';
+        }
+        renderSugerencias();
+    }
+    function adminRenombrarEquipoSeleccion() {
+        const team = equipoDelPanel();
+        if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
+        showPromptModal('NOMBRE DEL EQUIPO ' + String(equipoNombre(team)).toUpperCase() + ':', equipoNombre(team), (valor) => {
+            const nombre = (valor || '').trim();
+            if (!nombre) return showToast('⚠️ EL NOMBRE NO PUEDE QUEDAR VACÍO');
+            const act = equiposCatalogo[team] || {};
+            equiposCatalogo[team] = { nombre: nombre.toUpperCase(), orden: act.orden || 99, activo: act.activo !== false };
+            dbSet(ref(db, 'mantenimiento/pd/equipos/' + team), equiposCatalogo[team], 'RENOMBRAR EQUIPO');
+            showToast('✅ EQUIPO ' + nombre.toUpperCase());
+            renderAdminTeamBar();
+            renderTeamSwitcher();
+            refreshAdminListIfOpen();
+        }, 'GUARDAR NOMBRE', 'EJ: MANTENIMIENTO');
+    }
+    function adminAlternarEquipoSeleccion() { adminAlternarEquipo(equipoDelPanel()); }
+
+    // ─── SUGERENCIAS AL AGREGAR USUARIOS (evita duplicados) ───────────────
+    function renderSugerencias() {
+        const dl = document.getElementById('admin-sugerencias');
+        if (dl) dl.innerHTML = Object.keys(usuariosDB)
+            .filter(u => !isSuperAdmin(u))
+            .sort()
+            .map(u => `<option value="${escapeAttr(u)}">${escapeHtml(String(nombreDe(u)).toUpperCase())}</option>`)
+            .join('');
+    }
+    function adminSugerir() {
+        const inp = document.getElementById('admin-name');
+        const nota = document.getElementById('admin-sugerencia-nota');
+        if (!inp || !nota) return;
+        const v = normalizeEmail(inp.value);
+        if (!v) { nota.textContent = ''; nota.className = 'team-note'; inp.classList.remove('admin-existente'); return; }
+        const key = userKeyFor(v);
+        const existe = !!usuariosDB[key] && !!usuariosDB[key].roles;
+        if (existe) {
+            const team = equipoDelPanel();
+            const dentro = esMiembroDe(key, team);
+            nota.className = dentro ? 'team-note admin-sugerencia-ok' : 'team-note admin-sugerencia-aviso';
+            nota.textContent = dentro
+                ? 'YA EXISTE Y YA ESTÁ EN ' + String(equipoNombre(team)).toUpperCase() + ': PUEDES EDITAR SUS ROLES ABAJO'
+                : 'YA EXISTE, PERO NO ESTÁ EN ' + String(equipoNombre(team)).toUpperCase() + ': AL AGREGARLO LE DARÁS ACCESO A ESTE EQUIPO';
+            inp.classList.add('admin-existente');
+        } else {
+            nota.className = 'team-note';
+            nota.textContent = v.includes('@') ? 'USUARIO NUEVO' : 'ESCRIBE EL CORREO COMPLETO';
+            inp.classList.remove('admin-existente');
+        }
+    }
+
+    // Filtro: mostrar solo los usuarios del equipo seleccionado
+    let adminSoloEquipo = false;
+    function adminAlternarFiltroEquipo() {
+        adminSoloEquipo = !adminSoloEquipo;
+        const b = document.getElementById('admin-filtro-equipo');
+        if (b) { b.classList.toggle('on', adminSoloEquipo); b.textContent = adminSoloEquipo ? 'SOLO ESTE EQUIPO ✓' : 'SOLO ESTE EQUIPO'; }
+        refreshAdminList();
+    }
+
+    // Alta de equipo (solo super admin)
+    function adminCrearEquipo() {
+        if (!isSuperAdmin(sessionUser())) return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE AGREGAR EQUIPOS');
+        const inp = document.getElementById('admin-new-team-name');
+        if (!inp) return;
+        const nombre = (inp.value || '').trim();
+        if (!nombre) return showToast('⚠️ ESCRIBE EL NOMBRE DEL EQUIPO');
+        let id = sanitizeTeamId(nombre.toLowerCase().replace(/\s+/g, '-'));
+        if (!id) return showToast('⚠️ NOMBRE DE EQUIPO NO VÁLIDO');
+        if (equiposCatalogo[id]) id = id + '-' + (allTeams().length + 1);
+        equiposCatalogo[id] = { nombre: nombre.toUpperCase(), orden: allTeams().length + 1, activo: true };
+        dbSet(ref(db, 'mantenimiento/pd/equipos/' + id), equiposCatalogo[id], 'CREAR EQUIPO');
+        showToast('✅ EQUIPO CREADO: ' + nombre.toUpperCase() + ' · AGREGA ALGOUN MIEMBRO');
+        inp.value = '';
+        adminEquipoSel = id;
+        renderAdminTeamBar();
+        refreshAdminList();
+    }
+    function adminRenombrarEquipo(team) {
+        if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
+        const inp = document.getElementById('team-name-' + team);
+        if (!inp) return;
+        const nombre = (inp.value || '').trim();
+        if (!nombre) return showToast('⚠️ EL NOMBRE NO PUEDE QUEDAR VACÍO');
+        const act = equiposCatalogo[team] || {};
+        equiposCatalogo[team] = { nombre: nombre.toUpperCase(), orden: act.orden || 99, activo: act.activo !== false };
+        dbSet(ref(db, 'mantenimiento/pd/equipos/' + team), equiposCatalogo[team], 'RENOMBRAR EQUIPO');
+        showToast('✅ EQUIPO ' + nombre.toUpperCase());
+        renderAdminTeamBar();
+    }
+    // Desactivar en vez de borrar: el equipo y sus datos quedan intactos
+    function adminAlternarEquipo(team) {
+        if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
+        const activo = equipoActivo(team);
+        showConfirm(activo
+            ? `¿DESACTIVAR EL EQUIPO ${equipoNombre(team).toUpperCase()}?\n\nNadie podrá ver ni escribir en sus datos hasta volver a activarlo. Los datos NO se borran.`
+            : `¿ACTIVAR DE NUEVO EL EQUIPO ${equipoNombre(team).toUpperCase()}?`, () => {
+            const act = equiposCatalogo[team] || {};
+            equiposCatalogo[team] = { nombre: act.nombre || String(team).toUpperCase(), orden: act.orden || 99, activo: !activo };
+            dbSet(ref(db, 'mantenimiento/pd/equipos/' + team), equiposCatalogo[team], activo ? 'DESACTIVAR EQUIPO' : 'ACTIVAR EQUIPO');
+            showToast((activo ? '⛔ EQUIPO DESACTIVADO: ' : '✅ EQUIPO ACTIVADO: ') + equipoNombre(team).toUpperCase());
+            updateTeamSwitcherYRecargar();
+            renderAdminTeamBar();
+        });
+    }
+    function adminQuitarDeEquipo(team, user) {
+        if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
+        if (esElPropio(user)) return showToast('⚠️ NO TE PUEDES SACAR DE ' + String(equipoNombre(team)).toUpperCase() + ': TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO');
+        const esAdmin = rolDe(user, 'admin', team);
+        const otros = usuariosDeEquipo(team).filter(x => x !== userKeyFor(user));
+        const sinAdmin = esAdmin && !otros.some(x => rolDe(x, 'admin', team));
+        showConfirm(`¿QUITAR A ${String(nombreDe(user, team)).toUpperCase()} DEL EQUIPO ${equipoNombre(team).toUpperCase()}?` +
+                    (sinAdmin ? '\n\n⚠️ ES EL ÚLTIMO ADMIN DEL EQUIPO: SE QUEDARÁ SIN ADMIN.' : ''), () => {
+            const key = userKeyFor(user);
+            const rec = usuariosDB[key];
+            if (rec && rec.roles) delete rec.roles[team];
+            set(ref(db, rolesPath(key, team)), null).then(() => {
+                syncRoleArrays();
+                updateTeamSwitcher();
+                refreshAdminList();
+                showToast('✖ FUERA DE ' + equipoNombre(team).toUpperCase() + ': ' + key.toUpperCase());
+            }).catch((e) => {
+                console.error('FIREBASE WRITE ERROR', e);
+                showToast('⚠️ NO SE PUDO QUITAR DEL EQUIPO (' + (e.code || e.message) + ')');
+            });
+        });
+    }
+    // Alta / baja de un usuario en un equipo = crear o borrar sus roles en ese equipo
+    function adminAsignarEquipo(team, user, agregar) {
+        if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
+        const key = userKeyFor(user);
+        if (!key) return;
+        const rr = agregar
+            ? { usuario: true, tech: true, tl: false, admin: false }
+            : null;
+        if (agregar) {
+            guardarRol(key, team, rr).then((ok) => {
+                if (ok) showToast('✅ AGREGADO A ' + equipoNombre(team).toUpperCase() + ': ' + String(nombreDe(key, team)).toUpperCase());
+            });
+        } else {
+            window.adminQuitarDeEquipo(team, key);
+        }
+    }
+
+    // Orden del panel: admin, TL, tecnico y despues solo lectura; dentro de cada grupo por nombre
     function rangoUsuario(u) {
-        const r = usuariosDB[u] || {};
+        const r = rolesDe(u, equipoDelPanel()) || {};
         return r.admin ? 0 : r.tl ? 1 : r.tech ? 2 : r.usuario ? 3 : 4;
     }
     function ordenUsuarios(lista) {
+        const team = equipoDelPanel();
         return lista.slice().sort((a, b) => {
             const d = rangoUsuario(a) - rangoUsuario(b);
             if (d) return d;
-            const na = ((usuariosDB[a] || {}).nombre || a).toLowerCase();
-            const nb = ((usuariosDB[b] || {}).nombre || b).toLowerCase();
+            const na = String(nombreDe(a, team) || a).toLowerCase();
+            const nb = String(nombreDe(b, team) || b).toLowerCase();
             return na.localeCompare(nb) || a.localeCompare(b);
         });
     }
-function refreshAdminList() {
+    function refreshAdminList() {
         const listEl = document.getElementById('admin-list');
+        if (!listEl) return;
         const q = (document.getElementById('admin-search')?.value || '').trim().toLowerCase();
-        const all = new Set([...Object.keys(usuariosDB), ...correosAutorizados, ...adminList].filter(u => !isSuperAdmin(u)));
-        if (all.size === 0) {
-            listEl.innerHTML = '<div class="admin-empty">SIN USUARIOS AÚN</div>';
+        const team = equipoDelPanel();
+        const superAdmin = isSuperAdmin(sessionUser());
+        const todos = Object.keys(usuariosDB).filter(u => !isSuperAdmin(u));
+        // Con el filtro activo (o si no eres super admin) solo se ven los usuarios del equipo
+        const base = (adminSoloEquipo || !superAdmin) ? usuariosDeEquipo(team) : todos;
+        const delEquipo = usuariosDeEquipo(team);
+        const lista = ordenUsuarios(base.concat(base.filter(u => delEquipo.indexOf(u) === -1)));
+        const puedo = puedoGestionarEquipo(team);
+        const titleEl = document.getElementById('admin-list-title');
+        if (titleEl) {
+            titleEl.textContent = 'USUARIOS · ' + String(equipoNombre(team)).toUpperCase()
+                + (adminSoloEquipo ? '' : ' · TODOS');
+        }
+        if (!lista.length) {
+            listEl.innerHTML = '<div class="admin-empty">SIN USUARIOS EN ESTE EQUIPO</div>';
             updateAdminUI();
             return;
         }
         let html = '';
-        for (const user of ordenUsuarios(Array.from(all))) {
+        for (const user of lista) {
             if (!user) continue;
-            const info = usuariosDB[user] || {};
-            if (q && !user.toLowerCase().includes(q) && !(info.nombre || '').toLowerCase().includes(q)) continue;
-            const nombreReal = (info.nombre || '').trim();
-            const isTl = correosAutorizados.includes(user);
-            const isAdm = adminList.includes(user);
-            const esUsuario = !!info.usuario;
-            const esTech = !!info.tech;
-            const sinAcceso = !isTl && !isAdm && !esUsuario;
-            const userBadge = isAdm ? '<span class="admin-role-badge admin">ADMIN</span>' : (esTech ? '<span class="admin-role-badge tech">TÉCNICO</span>' : '');
+            const rr = rolesDe(user, team) || {};
+            const nombreReal = String(nombreDe(user, team) || '').trim();
+            if (q && !user.toLowerCase().includes(q) && !nombreReal.toLowerCase().includes(q)) continue;
+            const isTl = !!rr.tl;
+            const isAdm = !!rr.admin;
+            const esUsuario = !!rr.usuario;
+            const esTech = !!rr.tech;
+            const enEquipo = esMiembroDe(user, team);
+            const sinAcceso = !esUsuario && !esTech && !isTl && !isAdm;
+            // Solo se muestra la etiqueta ADMIN (los demas roles se ven en los botones)
+            const userBadge = isAdm ? '<span class="admin-role-badge admin">ADMIN</span>' : '';
+            const fuera = (enEquipo || !superAdmin) ? '' : '<span class="admin-role-badge" title="NO ESTÁ EN ESTE EQUIPO" style="opacity:.6">FUERA</span>';
             html += `<div class="admin-user-row ${sinAcceso ? 'no-access' : ''}">
                 <div class="admin-user-main">
                     <div class="admin-user-copy">
                         <span class="admin-username">${user.toUpperCase()}</span>
-                        ${nombreReal ? `<span class="admin-realname">${nombreReal}</span>` : ''}
+                        ${nombreReal ? `<span class="admin-realname">${escapeHtml(nombreReal)}</span>` : ''}
                     </div>
                     ${userBadge}
+                    ${fuera}
                 </div>
                 <div class="admin-user-actions">
-                    <button class="btn-action-small admin-user-action ${esUsuario ? 'active-user' : ''}" onclick="adminToggleUsuario('${user}')" title="Quitar/Dar acceso (sin roles queda solo lectura)" aria-pressed="${esUsuario}">👤</button>
+                    <button class="btn-action-small admin-user-action" onclick="adminEditEquipos('${user}')" title="EQUIPOS DEL USUARIO" ${(!puedo || !enEquipo) ? 'disabled style="opacity:.35"' : ''}>👥</button>
+                    <button class="btn-action-small admin-user-action ${esUsuario ? 'active-user' : ''}" onclick="adminToggleUsuario('${user}')" title="Quitar/Dar acceso en ${escapeAttr(equipoNombre(team))}" aria-pressed="${esUsuario}">👤</button>
                     <button class="btn-action-small admin-user-action ${esTech ? 'active-tech' : ''}" onclick="adminToggleTech('${user}')" title="Quitar/Dar rol de Técnico" aria-pressed="${esTech}">🛠️</button>
                     <button class="btn-action-small admin-user-action ${isTl ? 'active-tl' : ''}" onclick="adminToggleTl('${user}')" title="Quitar/Hacer Team Leader" aria-pressed="${isTl}">TL</button>
                     <button class="btn-action-small admin-user-action admin-action-wide ${isAdm ? 'active-admin' : ''}" onclick="adminToggleAdmin('${user}')" title="Quitar/Hacer Admin" aria-pressed="${isAdm}">ADMIN</button>
                     <button class="btn-action-small admin-user-action" onclick="adminEditNombre('${user}')" title="Editar nombre real">✎</button>
-                    <button class="btn-action-small admin-user-action delete-user" onclick="adminRemoveUser('${user}')" title="Eliminar usuario definitivamente">✖</button>
+                    <button class="btn-action-small admin-user-action delete-user" onclick="adminRemoveUser('${user}')" title="Quitar de este equipo" ${(!puedo || !enEquipo) ? 'disabled style="opacity:.35"' : ''}>✖</button>
                 </div>
             </div>`;
         }
-            listEl.innerHTML = html || '<div class="admin-empty">SIN COINCIDENCIAS PARA LA BÚSQUEDA</div>';
-            updateAdminUI();
-        }
+        listEl.innerHTML = html || '<div class="admin-empty">SIN COINCIDENCIAS PARA LA BÚSQUEDA</div>';
+        updateAdminUI();
+    }
 
+    // Crea al usuario DENTRO del equipo visible. Si ya existe, solo se le asignan roles en
+    // ese equipo (así no se duplican). Para otro equipo: cambia el desplegable y agrágalo.
     function adminAddUser() {
         if (!isAdminUser()) return;
         const name = normalizeEmail(document.getElementById('admin-name').value);
         if (!name) return showConfirm("INGRESE EL CORREO DEL USUARIO (EJ: juan.perez@latam.cl).", null);
         if (!name.includes('@')) return showConfirm("INGRESE EL CORREO COMPLETO, INCLUYENDO EL DOMINIO (EJ: juan.perez@latam.cl).", null);
         if (isSuperAdmin(name)) return showToast('⚠️ ESE USUARIO YA ES SUPER ADMIN');
+        const team = equipoDelPanel();
+        const aviso = avisoEquipoPanel();
+        if (aviso) return showToast(aviso);
         const asUser = document.getElementById('admin-is-user').checked;
         const asTech = document.getElementById('admin-is-tech').checked;
         const asTl = document.getElementById('admin-is-tl').checked;
         const asAdmin = document.getElementById('admin-is-admin').checked;
-        if (!asUser && !asTech && !asTl && !asAdmin) return showConfirm("SELECCIONE AL MENOS UN ROL (👤, 🛠️, TL O ADMIN).", null);
+        if (!asUser && !asTech && !asTl && !asAdmin) return showConfirm("SELECCIONE AL MENOS UN ROL (👤, TÉCNICO, TL O ADMIN).", null);
         const key = userKeyFor(name);
-        const prev = usuariosDB[key] || {};
-        const yaEsUsuario = !!prev.usuario;
-        const yaEsTech = !!prev.tech;
-        const alreadyTl = !!prev.tl;
-        const alreadyAdm = !!prev.admin;
-        if ((!asUser || yaEsUsuario) && (!asTech || yaEsTech) && (!asTl || alreadyTl) && (!asAdmin || alreadyAdm)) return showConfirm("EL USUARIO YA TIENE ESOS ROLES.", null);
-        const rec = userRec(name);
-        rec.email = name;
-        const nombreReal = document.getElementById('admin-realname').value.trim();
-        if (nombreReal && !rec.nombre) rec.nombre = nombreReal;
-        // Ver el sistema exige 'usuario'; trabajar exige 'tecnico'
-        if (asUser || asTech || asTl || asAdmin) rec.usuario = true;
-        if (asTech || asTl || asAdmin) rec.tech = true;
-        if (asTl) rec.tl = true;
-        if (asAdmin) rec.admin = true;
-        syncRoleArrays();
-        document.getElementById('admin-name').value = '';
-        document.getElementById('admin-realname').value = '';
-        refreshAdminList();
-        showToast(`✅ USUARIO AGREGADO: ${name.toUpperCase()}`);
-        saveUsuarios();
+        const yaExistia = esMiembroDe(key, team);
+        const nombre = (document.getElementById('admin-realname').value || '').trim()
+                    || (yaExistia ? nombreDe(key, team) : name.split('@')[0]);
+        const rr = {
+            usuario: asUser || asTech || asTl || asAdmin,   // ver el sistema exige 'usuario'
+            tech: asTech || asTl || asAdmin,                 // trabajar exige 'tecnico'
+            tl: asTl,
+            admin: asAdmin
+        };
+        guardarRol(key, team, rr).then((ok) => {
+            if (!ok) return;
+            if (!yaExistia) guardarEmail(key);               // el correo lo valida el indice uids
+            if (nombre !== nombreDe(key, team)) guardarNombre(key, nombre);
+            document.getElementById('admin-name').value = '';
+            document.getElementById('admin-realname').value = '';
+            const nota = document.getElementById('admin-sugerencia-nota');
+            if (nota) { nota.textContent = ''; nota.className = 'team-note'; }
+            renderSugerencias();
+            showToast(`✅ ${yaExistia ? 'AGREGADO AL EQUIPO' : 'USUARIO CREADO EN'} ${equipoNombre(team).toUpperCase()}: ${String(nombreDe(key, team)).toUpperCase()}`);
+        });
     }
 
         // Jerarquia de roles: usuario < tecnico < TL < admin.
@@ -1888,80 +2462,169 @@ function refreshAdminList() {
         const i = ROLES_ORDEN.indexOf(rol);
         for (let k = i; k < ROLES_ORDEN.length; k++) rec[ROLES_ORDEN[k]] = false;
     }
-    function adminToggleUsuario(user) {
+    // ─── ACCIONES DEL PANEL ADMIN ───────────────────────────────────────────
+    // Un admin NUNCA se quita sus propios roles ni se saca a si mismo del equipo:
+    // solo otro admin del mismo equipo puede hacerlo. Asi un equipo nunca se queda
+    // sin ningun admin (y el que queda no puede autoborrarse).
+    // Todo se aplica al EQUIPO que se está viendo en el panel (adminEquipoSel):
+    // los roles viven dentro del equipo, asi que no existe un rol "global".
+    function esElPropio(user) {
+        const yo = sessionUser();
+        return !!yo && userKeyFor(user) === userKeyFor(yo);
+    }
+    function avisoAutoRoles(user) {
+        if (!esElPropio(user)) return '';
+        return '⚠️ NO TE PUEDES QUITAR TUS PROPIOS ROLOS NI SALIR DEL EQUIPO: TIENE QUE HACERLO OTRO ADMIN DE ' + String(equipoNombre(equipoDelPanel())).toUpperCase();
+    }
+    function equipoDelPanel() {
+        return adminEquipoSel || currentTeam || EQUIPO_DEFECTO;
+    }
+    function avisoEquipoPanel() {
+        if (puedoGestionarEquipo(equipoDelPanel())) return '';
+        return '⚠️ NO ERES ADMIN DEL EQUIPO ' + String(equipoNombre(equipoDelPanel())).toUpperCase() + ': PIDE A UN ADMIN DE ESE EQUIPO';
+    }
+    // Aplica un cambio de rol dentro del equipo visible
+    function adminCambiarRol(user, rol, activar) {
         if (!isAdminUser()) return;
         if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
-        const rec = userRec(user);
-        const nuevoEstado = !rec.usuario;
-        if (nuevoEstado) activarRol(rec, 'usuario'); else quitarRol(rec, 'usuario');
-        syncRoleArrays();
-        refreshAdminList();
-        showToast(nuevoEstado ? `✅ ACCESO ACTIVADO: ${user.toUpperCase()}` : `⚠️ ${user.toUpperCase()} SE QUEDÓ SIN NINGÚN ACCESO`);
-        saveUsuarios();
+        const team = equipoDelPanel();
+        const aviso = avisoEquipoPanel();
+        if (aviso) return showToast(aviso);
+        const auto = avisoAutoRoles(user);
+        if (auto) return showToast(auto);
+        // El permiso se comprueba ANTES de tocar nada: si el usuario se quita a sí mismo
+        // el rol de admin, después de mutar el permiso ya no existiría y no se guardaría.
+        const autorizado = puedoGestionarEquipo(team);
+        if (!autorizado) return showToast('⚠️ NO PUEDES GESTIONAR EL EQUIPO ' + String(equipoNombre(team)).toUpperCase());
+        const rr = rolRec(user, team);
+        const previo = Object.assign({}, rr);          // copia para poder revertir
+        const teniaSuperior = activatingHasSuperior(rr, rol);
+        // si se queda el equipo sin ningún admin, avisar antes
+        const soyElUltimo = !activar && rol === 'admin' && esElUltimoAdmin(user, team);
+        const aplicar = () => {
+            if (activar) activarRol(rr, rol); else quitarRol(rr, rol);
+            guardarRol(user, team, rr, autorizado, previo).then((ok) => {
+                if (!ok) return;
+                refreshAdminList();
+                if (rol === 'usuario') {
+                    showToast(activar ? `✅ ACCESO ACTIVADO EN ${equipoNombre(team).toUpperCase()}: ${nombreDe(user, team).toUpperCase()}`
+                                      : `⚠️ ${nombreDe(user, team).toUpperCase()} SE QUEDÓ SIN ACCESO EN ${equipoNombre(team).toUpperCase()}`);
+                } else {
+                    showToast(activar ? `✅ ${rol.toUpperCase()} EN ${equipoNombre(team).toUpperCase()}: ${nombreDe(user, team).toUpperCase()}`
+                                      : (teniaSuperior
+                                         ? `⚠️ SE QUITARON LOS ROLES SUPERIORES A ${nombreDe(user, team).toUpperCase()}`
+                                         : `⚠️ ${rol.toUpperCase()} QUITADO A ${nombreDe(user, team).toUpperCase()} EN ${equipoNombre(team).toUpperCase()}`));
+                }
+                if (soyElUltimo) showToast('⚠️ ' + equipoNombre(team).toUpperCase() + ' SE QUEDÓ SIN ADMIN');
+            });
+        };
+        if (soyElUltimo) {
+            showConfirm(`⚠️ ERES EL ÚLTIMO ADMIN DE ${equipoNombre(team).toUpperCase()}.\n\nSi te quitas el admin, el equipo se queda sin nadie que lo administre y solo el super admin podría corregirlo.\n\n¿QUITARTE EL ADMIN IGUAL?`, aplicar);
+        } else {
+            aplicar();
+        }
     }
+    // ¿Es el único admin de ese equipo?
+    function esElUltimoAdmin(user, team) {
+        const key = userKeyFor(user);
+        return usuariosDeEquipo(team).filter(u => rolDe(u, 'admin', team)).length <= 1 && rolDe(key, 'admin', team);
+    }
+    function activatingHasSuperior(rr, rol) {
+        const i = ROLES_ORDEN.indexOf(rol);
+        return ROLES_ORDEN.slice(i + 1).some(r => rr[r]);
+    }
+    function adminToggleUsuario(user) { adminCambiarRol(user, 'usuario', !rolDe(user, 'usuario', equipoDelPanel())); }
+    function adminToggleTech(user)    { adminCambiarRol(user, 'tech',    !rolDe(user, 'tech',    equipoDelPanel())); }
+    function adminToggleTl(user)      { adminCambiarRol(user, 'tl',      !rolDe(user, 'tl',      equipoDelPanel())); }
+    function adminToggleAdmin(user)   { adminCambiarRol(user, 'admin',   !rolDe(user, 'admin',   equipoDelPanel())); }
 
     function adminEditNombre(user) {
         if (!isAdminUser()) return;
-        showPromptModal(`NOMBRE REAL DE ${user.toUpperCase()}:`, userRec(user).nombre || '', (valor) => {
-            usuariosDB[user].nombre = valor || '';
-            refreshAdminList();
-            saveUsuarios();
-            if (valor) showToast(`✅ NOMBRE GUARDADO: ${valor.toUpperCase()}`);
+        const team = equipoDelPanel();
+        const aviso = avisoEquipoPanel();
+        if (aviso) return showToast(aviso);
+        showPromptModal(`NOMBRE REAL DE ${nombreDe(user, team).toUpperCase()}:`, nombreDe(user, team), (valor) => {
+            const nombre = (valor || '').trim();
+            guardarNombre(user, nombre).then(() => {
+                refreshAdminList();
+                renderSugerencias();
+                if (nombre) showToast(`✅ NOMBRE GUARDADO: ${nombre.toUpperCase()}`);
+            });
         }, 'GUARDAR NOMBRE', 'EJ: JUAN PEREZ');
     }
 
-        function adminToggleTech(user) {
-        if (!isAdminUser()) return;
-        if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
-        const rec = userRec(user);
-        const nuevoEstado = !rec.tech;
-        const teniaSuperior = !!(rec.tl || rec.admin);
-        if (nuevoEstado) activarRol(rec, 'tech'); else quitarRol(rec, 'tech');
-        syncRoleArrays();
-        refreshAdminList();
-        showToast(nuevoEstado ? `✅ ROL TÉCNICO ASIGNADO A ${user.toUpperCase()}`
-            : teniaSuperior ? `⚠️ SE QUITARON TÉCNICO, TL Y ADMIN A ${user.toUpperCase()}`
-            : `⚠️ ROL TÉCNICO QUITADO A ${user.toUpperCase()}: QUEDA SOLO LECTURA`);
-        saveUsuarios();
-    }
-        function adminToggleTl(user) {
-        if (!isAdminUser()) return;
-        if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
-        const rec = userRec(user);
-        const nuevoEstado = !rec.tl;
-        const teniaAdmin = !!rec.admin;
-        if (nuevoEstado) activarRol(rec, 'tl'); else quitarRol(rec, 'tl');
-        syncRoleArrays();
-        refreshAdminList();
-        showToast(nuevoEstado ? `✅ TL OTORGADO A ${user.toUpperCase()}`
-            : teniaAdmin ? `⚠️ SE QUITARON TL Y ADMIN A ${user.toUpperCase()}`
-            : `⚠️ TL QUITADO A ${user.toUpperCase()}`);
-        saveUsuarios();
-    }
-
-        function adminToggleAdmin(user) {
-        if (!isAdminUser()) return;
-        if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
-        const rec = userRec(user);
-        const nuevoEstado = !rec.admin;
-        if (nuevoEstado) activarRol(rec, 'admin'); else quitarRol(rec, 'admin');
-        syncRoleArrays();
-        refreshAdminList();
-        showToast(nuevoEstado ? `✅ ADMIN OTORGADO A ${user.toUpperCase()}` : `⚠️ ADMIN QUITADO A ${user.toUpperCase()}`);
-        saveUsuarios();
-    }
-
+    // Quita al usuario del equipo visible (no borra su cuenta: solo este equipo)
     function adminRemoveUser(user) {
         if (!isAdminUser()) return;
-        if (isSuperAdmin(user)) return showToast('⚠️ EL SUPER ADMIN NO PUEDE SER ELIMINADO');
-        showConfirm(`¿ELIMINAR A ${user.toUpperCase()} DEFINITIVAMENTE? Ya no aparecerá en la lista.`, () => {
-            delete usuariosDB[user];
-            syncRoleArrays();
-            refreshAdminList();
-            showToast(`✖ USUARIO ELIMINADO: ${user.toUpperCase()}`);
-            saveUsuarios();
+        if (isSuperAdmin(user)) return showToast('\u26a0\ufe0f EL SUPER ADMIN NO PUEDE SER ELIMINADO');
+        const team = equipoDelPanel();
+        const aviso = avisoEquipoPanel();
+        if (aviso) return showToast(aviso);
+        // un admin no se saca a si mismo del equipo: lo hace otro admin
+        if (esElPropio(user)) return showToast('\u26a0\ufe0f NO TE PUEDES SACAR DE ' + String(equipoNombre(team)).toUpperCase() + ': TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO');
+        const esAdmin = rolDe(user, 'admin', team);
+        const otros = usuariosDeEquipo(team).filter(x => x !== userKeyFor(user));
+        const sinAdmin = esAdmin && !otros.some(x => rolDe(x, 'admin', team));
+        showConfirm(`\u00bfQUITAR A ${nombreDe(user, team).toUpperCase()} DEL EQUIPO ${equipoNombre(team).toUpperCase()}?` +
+                    (sinAdmin ? '\n\n\u26a0\ufe0f ES EL \u00daltimo ADMIN DEL EQUIPO: SE QUEDAR\u00c1 SIN ADMIN.' : '') +
+                    `\n\nEl usuario conserva sus roles en los otros equipos.`, () => {
+            const rec = usuariosDB[userKeyFor(user)];
+            if (rec && rec.roles) delete rec.roles[team];
+            set(ref(db, rolesPath(user, team)), null)
+                .then(() => {
+                    syncRoleArrays();
+                    updateTeamSwitcher();
+                    refreshAdminList();
+                    showToast(`\u2716 FUERA DE ${equipoNombre(team).toUpperCase()}: ${user.toUpperCase()}`);
+                })
+                .catch((e) => {
+                    console.error('FIREBASE WRITE ERROR', e);
+                    showToast('\u26a0\ufe0f NO SE PUDO QUITAR DEL EQUIPO (' + (e.code || e.message) + ')');
+                });
         });
     }
+
+    // ─── EQUIPOS POR USUARIO (botón 👥) ───────────────────────────────────
+    // Solo se muestran los equipos que administra quien está usando el panel.
+    let teamModalUser = null;
+    function adminEditEquipos(user) {
+        if (!isAdminUser()) return;
+        if (isSuperAdmin(user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
+        teamModalUser = user;
+        const label = document.getElementById('team-modal-user');
+        if (label) label.innerText = String(user).toUpperCase();
+        renderTeamModalList();
+        const modal = document.getElementById('team-modal');
+        if (modal) modal.style.display = 'block';
+    };
+    function renderTeamModalList() {
+        const list = document.getElementById('team-modal-list');
+        if (!list || !teamModalUser) return;
+        const key = userKeyFor(teamModalUser);
+        const mios = equiposDondeSoyAdmin();
+        list.innerHTML = mios.map(t => {
+            const dentro = esMiembroDe(key, t);
+            return `<button type="button" class="admin-team-btn${dentro ? ' active' : ''}" data-team="${escapeAttr(t)}"
+                style="width: auto; padding: 0 10px; height: var(--button-height); display: inline-flex; gap: 6px; align-items: center;"
+                onclick="adminAlternarEquipoUsuario('${escapeAttr(t)}','${escapeAttr(key)}')"
+                aria-pressed="${dentro}" title="${dentro ? 'QUITAR DE' : 'AGREGAR A'} ${escapeAttr(equipoNombre(t))}">${escapeHtml(equipoNombre(t))}</button>`;
+        }).join('') || '<div class="admin-empty">NO TIENES EQUIPOS QUE GESTIONAR</div>';
+    }
+    function adminAlternarEquipoUsuario(team, key) {
+        if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
+        const dentro = esMiembroDe(key, team);
+        if (dentro && esElPropio(key)) return showToast('⚠️ NO TE PUEDES SACAR DE ' + String(equipoNombre(team)).toUpperCase() + ': TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO');
+        if (!dentro) {
+            const rr = { usuario: true, tech: true, tl: false, admin: false };
+            guardarRol(key, team, rr).then((ok) => {
+                if (!ok) return;
+                renderTeamModalList();
+                showToast('✅ AGREGADO A ' + equipoNombre(team).toUpperCase() + ': ' + String(nombreDe(key, team)).toUpperCase());
+            });
+            return;
+        }
+        adminQuitarDeEquipo(team, key);
+    };
 
     function changeTurno() {
         activeTurno = document.getElementById('global-turno-select').value;
@@ -1984,7 +2647,7 @@ function refreshAdminList() {
     function getBasePath() {
         const safeTurno = activeTurno.replace(/\s+/g, '_');
         const [y,m,d] = viewingDate.split('-');
-        return `mantenimiento/pd/equipos/cabina/historial/${y}/${m}/${d}/${safeTurno}`;
+        return `${datosPath()}/historial/${y}/${m}/${d}/${safeTurno}`;
     }
     function flattenHistorialForSearch(nested){
         if(!nested) return {};
@@ -2103,7 +2766,7 @@ function refreshAdminList() {
                 ${jefeInfo ? `<span class="header-team-lead">${jefeInfo}</span>` : ''}
                 ${lockInfo}
             `;
-            document.title = `${turno.toUpperCase()} - ${fechaCorta}`;
+            document.title = `${equipoNombre(currentTeam)} · ${turno} - ${fechaCorta}`;
             
             updateLockUI();
             render();
@@ -2250,14 +2913,14 @@ function refreshAdminList() {
         if (globalTechs.includes(name)) return showConfirm("EL TÉCNICO YA EXISTE EN LA BASE GLOBAL.", null);
         globalTechs.push(name);
         globalTechs.sort();
-        dbSet(globalTechsRef, globalTechs, 'GUARDAR BASE GLOBAL');
+        dbSet(globalTechsRef(), globalTechs, 'GUARDAR BASE GLOBAL');
         input.value = '';
     }
 
     function removeGlobalTech(index) {
         showConfirm(`¿CONFIRMAS ELIMINAR A ${globalTechs[index]} DE LA BASE DE DATOS GLOBAL?`, () => {
             globalTechs.splice(index, 1);
-            dbSet(globalTechsRef, globalTechs, 'GUARDAR BASE GLOBAL');
+            dbSet(globalTechsRef(), globalTechs, 'GUARDAR BASE GLOBAL');
         });
     }
 
@@ -2318,7 +2981,7 @@ function refreshAdminList() {
         showConfirm(`⚠️ ¿CONFIRMAS TRASLADAR TODO A:\n${newTurno.toUpperCase()} DEL ${newDate}?`, () => {
             const safeNewTurno = newTurno.replace(/\s+/g, '_');
             const [ny,nm,nd] = newDate.split('-');
-            const newPath = `mantenimiento/pd/equipos/cabina/historial/${ny}/${nm}/${nd}/${safeNewTurno}`;
+            const newPath = `${datosPath()}/historial/${ny}/${nm}/${nd}/${safeNewTurno}`;
 
             // Escribir en la nueva fecha/turno
             dbSet(ref(db, `${newPath}/aviones`), avionesData, 'TRASLADAR');
@@ -3192,7 +3855,7 @@ function refreshAdminList() {
         if (!predefTasks.includes(desc)) {
             predefTasks.push(desc);
             predefTasks.sort();
-            dbSet(predefTasksRef, predefTasks, 'GUARDAR TAREA PREDEFINIDA');
+            dbSet(predefTasksRef(), predefTasks, 'GUARDAR TAREA PREDEFINIDA');
         }
         
         addPredefToAvion(desc);
@@ -3227,7 +3890,7 @@ function refreshAdminList() {
     function removePredefTask(index) {
         showConfirm(`¿CONFIRMAS ELIMINAR ESTA TAREA PREDEFINIDA DE LA BASE DE DATOS GLOBAL?`, () => {
             predefTasks.splice(index, 1);
-            dbSet(predefTasksRef, predefTasks, 'GUARDAR TAREA PREDEFINIDA');
+            dbSet(predefTasksRef(), predefTasks, 'GUARDAR TAREA PREDEFINIDA');
         });
     }
 
@@ -3568,7 +4231,7 @@ function refreshAdminList() {
         try {
             let data;
             if (forceRefresh || !searchCache) {
-                const snap = await get(ref(db, 'mantenimiento/pd/equipos/cabina/historial'));
+                const snap = await get(ref(db, datosPath() + '/historial'));
                 data = flattenHistorialForSearch(snap.val());
                 searchCache = data;
             } else {
@@ -3644,7 +4307,7 @@ function refreshAdminList() {
                 else if (r.type === 'TAREA') currGroup.tasks.push(r);
             }
 
-            let html = `<div style="font-size:10px;color:var(--comment);padding:8px 10px;border-bottom:1px solid var(--border);">🔍 ${results.length} resultado(s) para "<strong>${escapeHtml(query)}</strong>" <span style="opacity:0.7;">· últimos 30 días</span></div><div class="search-results-wrap">`;
+            let html = `<div style="font-size:10px;color:var(--comment);padding:8px 10px;border-bottom:1px solid var(--border);">🔍 ${results.length} resultado(s) para "<strong>${escapeHtml(query)}</strong>" <span style="opacity:0.7;">· últimos 30 días · equipo ${escapeHtml(equipoNombre(currentTeam))}</span></div><div class="search-results-wrap">`;
             let lastDt = '';
             let groupIdx = 0;
             for (const g of grouped) {
@@ -3764,7 +4427,11 @@ function refreshAdminList() {
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
         openAdminModal, adminAddUser, adminToggleTl, adminToggleAdmin, adminRemoveUser,
-        adminToggleUsuario, adminEditNombre, refreshAdminList,
+        adminToggleUsuario, adminToggleTech, adminEditNombre, refreshAdminList, adminSugerir, adminAlternarFiltroEquipo,
+        adminEditEquipos, adminAlternarEquipoUsuario,
+        switchTeam, adminToggleNuevoEquipo,
+        adminCambiaEquipoPanel, adminCrearEquipo, adminRenombrarEquipo, adminAlternarEquipo, adminQuitarDeEquipo,
+        adminRenombrarEquipoSeleccion, adminAlternarEquipoSeleccion,
         doGoogleLogin, logoutFull
     });
 
