@@ -778,7 +778,15 @@
             .avion-title.all-done { background: var(--gradient-completed) !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .avion-pos, .avion-times { background: color-mix(in srgb, var(--surface) 20%, transparent); color: var(--surface); padding: 2px 6px; font-weight: bold; font-size: 0.8em; border-radius: 4px; }
             .avion-comment { color: var(--text-lavender); font-size: 0.85em; white-space: nowrap; }
-            .avion-info-main { flex-direction: row !important; align-items: center !important; justify-content: flex-start !important; gap: 8px !important; }
+            /* En impresión va TODO en una sola línea: matrícula, POS y horas.
+               Sin esto se aplica la regla de móvil (max-width:900px), que pone la
+               matrícula al 100% y manda POS/horas a la línea de abajo (la hoja
+               mide ~816px CSS, así que entra en ese media query). */
+            .avion-info-main { flex-direction: row !important; flex-wrap: wrap !important; align-items: baseline !important; justify-content: flex-start !important; gap: 4px 6px !important; }
+            .avion-info-main > .avion-reg { flex: 0 0 auto !important; }
+            .avion-info-main > .avion-pos, .avion-info-main > .avion-times { flex: 0 0 auto !important; white-space: nowrap; }
+            /* la NOTA nunca se recorta: si es larga baja sola a la linea siguiente */
+            .avion-info-main > .avion-comment { flex: 0 1 auto !important; min-width: 0; white-space: normal !important; }
             .tango-link { color: var(--tango); -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .avion-title .tango-link { color: var(--tango); }
             .task-item .tango-link { color: var(--accent); }
