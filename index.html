@@ -243,7 +243,10 @@
             font-size: 0.8em; font-weight: 800; letter-spacing: 1px; color: var(--primary);
             display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
         }
-        .leader-title::after { content: ''; flex: 1; height: 1px; background: var(--border-tech); }
+        /* El texto puede recortarse antes que empujar a la lupa: la lupa nunca
+           debe saltar de lado, y en pantalla angosta el título es lo que cede. */
+        .leader-title-txt { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .leader-title::after { content: ''; flex: 1; height: 1px; background: var(--border-tech); min-width: 0; }
 
         .leader-grid { display: flex; flex-direction: column; gap: 6px; }
         .control-group { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
@@ -543,7 +546,7 @@
         .action-btn.active-alerta-tl { background: var(--red); color: var(--surface); border-color: var(--red-dark); }
         .action-btn.active-alerta-tech { background: var(--orange-alert); color: var(--surface); border-color: var(--orange-alert-dark); }
 
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: color-mix(in srgb, var(--slate-900) 60%, transparent); backdrop-filter: blur(4px); }
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; overflow: hidden; background-color: color-mix(in srgb, var(--slate-900) 60%, transparent); backdrop-filter: blur(4px); }
         /* por encima del panel admin (1000) y del modal de equipos (1200) */
         #confirm-modal, #prompt-modal { z-index: 1400; }
         
@@ -582,9 +585,19 @@
 
         .modal-footer { display: flex; gap: 10px; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border); }
         .btn-modal-action { flex: 1; padding: 0; height: var(--button-height); font-size: 10px; border-radius: var(--button-radius);}
-        .admin-modal-content { padding: 0 !important; width: 95%; max-width: 860px; min-height: 540px; border-radius: 12px; overflow-x: hidden; overflow-y: auto; background-color: var(--surface); }
-        .admin-modal-header { margin: 0; padding: 10px 14px 8px; background: var(--surface); color: var(--primary); border: 0; border-bottom: 2px solid var(--accent); font-size: 1.05em; font-weight: 800; letter-spacing: 0; }
-        .admin-modal-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 10px; padding: 10px; align-items: start; }
+        /* PANEL ADMIN: caja de altura fija, igual que un diálogo de verdad.
+           Encabezado, barra de equipo y pie quedan FIJOS (flex: none) y solo el
+           cuerpo se desplaza. Así el botón CERRAR nunca queda debajo del borde:
+           antes la caja completa se desplazaba y había que bajar hasta encontrarlo. */
+        .admin-modal-content {
+            padding: 0 !important; width: 95%; max-width: 860px;
+            height: 92vh; max-height: 92vh; min-height: 0; margin: 4vh auto;
+            border-radius: 12px; overflow: hidden; background-color: var(--surface);
+            display: flex; flex-direction: column;
+        }
+        .admin-modal-header { margin: 0; padding: 10px 14px 8px; background: var(--surface); color: var(--primary); border: 0; border-bottom: 2px solid var(--accent); font-size: 1.05em; font-weight: 800; letter-spacing: 0; flex: none; }
+        /* El cuerpo es la única zona con scroll. */
+        .admin-modal-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 10px; padding: 10px; align-items: stretch; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
         .admin-side { display: flex; flex-direction: column; gap: 8px; }
         .admin-card { border: 1px solid var(--border-soft); border-radius: 7px; padding: 7px; background: var(--light-gray); }
         .admin-card-title { color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: 0.3px; }
@@ -594,10 +607,19 @@
         .admin-role-option:has(input:checked) { border-color: var(--primary); background: var(--surface-violet); color: var(--primary); }
         .admin-role-option input { margin: 0; accent-color: var(--primary); }
         .admin-add-button { width: 100%; height: var(--button-height); border-radius: var(--button-radius); font-size: 9px; box-shadow: none; }
-        .admin-list-panel { min-width: 0; }
+        /* ── MODO MANTENIMIENTO (solo super admin) ── */
+        /* Tarjeta apartada del resto: apaga TODO el sistema, no es una cosa de un equipo. */
+        .admin-manto-card { border-color: color-mix(in srgb, var(--danger) 30%, var(--border-soft)); background: var(--surface-red-soft); }
+        .admin-manto-card .admin-card-title { color: var(--danger); }
+        .admin-manto-note { margin-top: 5px; line-height: 1.45; }
+        .admin-manto-btn { width: 100%; margin-top: 6px; border-style: dashed; font-size: 9px; letter-spacing: 0.3px; }
+        .admin-manto-btn.on { background: var(--danger); border-color: var(--danger); border-style: solid; color: var(--surface); }
+        /* La lista se estira hasta el alto disponible (y nunca más de la mitad de
+           la ventana), en vez de medir 400px fijos como antes. */
+        .admin-list-panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
         .admin-list-title { margin-bottom: 4px; color: var(--text-soft); font-size: 9px; font-weight: 800; letter-spacing: 0.3px; }
         .modal-content .admin-search { width: 100%; height: 30px; flex: none; box-sizing: border-box; margin: 0 0 6px; background: var(--surface); }
-        .admin-user-list { height: 400px; max-height: 60vh; overflow-y: auto; font-size: 10px; border: 1px solid var(--border-soft); border-radius: 8px; padding: 5px; background: var(--light-gray); }
+        .admin-user-list { flex: 1 1 auto; min-height: 180px; max-height: 52vh; overflow-y: auto; font-size: 10px; border: 1px solid var(--border-soft); border-radius: 8px; padding: 5px; background: var(--light-gray); }
         .admin-empty { padding: 12px 6px; text-align: center; color: var(--comment); font-size: 9px; font-weight: 800; }
         .admin-user-row { display: flex; align-items: center; gap: 5px; padding: 5px 6px; border: 1px solid var(--border-subtle); border-radius: 6px; margin-bottom: 4px; background: var(--surface); transition: border-color 0.2s ease, box-shadow 0.2s ease; }
         .admin-user-row:last-child { margin-bottom: 0; }
@@ -623,9 +645,23 @@
         /* Roles del usuario de un vistazo (la edición completa está en su propio modal) */
         .admin-roles-glance { flex: none; font-size: 9px; font-weight: 800; letter-spacing: 1px; color: var(--comment); white-space: nowrap; }
         /* ── MODAL DE EDICIÓN DE UN USUARIO ── */
-        #user-modal .modal-content { max-width: 520px; }
-        .user-modal-head { display: flex; flex-direction: column; gap: 2px; margin-bottom: 10px; }
-        .user-modal-email { font-size: 11px; font-weight: 800; color: var(--primary); word-break: break-all; }
+        /* Modal de usuario: igual que el panel admin, la caja es de alto fijo y
+           solo se desplaza el cuerpo. Así los botones del pie (incluido
+           ELIMINAR USUARIO) quedan siempre a la vista. */
+        #user-modal .modal-content {
+            max-width: 520px; width: 96%; box-sizing: border-box; height: 88vh; max-height: 88vh; margin: 6vh auto;
+            display: flex; flex-direction: column; overflow: hidden; padding: 20px;
+        }
+        #user-modal .modal-header { flex: none; }
+        .user-modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
+        .user-modal-body .admin-card { padding: 8px; }
+        .user-modal-footer { flex: none; margin: 8px 0 0; padding-top: 10px; flex-direction: column; gap: 0; }
+        /* Los tres botones del pie tienen que caber en un teléfono angosto: si no,
+           el que se sale empuja el modal y aparece una franja blanca debajo. */
+        .user-modal-foot-row { display: flex; flex-wrap: wrap; gap: 8px; }
+        .user-modal-foot-row .btn-modal-action { flex: 1 1 auto; min-width: 0; font-size: 9px; }
+        .user-modal-eliminar-nota { color: var(--comment); }
+        .btn-danger { background: var(--danger); color: var(--surface); }
         .user-modal-team-bar { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 8px; }
         .user-modal-team-bar label { font-size: 9px; font-weight: 800; color: var(--comment); }
         .user-modal-note { font-size: 9px; margin-top: 6px; line-height: 1.4; }
@@ -652,12 +688,12 @@
             border: 1px solid var(--border); color: var(--comment);
         }
         .admin-team-btn.active { background: var(--success); border-color: var(--success); color: var(--surface); }
-        .admin-modal-footer { justify-content: flex-end; margin: 0; padding: 8px 10px; background: var(--surface-soft); border-top: 1px solid var(--border-soft); }
+        .admin-modal-footer { flex: none; justify-content: flex-end; margin: 0; padding: 8px 10px; background: var(--surface-soft); border-top: 1px solid var(--border-soft); }
         .admin-modal-footer button { height: var(--button-height); padding: 0 14px; border-radius: var(--button-radius); font-size: 9px; }
 
         /* ── PESTANAS DEL PANEL ADMIN ── */
         /* selector de equipo del panel admin */
-        .admin-team-bar { display: flex; align-items: center; gap: 7px; padding: 8px 10px; background: var(--surface-soft); border-bottom: 1px solid var(--border-soft); flex-wrap: wrap; }
+        .admin-team-bar { display: flex; align-items: center; gap: 7px; padding: 8px 10px; background: var(--surface-soft); border-bottom: 1px solid var(--border-soft); flex-wrap: wrap; flex: none; }
         .admin-team-bar label { font-size: 9px; font-weight: 800; color: var(--comment); }
         select.admin-team-select {
             height: 28px; border: 1px solid var(--primary); border-radius: 6px; padding: 0 8px;
@@ -719,17 +755,21 @@
             .view-filters-wrap > button { grid-column: 1 / -1; justify-self: center; margin-top: 2px; }
             
             .header-controls { padding: 10px; }
-            .leader-panel-header { flex-direction: column; gap: 8px; text-align: center; }
-            .leader-panel-header div, .leader-panel-header button { width: 100%; }
+            /* La lupa se queda en la fila del título, a su costado. Antes bajaba a una
+               fila propia y el panel crecía una banda completa solo para un ícono. */
+            .leader-panel-header { flex-direction: row; gap: 8px; align-items: center; }
+            .leader-title { flex: 1 1 auto; min-width: 0; }
             .leader-title::after { display: none; }
-            .leader-search { width: 100%; justify-content: center; }
-            .leader-search.is-open { flex: 0 0 auto; }
+            .leader-search { width: auto; flex: 0 0 auto; justify-content: flex-end; }
+            /* Abierta, la lupa se lleva la mayor parte de la fila y el título
+               se recorta con puntos suspensivos antes que empujarla fuera. */
+            .leader-search.is-open { flex: 3 1 auto; min-width: 0; }
             .leader-panel-header .search-toggle,
             .leader-panel-header .search-clear { width: var(--button-height); flex: none; }
-            .leader-search.is-open .search-field { flex: 0 1 auto; width: 190px; max-width: 190px; }
-            .admin-modal-content { width: 98% !important; min-height: 0; max-height: 92vh; margin: 4% auto; }
+            .leader-search.is-open .search-field { flex: 1 1 auto; width: auto; min-width: 80px; max-width: none; }
+            .admin-modal-content { width: 98% !important; height: 94vh; max-height: 94vh; min-height: 0; margin: 3vh auto; }
             .admin-modal-layout { grid-template-columns: minmax(0, 1fr); }
-            .admin-user-list { height: 300px; max-height: 46vh; }
+            .admin-user-list { flex: 0 0 auto; height: 300px; max-height: 42vh; }
             
             .control-group { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; }
             .control-group span { width: auto !important; white-space: nowrap; text-align: left; margin-bottom: 0px; }
@@ -778,6 +818,7 @@
             .clock-divider { display: block; height: 23px; }
             .clock-zone { justify-content: center; gap: 5px; padding: 4px; }
             .clock-time { font-size: 10px; }
+            .leader-title { font-size: 0.7em; letter-spacing: 0.6px; }
             .admin-modal-layout { padding: 10px; gap: 10px; }
             .admin-role-option { padding: 2px; font-size: 8px; }
             .admin-user-row { align-items: flex-start; flex-wrap: wrap; }
@@ -885,7 +926,9 @@
 
         #toast {
             visibility: hidden; min-width: 250px; background-color: var(--primary); color: var(--surface);
-            text-align: center; border-radius: 4px; padding: 10px; position: fixed; z-index: 1001;
+            text-align: center; border-radius: 4px; padding: 10px; position: fixed; z-index: 1500;
+            /* 1500 y no 1001: el modal de usuario es 1250 y el de confirmacion 1400, asi que
+               con 1001 todos los avisos se veian DETRAS del modal y parecian no guardar */
             bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; box-shadow: 0 4px 12px color-mix(in srgb, var(--black) 20%, transparent);
             opacity: 0; transition: opacity 0.3s, visibility 0.3s; border-left: 4px solid var(--accent);
         }
@@ -974,6 +1017,19 @@
         .login-btn-danger { background: var(--danger); }
         .login-error { color: var(--danger); font-size: 10px; font-weight: 700; min-height: 14px; }
 
+        /* Pantalla de mantenimiento: reutiliza la carta de acceso, cambia el contenido.
+           El aviso se muestra incluso sin sesión, para que nadie piense que la
+           plataforma falló. */
+        .login-screen.is-mantenimiento .login-card { border-top: 4px solid var(--danger); }
+        .login-maint { display: none; }
+        .login-screen.is-mantenimiento .login-maint { display: block; }
+        .login-maint-txt { font-size: 10px; font-weight: 600; color: var(--text-soft); line-height: 1.6; margin: 0 0 9px; }
+        .login-maint-txt strong { color: var(--primary); font-weight: 800; }
+        .login-maint-since {
+            margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-subtle);
+            font-size: 8.5px; font-weight: 800; letter-spacing: 0.6px; color: var(--comment);
+        }
+
         /* Pantalla de carga profesional */
         #boot-splash { position: fixed; inset: 0; z-index: 10000; background: var(--gradient-boot); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: opacity .35s ease; }
         #boot-splash.hide { opacity: 0; pointer-events: none; }
@@ -999,9 +1055,15 @@
     <div class="login-card">
         <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines">
         <div id="login-card-title" class="login-title">PROGRAMACIÓN DIARIA</div>
-        <div class="login-sub">ACCESO RESTRINGIDO · PERSONAL AUTORIZADO</div>
+        <div id="login-sub" class="login-sub">ACCESO RESTRINGIDO · PERSONAL AUTORIZADO</div>
         <button id="login-google-btn" class="login-btn login-btn-google" onclick="doGoogleLogin()"><span class="g-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"><path fill="var(--google-blue)" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="var(--google-green)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="var(--google-yellow)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="var(--google-red)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></span> ENTRAR CON GOOGLE</button>
         <div id="login-google-sub" class="login-sub" style="font-size: 9px; margin-top: 2px;">USA TU CUENTA CORPORATIVA DE GOOGLE</div>
+        <div id="login-mantenimiento-msg" class="login-maint">
+            <p class="login-maint-txt">La Programación Diaria se encuentra <strong>temporalmente fuera de servicio</strong>: se están realizando trabajos de mantención y mejoras al sistema.</p>
+            <p class="login-maint-txt">Durante este período no es posible leer ni registrar información en la plataforma. El servicio se restablece de forma automática una vez finalizado el trabajo.</p>
+            <p class="login-maint-txt">Si tienes una operación en curso, comunícate con tu Team Leader. Gracias por tu comprensión.</p>
+            <div class="login-maint-since" id="login-mantenimiento-desde">MANTENIMIENTO EN CURSO</div>
+        </div>
         <div id="login-error-msg" class="login-error"></div>
     </div>
 </div>
@@ -1054,7 +1116,7 @@
 
     <div class="header-controls leader-only no-print">
         <div class="leader-panel-header">
-            <div class="leader-title">⚙️ PANEL DE CONTROL TEAM LEADER</div>
+            <div class="leader-title"><span class="leader-title-txt">⚙️ PANEL DE CONTROL TEAM LEADER</span></div>
             <div class="leader-search" id="leader-search">
                 <button type="button" id="btn-search-toggle" class="search-toggle" onclick="toggleSearch()" title="Buscar" aria-label="Buscar">🔍</button>
                 <input type="text" id="global-search-input" class="search-field" placeholder="BUSCAR SOLO ÚLTIMOS 30 DÍAS - TAREA, TANGO, WP, COMENTARIO...">
@@ -1112,7 +1174,11 @@
 <div id="confirm-modal" class="modal">
     <div class="modal-content" style="max-width: 380px;">
         <div class="modal-header">⚠️ CONFIRMACIÓN</div>
-        <div id="confirm-message" style="margin-bottom: 25px; font-size: 12px; font-weight: bold; color: var(--primary); text-align: center;">¿ESTÁS SEGURO?</div>
+        <div id="confirm-message" style="margin-bottom: 18px; font-size: 12px; font-weight: bold; color: var(--primary); text-align: center;">¿ESTÁS SEGURO?</div>
+        <div id="confirm-typed-wrap" style="display:none; margin-bottom: 14px;">
+            <div id="confirm-typed-hint" style="font-size: 9px; font-weight: 800; color: var(--comment); margin-bottom: 6px; text-align: center; line-height: 1.4;"></div>
+            <input type="text" id="confirm-typed-input" autocomplete="off" style="width: 100%; margin: 0; text-align: center; letter-spacing: 0.5px;">
+        </div>
         <div class="modal-footer" style="border:none; padding-top:0;">
             <button class="btn-outline btn-modal-action" onclick="closeConfirmModal()">CANCELAR</button>
             <button class="btn-leader btn-modal-action" id="confirm-yes-btn">CONFIRMAR</button>
@@ -1386,7 +1452,7 @@
                     <input type="text" id="admin-name" class="admin-field" list="admin-sugerencias" placeholder="USUARIO · EJ: juan.perez@latam.cl" autocomplete="off" oninput="adminSugerir()" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <datalist id="admin-sugerencias"></datalist>
                     <div class="team-note" id="admin-sugerencia-nota"></div>
-                    <input type="text" id="admin-realname" class="admin-field" placeholder="NOMBRE REAL · EJ: JUAN PEREZ" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
+                    <input type="text" id="admin-realname" class="admin-field" placeholder="NOMBRE · EJ: JUAN PEREZ" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <div class="admin-card-title">ROL EN ESTE EQUIPO <span style="font-weight:400;opacity:.7">· UNO SOLO</span></div>
                     <div class="admin-role-grid">
                         <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-user" value="usuario" checked> USUARIO</label>
@@ -1400,11 +1466,16 @@
                     <div class="admin-team-grid" id="admin-new-teams"></div>
                 </div>
                 <button class="btn-leader admin-add-button" onclick="adminAddUser()">AGREGAR AL EQUIPO</button>
+                <div class="admin-card admin-manto-card" id="admin-mantenimiento-card" style="display:none;">
+                    <div class="admin-card-title">MODO MANTENIMIENTO <span style="font-weight:400;opacity:.7">· SOLO SUPER ADMIN</span></div>
+                    <div class="team-note admin-manto-note" id="admin-mantenimiento-nota">DESACTIVADO. TODO EL PERSONAL ACCEDE CON NORMALIDAD.</div>
+                    <button type="button" class="admin-rol-btn admin-manto-btn" id="admin-mantenimiento-btn" onclick="adminAlternarMantenimiento()">🔧 ACTIVAR MANTENIMIENTO</button>
+                </div>
             </div>
             <div class="admin-list-panel">
                 <div class="admin-list-title" id="admin-list-title">USUARIOS</div>
                 <div class="admin-search-row">
-                    <input type="text" id="admin-search" class="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE REAL..." autocomplete="off" oninput="refreshAdminList()">
+                    <input type="text" id="admin-search" class="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE..." autocomplete="off" oninput="refreshAdminList()">
                     <button class="team-btn" id="admin-filtro-equipo" onclick="adminAlternarFiltroEquipo()" title="MOSTRAR SOLO LOS USUARIOS DE ESTE EQUIPO">SOLO ESTE EQUIPO</button>
                 </div>
                 <div id="admin-list" class="admin-user-list"></div>
@@ -1419,38 +1490,49 @@
 <div id="user-modal" class="modal" style="z-index: 1250;">
     <div class="modal-content">
         <div class="modal-header">✎ EDITAR USUARIO</div>
-        <div class="user-modal-head">
-            <span class="user-modal-email" id="user-modal-user">USUARIO</span>
-        </div>
-        <div class="user-modal-team-bar">
-            <label for="user-modal-team">EQUIPO:</label>
-            <select id="user-modal-team" class="admin-team-select" onchange="userModalCambiaEquipo(this.value)"></select>
+        <div class="user-modal-body">
+            <div class="admin-card">
+                <div class="admin-card-title">NOMBRE</div>
+                <input type="text" id="user-modal-nombre" class="admin-field" placeholder="EJ: JUAN PEREZ" autocomplete="off" oninput="userModalEscribeNombre()" onkeypress="if(event.key === 'Enter') userModalGuardarNombre()">
+                <button class="btn-leader admin-add-button" style="margin-top: 6px;" onclick="userModalGuardarNombre()">GUARDAR NOMBRE</button>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-title">EMAIL DE LA CUENTA</div>
+                <input type="text" id="user-modal-email" class="admin-field" placeholder="EJ: JUAN.PEREZ@LATAM.COM" autocomplete="off" oninput="userModalEscribeEmail()" onkeypress="if(event.key === 'Enter') userModalGuardarEmail()">
+                <div class="team-note" id="user-modal-email-nota">Es el correo con el que la persona entra a la plataforma. Si lo corriges, tendrá que entrar con la cuenta nueva.</div>
+                <button class="btn-leader admin-add-button" id="user-modal-guardar-email" style="margin-top: 6px;" onclick="userModalGuardarEmail()">GUARDAR EMAIL</button>
+            </div>
+
+            <div class="user-modal-team-bar">
+                <label for="user-modal-team">EQUIPO:</label>
+                <select id="user-modal-team" class="admin-team-select" onchange="userModalCambiaEquipo(this.value)"></select>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-title">ROL EN ESTE EQUIPO <span style="font-weight:400;opacity:.7">· UNO SOLO</span></div>
+                <div class="admin-rol-grid2" id="user-modal-roles"></div>
+                <div class="team-note" style="margin-top:6px">EL ADMIN SE SUMA ARRIBA DEL ROL: NO LO REEMPLAZA Y NO DA PODERES DE TURNO.</div>
+                <button type="button" class="admin-rol-btn admin-rol-admin" id="user-modal-admin"
+                    onclick="userModalAlternarAdmin()">ADMIN</button>
+                <div class="team-note user-modal-note" id="user-modal-nota"></div>
+            </div>
+
+            <div class="admin-card">
+                <div class="admin-card-title">ADMIN DE OTROS EQUIPOS</div>
+                <div class="admin-team-grid" id="user-modal-equipos"></div>
+                <div class="team-note">Marca los equipos en los que esta persona es admin. Para que entre a otro equipo, un admin de ese equipo debe agregarlo como miembro.</div>
+            </div>
         </div>
 
-        <div class="admin-card">
-            <div class="admin-card-title">NOMBRE REAL</div>
-            <input type="text" id="user-modal-nombre" class="admin-field" placeholder="EJ: JUAN PEREZ" autocomplete="off" oninput="userModalEscribeNombre()" onkeypress="if(event.key === 'Enter') userModalGuardarNombre()">
-            <button class="btn-leader admin-add-button" style="margin-top: 6px;" onclick="userModalGuardarNombre()">GUARDAR NOMBRE</button>
-        </div>
-
-        <div class="admin-card">
-            <div class="admin-card-title">ROL EN ESTE EQUIPO <span style="font-weight:400;opacity:.7">· UNO SOLO</span></div>
-            <div class="admin-rol-grid2" id="user-modal-roles"></div>
-            <div class="team-note" style="margin-top:6px">EL ADMIN SE SUMA ARRIBA DEL ROL: NO LO REEMPLAZA Y NO DA PODERES DE TURNO.</div>
-            <button type="button" class="admin-rol-btn admin-rol-admin" id="user-modal-admin"
-                onclick="userModalAlternarAdmin()">ADMIN</button>
-            <div class="team-note user-modal-note" id="user-modal-nota"></div>
-        </div>
-
-        <div class="admin-card">
-            <div class="admin-card-title">EQUIPOS QUE ADMINISTRAS</div>
-            <div class="admin-team-grid" id="user-modal-equipos"></div>
-            <div class="team-note">Toca un equipo para agregarlo o quitarlo. Para entrar a otro equipo, un admin de ese equipo debe agregarte.</div>
-        </div>
-
-        <div class="modal-footer">
-            <button class="btn-danger-outline btn-modal-action" id="user-modal-quitar" onclick="userModalQuitarDeEquipo()">✖ QUITAR DEL EQUIPO</button>
-            <button class="btn-outline btn-modal-action" onclick="closeModal('user-modal')">CERRAR</button>
+        <div class="modal-footer user-modal-footer">
+            <div class="team-note user-modal-eliminar-nota" id="user-modal-eliminar-nota" style="margin: 0 0 6px;"></div>
+            <div class="user-modal-foot-row">
+                <button class="btn-danger-outline btn-modal-action" id="user-modal-quitar" onclick="userModalQuitarDeEquipo()">✖ QUITAR DEL EQUIPO</button>
+                <button class="btn-danger btn-modal-action" id="user-modal-borrar" onclick="userModalEliminar()"
+                    title="BORRA LA CUENTA COMPLETA DE ESTE USUARIO EN TODOS LOS EQUIPOS">🗑 ELIMINAR USUARIO</button>
+                <button class="btn-outline btn-modal-action" onclick="closeModal('user-modal')">CERRAR</button>
+            </div>
         </div>
     </div>
 </div>
@@ -1505,9 +1587,23 @@
     let correosAutorizados = [];
     let adminList = [];
     let superAdmins = [];
+    // La lista de super admins es global (no depende de la sesión): una vez cargada
+    // sirve para siempre. Se necesita saber si YA llegó, para no expulsar al super
+    // admin por un falso negativo mientras la lista todavía está cargando.
+    let superAdminsListo = false;
 
     // SUPER ADMINS (gestionados directamente en Firebase, no en el código)
     const superAdminsRef = ref(db, 'mantenimiento/super_admin');
+
+    // MODO MANTENIMIENTO. Es una bandera GLOBAL, no de un equipo: apaga el sistema
+    // completo. Cuando está activa las reglas bloquean toda lectura y escritura
+    // (salvo al super admin) y el resto del personal ve la pantalla de acceso con
+    // el aviso de mantenimiento. El aviso se lee SIN sesión, para que también quien
+    // aún no entró con Google sepa que no es una caída.
+    const estadoMantenimientoRef = ref(db, 'mantenimiento/_estado');
+    let mantenimientoActivo = false;
+    let mantenimientoDesde = 0;
+    const TZ_SANTIAGO = 'America/Santiago';
 
     // La identidad es SIEMPRE el correo completo. Se aceptan también el alias sin
     // dominio para no dejar fuera cuentas antiguas ni listas ya cargadas en Firebase.
@@ -1535,6 +1631,9 @@
     let techUsers = [];
     let uidLinked = false;   // el indice de uids solo se escribe una vez por carga
     let usuariosDB = {};
+    // clave REAL de cada nodo en firebase (tal cual la devuelve la base), indexada por la
+    // clave que usa la app. Sin esto habria que adivinarla y se creaban duplicados.
+    let nodoRealDe = {};
     // Resuelve la clave del registro: correo completo y, si la cuenta viene del formato
     // antiguo (guardada sin dominio), su alias. Evita que nadie quede fuera tras el cambio.
     function sanitizeKey(k) {
@@ -1544,6 +1643,8 @@
     // pero la ruta de firebase va saneada (con guiones bajos, porque . no se puede usar en una
     // clave). Al resolver hay que probar las dos formas: si no, pasar la clave de la ruta
     // creaba un SEGUNDO registro de la misma persona y el usuario aparecia duplicado.
+    // OJO: devuelve la forma que EXISTE en usuariosDB (con puntos), no la de la ruta. Quien
+    // vaya a escribir en firebase tiene que pasar esa clave por sanitizeKey() primero.
     function userKeyFor(id) {
         const n = normalizeEmail(id);
         const alias = n.split('@')[0];
@@ -1554,7 +1655,36 @@
                 if (k && formas.indexOf(k) === -1) formas.push(k);
             });
         });
-        return formas.find(k => usuariosDB[k]) || formas[0];
+        return formas.find(k => usuariosDB[k]) || sanitizeKey(formas[0] || n);
+    }
+    // Puente entre las dos claves: la entrada de usuariosDB que corresponde a una clave
+    // de nodo. Se usa al guardar nombre/email, que antes escribían en usuariosDB[<clave
+    // saneada>] (que no existe) y creaban un registro fantasma: el nombre no se veía,
+    // el campo se repintaba con el email y el usuario salía duplicado.
+    function idxLocalDe(claveNodo) {
+        if (nodoRealDe[claveNodo]) return nodoRealDe[claveNodo];
+        if (usuariosDB[claveNodo]) return claveNodo;
+        return Object.keys(nodoRealDe).find(k => nodoRealDe[k] === claveNodo)
+            || Object.keys(usuariosDB).find(x => sanitizeKey(x) === sanitizeKey(claveNodo))
+            || claveNodo;
+    }
+    function recLocalDe(claveNodo) {
+        const i = idxLocalDe(claveNodo);
+        if (!usuariosDB[i]) usuariosDB[i] = { email: '', nombre: '', roles: {} };
+        return usuariosDB[i];
+    }
+    // LA clave de nodo con la que hay que escribir, tal cual la tiene firebase.
+    //
+    // Aquí estaba el bug de verdad: los nodos NO son todos iguales. Los que creó la app
+    // tienen la clave saneada (alonso_urzua@latam_com) pero los importados o escritos a
+    // mano conservan los puntos y las mayusculas (DECCI.GUZZMAN@LATAM.COMM). Si al
+    // escribir se hacia sanitizeKey() a ciegas, esa clave se convertia en
+    // DECCI_GUZZMAN@LATAM_COMM: se creaba un usuario NUEVO, el original se quedaba sin
+    // el nombre y el modal, al repintar, caia en el registro equivocado. Por eso la clave
+    // real se guarda al leer (nodoRealDe) y no se vuelve a adivinar nunca.
+    function claveNodoDe(user) {
+        const local = userKeyFor(user);
+        return nodoRealDe[local] || sanitizeKey(local);
     }
     function displayNameFor(id) {
         const rec = usuariosDB[userKeyFor(id)];
@@ -1746,7 +1876,7 @@
     }
     function datosPath() { return 'mantenimiento/pd/datos/' + (currentTeam || EQUIPO_DEFECTO); }
     function rolesPath(user, team) {
-        return 'mantenimiento/pd/usuarios/' + sanitizeKey(userKeyFor(user)) + '/roles/' + sanitizeTeamId(team || currentTeam);
+        return 'mantenimiento/pd/usuarios/' + claveNodoDe(user) + '/roles/' + sanitizeTeamId(team || currentTeam);
     }
     function esMiembroDe(user, team) {
         return rolDeUsuario(user, team) !== null;
@@ -1857,7 +1987,7 @@
     // fallar la escritura del rol (que ya se guardo) ni mostrar un error mentiroso.
     function sincronizarIndiceAdmins(user, team) {
         try {
-            const key = sanitizeKey(userKeyFor(user));
+            const key = claveNodoDe(user);
             if (!key || !team) return;
             const esAdmin = puede(user, 'administrar', team);
             const ruta = 'mantenimiento/pd/admins/' + key + '/' + sanitizeTeamId(team);
@@ -1907,19 +2037,95 @@
                 return false;
             });
     }
-    // El nombre real se escribe en pd/usuarios/<correo>/nombre (junto al email)
+    // El nombre se escribe en pd/usuarios/<clave del nodo>/nombre (junto al email).
+    // La copia local se actualiza en la ENTRADA REAL del registro (idxLocalDe): si se
+    // escribiera en usuariosDB[<clave saneada>] se creaba un segundo registro en memoria,
+    // el nombre no se veía y el usuario salia duplicado en las listas.
     function guardarNombre(user, nombre) {
-        const key = sanitizeKey(userKeyFor(user));
-        const rec = usuariosDB[key] || {};
+        const key = claveNodoDe(user);
+        const rec = recLocalDe(key);
+        const previo = rec.nombre;
         rec.nombre = nombre || '';
         return set(ref(db, 'mantenimiento/pd/usuarios/' + key + '/nombre'), nombre || '')
-            .catch((e) => { console.warn('nombre no guardado:', e && e.code); });
+            .catch((e) => {
+                rec.nombre = previo;   // si no se guardó, la pantalla no lo muestra
+                console.error('FIREBASE WRITE ERROR (nombre)', e);
+                throw e;
+            });
     }
-    function guardarEmail(user) {
-        const key = sanitizeKey(userKeyFor(user));
-        const rec = usuariosDB[key] || {};
-        return set(ref(db, 'mantenimiento/pd/usuarios/' + key + '/email'), rec.email || normalizeEmail(user))
-            .catch((e) => { console.warn('email no guardado:', e && e.code); });
+    // El email ES la identidad de la persona: la clave del nodo se llama como el email
+    // (alonso_urzua@latam_com), asi que corregirlo implica MOVER el registro al nodo
+    // nuevo. Si solo se cambiara el campo, la clave vieja se quedaria apuntando al
+    // indice de admins y a uids, y la persona perderia sus permisos al entrar.
+    // Mover el nodo exige .write sobre el, que solo tiene el super admin: de paso
+    // nadie mas puede quedarse con la cuenta de otro escribiendole un correo nuevo.
+    function guardarEmail(user, email) {
+        const viejo = claveNodoDe(user);
+        const valor = normalizeEmail(email !== undefined ? email : user);
+        // la clave del nodo NUEVO se crea saneada, como las altas nuevas de la app
+        const nuevo = sanitizeKey(valor);
+        const i = idxLocalDe(viejo);
+        if (!usuariosDB[i]) usuariosDB[i] = { email: '', nombre: '', roles: {} };
+        const rec = usuariosDB[i];
+        const previo = rec.email;
+        const tareas = [];
+        if (nuevo === viejo) {
+            rec.email = valor;
+            nodoRealDe[nuevo] = nuevo;
+            tareas.push(set(ref(db, 'mantenimiento/pd/usuarios/' + viejo + '/email'), valor));
+        } else {
+            // se copia el registro al nodo nuevo (roles incluidos) y se borra el viejo
+            const roles = (rec.roles && Object.keys(rec.roles).length) ? rec.roles : null;
+            tareas.push(set(ref(db, 'mantenimiento/pd/usuarios/' + nuevo), { email: valor, nombre: rec.nombre || '', roles: roles }));
+            // el indice de admins tambien se mueve: las reglas lo usan para saber quien
+            // administra que, asi que si se queda atras el admin pierde el equipo
+            Object.keys(rec.roles || {}).forEach(t => {
+                if (rec.roles[t] && rec.roles[t].admin === true) tareas.push(set(ref(db, 'mantenimiento/pd/admins/' + nuevo + '/' + sanitizeTeamId(t)), true));
+            });
+            tareas.push(remove(ref(db, 'mantenimiento/pd/usuarios/' + viejo)));
+            tareas.push(remove(ref(db, 'mantenimiento/pd/admins/' + viejo)));
+        }
+        return Promise.all(tareas)
+            .then(() => {
+                rec.email = valor;
+                // el mapa de claves reales se actualiza al registro movido
+                delete nodoRealDe[i];
+                nodoRealDe[valor] = nuevo;
+                // usuariosDB se indexa por el email: si cambio hay que reindexar la
+                // entrada, o userKeyFor() dejaria de encontrar a la persona y perderia
+                // sus roles en pantalla hasta recargar la pagina
+                if (i !== valor) { delete usuariosDB[i]; usuariosDB[valor] = rec; }
+                return { nodo: nuevo, movido: nuevo !== viejo };
+            })
+            .catch((e) => {
+                rec.email = previo;
+                console.error('FIREBASE WRITE ERROR (email)', e);
+                throw e;
+            });
+    }
+    // Registros que dejaron versiones anteriores: nodos SIN email y SIN roles, que no
+    // sirven para que nadie entre y solo hacen ruido en la base. Se listan para que el
+    // super admin los borre con:  limpiarRegistrosBasura()
+    function registrosBasura() {
+        const sucios = [];
+        if (typeof usuariosDB !== 'undefined') {
+            Object.keys(usuariosDB).forEach(k => {
+                const r = usuariosDB[k] || {};
+                if (!normalizeEmail(r.email) && !(r.roles && Object.keys(r.roles).length)) sucios.push(k);
+            });
+        }
+        return sucios;
+    }
+    async function limpiarRegistrosBasura() {
+        if (!isSuperAdmin(sessionUser())) { showToast('⚠️ SOLO EL SUPER ADMIN PUEDE LIMPIAR ESTOS REGISTROS'); return 0; }
+        const sucios = registrosBasura();
+        if (!sucios.length) { showToast('✅ NO HAY REGISTROS SIN DATOS'); return 0; }
+        for (let i = 0; i < sucios.length; i++) {
+            try { await remove(ref(db, 'mantenimiento/pd/usuarios/' + (nodoRealDe[sucios[i]] || sucios[i]))); }
+            catch (e) { console.warn('no se pudo borrar', sucios[i], e && e.code); }
+        }
+        showToast('🧹 SE BORRARON ' + sucios.length + ' REGISTRO(S) SIN DATOS');
+        return sucios.length;
     }
     const tlUsersRef = ref(db, 'mantenimiento/pd/usuarios');
 
@@ -1940,14 +2146,34 @@
             if(Array.isArray(v)) superAdmins = v;
             else if(v && typeof v==='object') superAdmins = Object.values(v);
             else superAdmins = [];
+            superAdminsListo = true;
             updateAdminUI();
             refreshAdminListIfOpen();
             if (typeof evaluateGate === 'function') evaluateGate();
         }, (e) => console.warn('super_admin:', e.code)));
+        // Bandera de mantenimiento. Es la ÚNICA fuente de verdad: la cambian las
+        // reglas, no el cliente. Si llega un cambio, se vuelve a evaluar la puerta
+        // para que el bloqueo (o su levantamiento) sea inmediato en todos los equipos.
+        rolesUnsubs.push(onValue(estadoMantenimientoRef, (snapshot) => {
+            const v = snapshot.val() || {};
+            const activo = v.activo === true;
+            const desde = typeof v.desde === 'number' ? v.desde : 0;
+            updateMantenimientoUI();
+            if (activo === mantenimientoActivo && desde === mantenimientoDesde) return;
+            const estaba = mantenimientoActivo;
+            mantenimientoActivo = activo;
+            mantenimientoDesde = desde;
+            // Firebase cancela solo los listeners a los que se le niegan los
+            // permisos: al levantar el mantenimiento hay que volver a suscribirlos,
+            // si no el personal se quedaría con los datos congelados de antes.
+            if (estaba && !activo) { lastRolesUid = null; subscribeRoles(); }
+            if (typeof evaluateGate === 'function') evaluateGate();
+        }, (e) => console.warn('_estado:', e.code)));
         rolesUnsubs.push(onValue(tlUsersRef, (snapshot) => {
             const raw = snapshot.val();
             usuariosLoaded = true;
         usuariosDB = {};
+        nodoRealDe = {};
         const ingest = (name, e) => {
             if (!name) return;
             if (typeof e === 'string') e = {};
@@ -1980,7 +2206,16 @@
                 const r = { usuario: !!(e.usuario || e.acceso), tech: !!e.tech, tl: !!e.tl, admin: !!e.admin };
                 roles[EQUIPO_DEFECTO] = Object.assign({ nombre: e.nombre || '' }, rolesDeUnRol(unRol(r), r.admin === true));
             }
+            // Nodo basura: sin correo y sin ningún rol no le sirve de nada a nadie y solo
+            // ensucia las listas (puede haberlos dejado una escritura con una clave mal
+            // resuelta en versiones anteriores). No se carga.
+            if (!email && !Object.keys(roles).length) return;
             usuariosDB[key] = { email: email, nombre: nombre, roles: roles };
+            // La clave REAL del nodo, sin sanear: es la unica que vale para escribir.
+            // Si se calculara con sanitizeKey(), un nodo importado como
+            // DECCI.GUZZMAN@LATAM.COMM escribiria en DECCI_GUZZMAN@LATAM_COMM y crearia
+            // un usuario fantasma en vez de editar a este.
+            nodoRealDe[key] = name;
         };
         if (Array.isArray(raw)) { // formato antiguo: lista de strings o de registros
             raw.filter(Boolean).forEach(e => ingest(typeof e === 'string' ? e : e.u, e));
@@ -2264,6 +2499,54 @@
     // P3 FIX: Solo se oculta cuando llegan datos del header (arriba). Fallback 15s para no quedar pegado si no hay datos.
     setTimeout(() => { if(!splashHidden) console.warn('Splash fallback 15s'); hideSplash(); }, 15000);
 
+    // ─── PANTALLA DE MANTENIMIENTO ────────────────────────────────────────
+    // Reutiliza la pantalla de acceso: mismo lugar donde el personal ya sabe
+    // que tiene que entrar, pero con el aviso de mantenimiento en vez del botón
+    // de Google (entrar no serviría de nada con el sistema apagado).
+    function mostrarPantallaMantenimiento() {
+        const overlay = document.getElementById('login-obligatorio');
+        if (!overlay) return;
+        detachData();
+        deactivateLeaderUI();
+        const btnLogout = document.getElementById('btn-logout');
+        if (btnLogout) btnLogout.style.display = 'none';
+        currentTeam = null;
+        const switcher = document.getElementById('team-switcher');
+        if (switcher) switcher.style.display = 'none';
+        overlay.classList.add('is-mantenimiento');
+        const t = document.getElementById('login-card-title');
+        const s = document.getElementById('login-sub');
+        const g = document.getElementById('login-google-btn');
+        const gs = document.getElementById('login-google-sub');
+        const err = document.getElementById('login-error-msg');
+        if (t) t.innerText = 'MANTENIMIENTO EN CURSO';
+        if (s) s.innerText = 'PROGRAMACIÓN DIARIA · NO DISPONIBLE';
+        if (g) g.style.display = 'none';
+        if (gs) gs.style.display = 'none';
+        if (err) err.innerText = '';
+        const desde = document.getElementById('login-mantenimiento-desde');
+        const hora = horaMantenimiento(mantenimientoDesde);
+        if (desde) desde.innerText = hora ? 'MANTENIMIENTO EN CURSO DESDE LAS ' + hora + ' HRS' : 'MANTENIMIENTO EN CURSO';
+        overlay.style.display = 'flex';
+        document.title = 'Mantenimiento · Programación Diaria';
+        hideSplash();
+    }
+    // Deja la pantalla de acceso tal como estaba, por si el mantenimiento se levantó
+    // o nunca estuvo activo (si no, la clase y el botón ocultos se quedarían).
+    function limpiarPantallaMantenimiento() {
+        const overlay = document.getElementById('login-obligatorio');
+        if (!overlay) return;
+        overlay.classList.remove('is-mantenimiento');
+        const t = document.getElementById('login-card-title');
+        const s = document.getElementById('login-sub');
+        const g = document.getElementById('login-google-btn');
+        const gs = document.getElementById('login-google-sub');
+        if (g) g.style.display = '';
+        if (gs) gs.style.display = '';
+        if (t) t.innerText = 'PROGRAMACIÓN DIARIA';
+        if (s) s.innerText = 'ACCESO RESTRINGIDO · PERSONAL AUTORIZADO';
+    }
+
     function evaluateGate() {
         const overlay = document.getElementById('login-obligatorio');
         if (!overlay) return;
@@ -2271,6 +2554,25 @@
 
         // ═══ INICIO DE SESIÓN CON GOOGLE OBLIGATORIO (único modo) ═══
         const u = sessionUser();
+
+        // Primero la lista de super admins: es lo único que separa al super admin
+        // del resto, y sin ella no se puede decidir a quién se deja pasar. Se espera
+        // corto y se reintenta, como con los roles.
+        if (u && !superAdminsListo) {
+            if (!gateRolesTimer) gateRolesTimer = setTimeout(() => { gateRolesTimer = null; evaluateGate(); }, 2500);
+            return;
+        }
+
+        // ═══ MANTENIMIENTO ═══
+        // Las reglas ya impiden leer y escribir a cualquiera que no sea super admin:
+        // esto es solo la capa que se ve. Se comprueba ANTES de esperar los roles,
+        // porque en mantenimiento la lista de usuarios también está bloqueada y
+        // esperarla dejaría al personal mirando la pantalla de carga.
+        if (mantenimientoActivo && !(u && isSuperAdmin(u))) {
+            mostrarPantallaMantenimiento();
+            return;
+        }
+
         if (u && !usuariosLoaded) {
             // roles aún cargando: espera breve y reintenta (sin parpadeos ni bloqueos falsos)
             if (!gateRolesTimer) gateRolesTimer = setTimeout(() => { gateRolesTimer = null; evaluateGate(); }, 2500);
@@ -2283,6 +2585,7 @@
             // hay que asegurar el indice de uids o las reglas no dareian permisos.
             const g = googleUser();
             if (g && !uidLinked) { uidLinked = true; linkUid(g, u).catch(() => {}); }
+            limpiarPantallaMantenimiento();
             overlay.style.display = 'none';
             attachData();
             myEmail = u;
@@ -2307,6 +2610,7 @@
         }
 
         // Sin sesión válida → pantalla de acceso con Google
+        limpiarPantallaMantenimiento();
         detachData();
         deactivateLeaderUI();
         if (btnLogout) btnLogout.style.display = 'none';   // sin sesión no hay nada que cerrar
@@ -2355,7 +2659,7 @@
             return;
         }
         // el indice de las reglas debe apuntar siempre a la clave real del registro
-        await dbSet(ref(db, 'mantenimiento/uids/' + fu.uid), sanitizeKey(key), 'REGISTRAR UID');
+        await dbSet(ref(db, 'mantenimiento/uids/' + fu.uid), claveNodoDe(key), 'REGISTRAR UID');
         // El correo ya lo escribe el admin al crear el usuario; solo un admin puede
         // tocarlo, asi que aqui no se intenta (el indice de arriba ya quedo listo).
     }
@@ -2392,6 +2696,80 @@
     function updateAdminUI() {
         const btn = document.getElementById('btn-admin');
         if (btn) btn.style.display = isAdminUser() ? 'inline-flex' : 'none';
+        updateMantenimientoUI();
+    }
+
+    // ─── MODO MANTENIMIENTO (solo super admin) ───────────────────────────
+    function horaMantenimiento(ts) {
+        if (!ts) return '';
+        try {
+            return new Date(ts).toLocaleTimeString('es-ES', { timeZone: TZ_SANTIAGO, hour: '2-digit', minute: '2-digit' });
+        } catch (e) { return ''; }
+    }
+    function updateMantenimientoUI() {
+        const card = document.getElementById('admin-mantenimiento-card');
+        const btn = document.getElementById('admin-mantenimiento-btn');
+        const nota = document.getElementById('admin-mantenimiento-nota');
+        // La tarjeta NO existe para un admin de equipo: el mantenimiento es una
+        // decisión de sistema y solo el super admin puede tomarla.
+        const puede = isSuperAdmin(sessionUser());
+        if (card) card.style.display = puede ? 'block' : 'none';
+        if (!puede) return;
+        const hora = horaMantenimiento(mantenimientoDesde);
+        if (btn) {
+            btn.classList.toggle('on', mantenimientoActivo);
+            btn.textContent = mantenimientoActivo ? '🔧 MANTENIMIENTO ACTIVO · DESACTIVAR' : '🔧 ACTIVAR MANTENIMIENTO';
+        }
+        if (nota) {
+            nota.textContent = mantenimientoActivo
+                ? 'ACTIVADO DESDE LAS ' + (hora || '—') + ' HRS. NADIE PUEDE LEER NI ESCRIBIR; SOLO TÚ SEGUES OPERANDO.'
+                : 'DESACTIVADO. TODO EL PERSONAL ACCEDE CON NORMALIDAD.';
+            nota.style.color = mantenimientoActivo ? 'var(--danger)' : 'var(--comment)';
+        }
+    }
+    function adminAlternarMantenimiento() {
+        if (!isSuperAdmin(sessionUser())) {
+            return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE CONTROLAR EL MANTENIMIENTO');
+        }
+        const activar = !mantenimientoActivo;
+        showConfirm(
+            activar
+                ? '⚠️ SE ACTIVARÁ EL MODO MANTENIMIENTO\n\n' +
+                  'A partir de este momento se bloquea TODA lectura y escritura del sistema:\n' +
+                  '· El personal verá la pantalla de acceso con el aviso de mantenimiento.\n' +
+                  '· Nadie podrá ver, crear ni modificar nada en ningún equipo.\n' +
+                  '· Los datos ya guardados NO se borran ni se modifican.\n\n' +
+                  'Solo tú (super admin) seguirás trabajando con normalidad para aplicar los cambios.\n\n' +
+                  '¿ACTIVAR EL MANTENIMIENTO?'
+                : '¿DESACTIVAR EL MODO MANTENIMIENTO?\n\n' +
+                  'Todo el personal recuperará el acceso normal al sistema de inmediato.',
+            () => {
+                const ahora = activar ? Date.now() : 0;
+                set(estadoMantenimientoRef, { activo: activar, desde: ahora })
+                    .then(() => {
+                        // Se actualiza en memoria al tiro para que el botón no se vea
+                        // congelado: el listener puede tardar un instante en llegar.
+                        mantenimientoActivo = activar;
+                        mantenimientoDesde = ahora;
+                        updateMantenimientoUI();
+                        showToast(activar
+                            ? '🔧 MANTENIMIENTO ACTIVADO · SOLO EL SUPER ADMIN PUEDE OPERAR'
+                            : '✅ MANTENIMIENTO DESACTIVADO · ACCESO NORMAL');
+                    })
+                    .catch((e) => {
+                        console.error('FIREBASE WRITE ERROR', e);
+                        // Si ya se verificó que eres super admin, un PERMISSION_DENIED
+                        // aquí casi siempre significa que las reglas de la base todavía
+                        // no incluyen la escritura de _estado en Firebase.
+                        const pista = (e.code === 'permission-denied')
+                            ? '\nRevisa que REGLAS_FIREBASE.json esté publicado en Firebase.'
+                            : '';
+                        showToast('⚠️ NO SE PUDO CAMBIAR EL MODO MANTENIMIENTO (' + (e.code || e.message) + ')' + pista);
+                    });
+            }
+        );
+        const yes = document.getElementById('confirm-yes-btn');
+        if (yes) yes.innerText = activar ? 'SÍ, ACTIVAR' : 'SÍ, DESACTIVAR';
     }
 
     function showToast(msg) {
@@ -2609,7 +2987,7 @@
             usuariosConRolEn(team).forEach(key => {
                 const rec = usuariosDB[key];
                 if (rec && rec.roles) delete rec.roles[team];
-                tareas.push(remove(ref(db, 'mantenimiento/pd/usuarios/' + sanitizeKey(key) + '/roles/' + team)));
+                tareas.push(remove(ref(db, 'mantenimiento/pd/usuarios/' + claveNodoDe(key) + '/roles/' + team)));
             });
             ['global_techs', 'predefined_task', 'historial'].forEach(hoja =>
                 tareas.push(remove(ref(db, 'mantenimiento/pd/datos/' + team + '/' + hoja))));
@@ -2877,8 +3255,12 @@
                     || (yaExistia ? nombreDe(key, team) : name.split('@')[0]);
         guardarRol(key, team, rolesDeUnRol(rol, admin)).then((ok) => {
             if (!ok) return;
-            if (!yaExistia) guardarEmail(key);               // el correo lo valida el indice uids
-            if (nombre !== nombreDe(key, team)) guardarNombre(key, nombre);
+            // el correo lo valida el indice uids: si no se puede guardar, el alta
+            // igual quedó hecha, asi que se avisa en vez de romper la promesa suelta
+            if (!yaExistia) guardarEmail(key).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL EMAIL (' + (e.code || e.message) + ')'));
+            if (nombre !== nombreDe(key, team)) {
+                guardarNombre(key, nombre).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL NOMBRE (' + (e.code || e.message) + ')'));
+            }
             document.getElementById('admin-name').value = '';
             document.getElementById('admin-realname').value = '';
             const nota = document.getElementById('admin-sugerencia-nota');
@@ -3083,7 +3465,7 @@
     }
 
     // ─── AGREGAR / QUITAR USUARIO DE UN EQUIPO ─────────────────────────────
-    // Se usa desde el modal de edición de usuario (apartado "EQUIPOS QUE ADMINISTRAS").
+    // Se usa desde el modal de edición de usuario (apartado "ADMIN DE OTROS EQUIPOS").
     function adminAlternarEquipoUsuario(team, key) {
         if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
         const dentro = esMiembroDe(key, team);
@@ -3106,6 +3488,7 @@
     let userModalUser = null;   // clave del usuario abierto
     let userModalTeam = null;   // equipo cuyos roles se están editando
     let userModalNombre = null; // nombre tecleado y aún sin guardar (null = nada tecleado)
+    let userModalEmail = null;  // email tecleado y aún sin guardar (null = nada tecleado)
     const USER_ROLES_UI = ROLES;   // una sola fuente: agregar un rol lo agrega al modal
     function abrirEditarUsuario(user) {
         if (!isAdminUser()) return;
@@ -3117,8 +3500,7 @@
         if (isSuperAdmin(rec.email || user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
         userModalUser = key;
         userModalNombre = null;
-        const label = document.getElementById('user-modal-user');
-        if (label) label.innerText = key.toUpperCase();
+        userModalEmail = null;
         // arranca en el equipo del panel si el usuario está ahí; si no, en el primero
         // que administres y del que sea miembro
         const panel = equipoDelPanel();
@@ -3136,6 +3518,59 @@
         const modal = document.getElementById('user-modal');
         if (!key || !modal || modal.style.display !== 'block') return;
         const team = userModalTeam;
+
+        // ── Datos de la cuenta (independientes del equipo abierto) ──
+        // Se pintan antes de todo porque se ven igual con cualquier equipo elegido.
+        const editable = userModalTeam ? puedoGestionarEquipo(userModalTeam) : puedoGestionarEquipo(equipoDelPanel());
+        // email: si el admin ya está tecleando algo, no se le pisa al redibujar
+        const inpEmail = document.getElementById('user-modal-email');
+        if (inpEmail) {
+            const recE = usuariosDB[userKeyFor(key)] || {};
+            if (userModalEmail !== null && document.activeElement !== inpEmail) inpEmail.value = userModalEmail;
+            else if (document.activeElement !== inpEmail) inpEmail.value = String(recE.email || '').trim();
+            // el email corre el nodo del usuario, asi que solo el super admin lo cambia
+            const puedeEmail = editable && isSuperAdmin(sessionUser());
+            inpEmail.disabled = !puedeEmail;
+            inpEmail.title = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
+                : !puedeEmail ? 'CAMBIAR EL EMAIL MUEVE LA CUENTA: SOLO EL SUPER ADMIN PUEDE HACERLO'
+                : 'EL CORREO CON EL QUE ENTRA A LA PLATAFORMA';
+        }
+        const btnGuardarEmail = document.getElementById('user-modal-guardar-email');
+        if (btnGuardarEmail) {
+            const puedeEmail = editable && isSuperAdmin(sessionUser());
+            btnGuardarEmail.disabled = !puedeEmail;
+            btnGuardarEmail.title = inpEmail ? inpEmail.title : '';
+        }
+        const notaEmail = document.getElementById('user-modal-email-nota');
+        if (notaEmail) {
+            const puedeEmail = editable && isSuperAdmin(sessionUser());
+            notaEmail.textContent = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
+                : !puedeEmail ? 'SOLO EL SUPER ADMIN PUEDE CORREGIRLO: EL EMAIL ES LA CUENTA.'
+                : 'Es el correo con el que la persona entra a la plataforma. Si lo corriges, tendrá que entrar con la cuenta nueva.';
+            notaEmail.style.color = puedeEmail ? '' : 'var(--comment)';
+        }
+
+        // BORRADO COMPLETO. Solo el super admin puede (las reglas también lo filtran):
+        // un admin de equipo saca a la gente de SU equipo, no borra cuentas ajenas.
+        const nEquipos = usuariosConRolEn(userKeyFor(key));
+        const propio = esElPropio(key);
+        const soySuper = isSuperAdmin(sessionUser());
+        const btnBorrar = document.getElementById('user-modal-borrar');
+        if (btnBorrar) {
+            btnBorrar.disabled = !editable || !soySuper || propio;
+            btnBorrar.title = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
+                : !soySuper ? 'SOLO EL SUPER ADMIN PUEDE BORRAR UNA CUENTA COMPLETA · PARA SACARLO DE UN EQUIPO USA "✖ QUITAR DEL EQUIPO"'
+                : propio ? 'NO TE PUEDES ELIMINAR A TI MISMO'
+                : 'BORRA LA CUENTA COMPLETA EN TODOS LOS EQUIPOS · PIDE CONFIRMAR ESCRIBIENDO EL USUARIO';
+        }
+        const notaBorrar = document.getElementById('user-modal-eliminar-nota');
+        if (notaBorrar) {
+            notaBorrar.textContent = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
+                : !soySuper ? 'BORRAR LA CUENTA COMPLETA ES SOLO DEL SUPER ADMIN. PARA SACARLO DE UN EQUIPO USA "✖ QUITAR DEL EQUIPO".'
+                : propio ? '⚠️ NO PUEDES ELIMINARTE A TI MISMO'
+                : 'BORRA LA CUENTA COMPLETA EN ' + nEquipos.length + ' EQUIPO(S) Y SU REGISTRO. NO SE PUEDE DESHACER.';
+            notaBorrar.style.color = (editable && soySuper && !propio) ? 'var(--comment)' : 'var(--danger)';
+        }
 
         // selector de equipo (solo los que administras)
         const sel = document.getElementById('user-modal-team');
@@ -3180,7 +3615,7 @@
         if (nota) {
             const propio = esElPropio(key);
             nota.textContent = !puedo ? avisoEquipo(team)
-                : !dentro ? '⚠️ NO ESTÁ EN ESTE EQUIPO: AGGREGÁLO DESDE "EQUIPOS QUE ADMINISTRAS"'
+                : !dentro ? '⚠️ NO ESTÁ EN ESTE EQUIPO: AGGREGÁLO DESDE "ADMIN DE OTROS EQUIPOS"'
                 : propio ? '⚠️ NO PUEDES QUITARTE TUS PROPIOS ROLES NI SALIR DEL EQUIPO: TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO'
                 : '';
             nota.style.color = (puedo && dentro && !propio) ? 'var(--comment)' : 'var(--danger)';
@@ -3253,12 +3688,21 @@
         const aviso = userModalTeam ? avisoEquipo(userModalTeam) : avisoEquipoPanel();
         if (aviso) return showToast(aviso);
         const nombre = (document.getElementById('user-modal-nombre')?.value || '').trim();
-        guardarNombre(key, nombre).then(() => {
-            userModalNombre = null;   // ya está guardado: se puede volver a pintar
-            refreshAdminList();       // refresca la lista y, con ella, este modal
-            renderSugerencias();
-            showToast(nombre ? '✅ NOMBRE GUARDADO: ' + nombre.toUpperCase() : '✅ NOMBRE BORRADO');
-        });
+        guardarNombre(key, nombre)
+            .then(() => {
+                userModalNombre = null;   // ya está guardado: se puede volver a pintar
+                refreshAdminList();       // refresca la lista y, con ella, este modal
+                renderSugerencias();
+                showToast(nombre ? '✅ NOMBRE GUARDADO: ' + nombre.toUpperCase() : '✅ NOMBRE BORRADO');
+            })
+            .catch((e) => {
+                console.error('FIREBASE WRITE ERROR', e);
+                // el campo vuelve a lo que hay en la BD: si se dejara el texto tecleado
+                // parecería guardado cuando firebase lo rechazó
+                userModalNombre = null;
+                renderUserModal();
+                showToast('⚠️ NO SE PUDO GUARDAR EL NOMBRE (' + (e.code || e.message) + '). REVISA QUE LAS REGLAS ESTÉN PUBLICADAS.');
+            });
     }
     function userModalQuitarDeEquipo() {
         const key = userModalUser;
@@ -3266,6 +3710,154 @@
         if (!key || !team) return;
         adminRemoveUser(key, team);
         renderUserModal();
+    }
+
+    // ─── EMAIL DE LA CUENTA (editable, igual que el nombre real) ───────────
+    // El correo es la identidad con la que la persona entra y con la que las
+    // reglas la reconocen, asi que se valida antes de guardar: tiene que traer
+    // dominio y no puede repetirse (la clave del registro es el correo).
+    function userModalEscribeEmail() {
+        const inp = document.getElementById('user-modal-email');
+        if (inp) userModalEmail = inp.value;
+    }
+    function emailEnUso(email, exceptoKey) {
+        // se compara por la clave de ruta: el propio usuario puede venir con la forma
+        // con puntos y el resto con la saneada, y si no se excluye a si mismo
+        // el guardado del email diria siempre "ya existe otro usuario con ese email"
+        const mio = sanitizeKey(exceptoKey || '');
+        return Object.keys(usuariosDB).find(k => {
+            if (sanitizeKey(k) === mio) return false;
+            const rec = usuariosDB[k] || {};
+            return normalizeEmail(rec.email || k) === email;
+        }) || '';
+    }
+    function userModalGuardarEmail() {
+        const key = userModalUser;
+        if (!key) return;
+        // the check is against the team that is open in the modal, not the panel's
+        const aviso = userModalTeam ? avisoEquipo(userModalTeam) : avisoEquipoPanel();
+        if (aviso) return showToast(aviso);
+        // cambiar el email mueve el nodo del usuario, y eso solo lo puede hacer el super
+        // admin (es el unico con permiso de escritura sobre el nodo). Ademas, si cualquiera
+        // pudiera hacerlo, bastaba con escribirle un correo a otra persona para quedarse
+        // con su cuenta.
+        if (!isSuperAdmin(sessionUser())) {
+            return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE CAMBIAR EL EMAIL DE UN USUARIO');
+        }
+        const email = normalizeEmail(document.getElementById('user-modal-email')?.value || '');
+        if (!email) return showConfirm('ESCRIBE EL EMAIL DE LA CUENTA (EJ: JUAN.PEREZ@LATAM.COM).', null);
+        if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+            return showConfirm('EL EMAIL NO ES VÁLIDO. TIENE QUE INCLUIR EL DOMINIO (EJ: JUAN.PEREZ@LATAM.COM).', null);
+        }
+        if (isSuperAdmin(email)) return showToast('⚠️ ESE CORREO ES EL DEL SUPER ADMIN');
+        const actualKey = userKeyFor(key);
+        const actual = normalizeEmail((usuariosDB[actualKey] || {}).email || '');
+        if (actual === email) {
+            userModalEmail = null;
+            renderUserModal();
+            return showToast('ℹ️ EL EMAIL YA ERA ' + email.toUpperCase());
+        }
+        const repetido = emailEnUso(email, actualKey);
+        if (repetido) {
+            return showConfirm('YA EXISTE OTRO USUARIO CON ESE EMAIL:\n' + String(repetido).toUpperCase() + '\n\nCADA PERSONA TIENE SU PROPIO CORREO.', null);
+        }
+        // el registro se cambia de nodo, asi que se pide una confirmacion de verdad
+        const nombre = String((usuariosDB[actualKey] || {}).nombre || '').trim().toUpperCase();
+        showConfirm(
+            'SE CAMBIARÁ EL EMAIL DE ' + (nombre || actual.toUpperCase()) + ':\n\n'
+            + '· AHORA: ' + actual.toUpperCase() + '\n'
+            + '· DESPUÉS: ' + email.toUpperCase() + '\n\n'
+            + '⚠️ LA PERSONA TENDRÁ QUE VOLVER A ENTRAR CON EL EMAIL NUEVO.\n'
+            + '⚠️ SI EL NUEVO ESTÁ MAL ESCRITO, NADIE PODRÁ ENTRAR CON ESA CUENTA.',
+            () => guardarEmail(key, email)
+                .then((r) => {
+                    userModalEmail = null;   // ya está guardado: se puede volver a pintar
+                    // si el nodo se movio, el modal sigue abierto pero sobre la clave nueva
+                    if (r && r.movido) userModalUser = r.nodo;
+                    refreshAdminList();
+                    renderSugerencias();
+                    showToast('✅ EMAIL GUARDADO: ' + email.toUpperCase()
+                        + (r && r.movido ? ' · AVISA A LA PERSONA QUE ENTRE DE NUEVO' : ''));
+                })
+                .catch((e) => {
+                    console.error('FIREBASE WRITE ERROR', e);
+                    userModalEmail = null;
+                    renderUserModal();
+                    showToast('⚠️ NO SE PUDO GUARDAR EL EMAIL (' + (e.code || e.message) + '). REVISA QUE LAS REGLAS ESTÉN PUBLICADAS.');
+                }),
+            null
+        );
+    }
+
+    // ─── BORRAR UN USUARIO COMPLETO ────────────────────────────────────────
+    // A diferencia de "QUITAR DEL EQUIPO" (que solo saca a la persona del equipo
+    // abierto), esto borra la CUENTA en todos los equipos. Por eso es del super
+    // admin, y por eso hay que escribir el usuario para confirmar: no hay vuelta atrás.
+    function userModalEliminar() {
+        const key = userModalUser ? userKeyFor(userModalUser) : null;
+        if (!key) return;
+        if (!isSuperAdmin(sessionUser())) {
+            return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE BORRAR UNA CUENTA COMPLETA');
+        }
+        if (esElPropio(key)) return showToast('⚠️ NO TE PUEDES ELIMINAR A TI MISMO');
+        const teams = usuariosConRolEn(key);
+        // Equipos que se quedarían sin admin si esta persona los administra
+        const sinAdmin = teams.filter(t => {
+            if (!puede(key, 'administrar', t)) return false;
+            const otros = usuariosDeEquipo(t).filter(u => userKeyFor(u) !== key);
+            return !otros.some(u => puede(u, 'administrar', t));
+        });
+        const quien = key.toUpperCase();
+        const equiposTxt = teams.length
+            ? teams.map(t => String(equipoNombre(t)).toUpperCase()).join(', ')
+            : 'NO ESTÁ EN NINGÚN EQUIPO';
+        showConfirm(
+            '⚠️ SE BORRARÁ DEFINITIVAMENTE LA CUENTA DE\n' + quien + '\n\n' +
+            '• SUS ROLES EN: ' + equiposTxt + '\n' +
+            '• SU NOMBRE, EMAIL Y TODO SU REGISTRO\n\n' +
+            (sinAdmin.length
+                ? '⚠️ ' + sinAdmin.map(t => String(equipoNombre(t)).toUpperCase()).join(', ') + ' SE QUEDARÍA SIN ADMIN.\n\n'
+                : '') +
+            '⚠️ ESTO NO SE PUEDE DESHACER.',
+            () => borrarUsuarioCompleto(key, teams),
+            key    // hay que ESCRIBIR el usuario para habilitar el borrado
+        );
+        const yes = document.getElementById('confirm-yes-btn');
+        if (yes) yes.innerText = 'SÍ, ELIMINAR';
+    }
+    function borrarUsuarioCompleto(key, teams) {
+        const ruta = 'mantenimiento/pd/usuarios/' + claveNodoDe(key);
+        const tareas = [];
+        // hoja por hoja: en Firebase las reglas NO son filtros, asi que un remove()
+        // del nodo completo no pasaria por el permiso de roles/<equipo>.
+        (teams || []).forEach(t => tareas.push(remove(ref(db, ruta + '/roles/' + t))));
+        // el indice de admins se va con la cuenta
+        tareas.push(remove(ref(db, 'mantenimiento/pd/admins/' + claveNodoDe(key))));
+        // y por ultimo la cuenta entera. En Realtime Database un remove() es un
+        // .write, asi que el permiso vive en usuarios/$user/.write (super admin).
+        tareas.push(remove(ref(db, ruta)));
+        Promise.all(tareas.map(t => t.then(() => true).catch(e => {
+            console.error('FIREBASE WRITE ERROR (borrar usuario)', e);
+            return false;
+        }))).then(ok => {
+            const fallidas = ok.filter(x => !x).length;
+            if (fallidas) {
+                // La base quedo a medias: no se cierra el modal ni se anuncia el borrado,
+                // porque la pantalla no puede mostrar un cambio que no se guardo.
+                showToast('⚠️ NO SE PUDO BORRAR TODO (' + fallidas + ' ESCRITURA(S) RECHAZADA(S)). REVISA QUE LAS REGLAS ESTÉN PUBLICADAS.');
+                return;
+            }
+            delete usuariosDB[key];
+            userModalUser = null; userModalTeam = null;
+            userModalNombre = null; userModalEmail = null;
+            syncRoleArrays();
+            updateTeamSwitcher();
+            closeModal('user-modal');
+            refreshAdminListIfOpen();
+            renderAdminTeamBar();
+            updateAdminUI();
+            showToast('🗑 USUARIO ELIMINADO: ' + key.toUpperCase());
+        });
     }
 
     function changeTurno() {
@@ -3543,18 +4135,67 @@
         escribirHeader();
     }
 
+    // ─── CONFIRMACIÓN ──────────────────────────────────────────────────────
+    // showConfirm(mensaje, callback, textoObligatorio)
+    //   Si se pasa `textoObligatorio`, aparece un campo: CONFIRMAR queda
+    //   deshabilitado hasta que la persona escriba ese texto. Es la garantia para
+    //   las acciones que no se pueden deshacer (borrar un usuario, un equipo...).
     let confirmCallback = null;
-    function showConfirm(message, callback) {
+    let confirmEsperado = '';
+    function confirmEscribioEsperado() {
+        if (!confirmEsperado) return true;
+        const input = document.getElementById('confirm-typed-input');
+        return !!input && input.value.trim().toUpperCase() === confirmEsperado.toUpperCase();
+    }
+    function refrescarBotonConfirm() {
+        const yes = document.getElementById('confirm-yes-btn');
+        if (yes) yes.disabled = !confirmEscribioEsperado();
+    }
+    function showConfirm(message, callback, textoObligatorio) {
         document.getElementById('confirm-message').innerText = message;
         confirmCallback = callback;
+        confirmEsperado = textoObligatorio ? String(textoObligatorio) : '';
+        const wrap = document.getElementById('confirm-typed-wrap');
+        const input = document.getElementById('confirm-typed-input');
+        const hint = document.getElementById('confirm-typed-hint');
+        if (confirmEsperado) {
+            if (wrap) wrap.style.display = 'block';
+            if (input) { input.value = ''; input.placeholder = confirmEsperado.toUpperCase(); }
+            if (hint) hint.textContent = 'ESCRIBE ' + confirmEsperado.toUpperCase() + ' PARA HABILITAR EL BORRADO';
+        } else {
+            if (wrap) wrap.style.display = 'none';
+            if (input) input.value = '';
+        }
+        refrescarBotonConfirm();
         document.getElementById('confirm-modal').style.display = 'block';
+        if (confirmEsperado && input) setTimeout(() => input.focus(), 60);
     }
     function closeConfirmModal() {
         document.getElementById('confirm-modal').style.display = 'none';
-        document.getElementById('confirm-yes-btn').innerText = 'CONFIRMAR';
+        const yes = document.getElementById('confirm-yes-btn');
+        if (yes) { yes.innerText = 'CONFIRMAR'; yes.disabled = false; }
+        const wrap = document.getElementById('confirm-typed-wrap');
+        const input = document.getElementById('confirm-typed-input');
+        if (wrap) wrap.style.display = 'none';
+        if (input) input.value = '';
         confirmCallback = null;
+        confirmEsperado = '';
     }
-    document.getElementById('confirm-yes-btn').onclick = function() { if(confirmCallback) confirmCallback(); closeConfirmModal(); };
+    document.getElementById('confirm-yes-btn').onclick = function() {
+        // con texto obligatorio el botón llega deshabilitado, pero se vuelve a
+        // comprobar igual: si alguien lo habilitó con el teclado y cambió el texto, no pasa.
+        if (!confirmEscribioEsperado()) return;
+        const cb = confirmCallback;
+        if (cb) cb();
+        closeConfirmModal();
+    };
+    document.getElementById('confirm-typed-input').addEventListener('input', refrescarBotonConfirm);
+    document.getElementById('confirm-typed-input').addEventListener('keydown', function(e) {
+        if (e.key === 'Enter' && confirmEscribioEsperado()) {
+            e.preventDefault();
+            document.getElementById('confirm-yes-btn').click();
+        }
+    });
 
     let promptCallback = null;
     function showPromptModal(title, defaultVal, callback, saveLabel, placeholder) {
@@ -5161,10 +5802,13 @@
         abrirEditarUsuario, renderUserModal, userModalCambiaEquipo, userModalEscribeNombre,
         userModalPonerRol, userModalAlternarAdmin, userModalAlternarEquipo,
         userModalGuardarNombre, userModalQuitarDeEquipo,
+        userModalEscribeEmail, userModalGuardarEmail, userModalEliminar, limpiarRegistrosBasura, registrosBasura,
         adminCambiarRol, adminCambiarAdmin,
         switchTeam, adminToggleNuevoEquipo,
         adminCambiaEquipoPanel, adminCrearEquipo, adminAlternarEquipo, adminQuitarDeEquipo,
         adminRenombrarEquipoSeleccion, adminAlternarEquipoSeleccion, adminEliminarEquipoSeleccion,
+        // mantenimiento (solo super admin)
+        adminAlternarMantenimiento,
         estadoActual, equiposDelPanel, puedoGestionarEquipo, usuariosDeEquipo, resumenEquipo,
         doGoogleLogin, logoutFull
     });
