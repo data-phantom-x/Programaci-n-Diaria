@@ -1559,30 +1559,27 @@
     }
 
     // ─── MULTI-EQUIPOS (solo PD) ──────────────────────────────────────────────
-    //   pd/equipos/<equipo>/{nombre, orden, activo}   ficha: solo la escribe el super
-    //   pd/equipos_cfg/<equipo>/{nombre, activo}       lo que edita el admin del equipo
+    //   pd/equipos/<equipo>/{nombre, orden, activo}   el super admin crea y borra el
+    //                                                 equipo; el admin de ESE equipo solo
+    //                                                 puede tocar 'nombre' y 'activo'
     //   pd/datos/<equipo>/{global_techs,predefined_task,historial}
     //   pd/usuarios/<correo>/{email, nombre, roles/<equipo>/{usuario,tech,tl,admin}}
     // La pertenencia y los roles son la MISMA cosa: estar en roles/<equipo>.
     const EQUIPO_DEFECTO = 'cabina';
     const LS_EQUIPO = 'pd_equipo_activo';
     let shiftJefe = '';           // TL que ya tiene el turno abierto
-    let equiposCatalogo = {};     // pd/equipos + pd/equipos_cfg ya combinados
-    let equiposFicha = {};        // -> pd/equipos          (solo super admin escribe)
-    let equiposCfg = {};          // -> pd/equipos_cfg       (admin del equipo escribe)
+    // Un equipo vive TODO en pd/equipos: nombre, orden y activo. Los permisos por campo
+    // (que un admin de equipo pueda renombrar o desactivar el suyo sin poder crear equipos)
+    // los dan las reglas en pd/equipos/<equipo>/nombre y .../activo.
+    let equiposCatalogo = {};     // copia del catalogo, para no mutar la ficha
+    let equiposFicha = {};        // -> pd/equipos  (super admin crea/borra; admin de equipo, nombre y activo)
     let currentTeam = null;       // equipo que se esta viendo ahora
 
     function sanitizeTeamId(id) { return String(id || '').replace(/[.#$\[\]\/]/g, '_').trim(); }
-    // pd/equipos_cfg se superpone a la ficha. Van en nodos separados porque las
-    // reglas de Firebase no son filtros: si pd/equipos/.write fuera del super admin,
-    // taparia los permisos por campo de aqui y el admin no podria renombrar ni activar.
+    // Copia superficial: el catalogo se puede mutar (alta rapida) sin tocar la ficha
     function combinarCatalogo() {
         const combinado = {};
-        const ids = new Set(Object.keys(equiposFicha).concat(Object.keys(equiposCfg)));
-        ids.forEach(t => {
-            const ficha = equiposFicha[t] || {};
-            combinado[t] = Object.assign({}, ficha, equiposCfg[t] || {});
-        });
+        Object.keys(equiposFicha).forEach(t => { combinado[t] = Object.assign({}, equiposFicha[t]); });
         equiposCatalogo = combinado;
     }
     function equipoNombre(id) { const e = equiposCatalogo[id]; return (e && e.nombre) || String(id || '').toUpperCase(); }
@@ -1608,7 +1605,7 @@
     }
     // Catalogo completo de equipos (los de la BD + los que aun no estan en la ficha)
     function allTeams() {
-        const s = new Set(Object.keys(equiposCatalogo).concat(Object.keys(equiposFicha), Object.keys(equiposCfg)));
+        const s = new Set(Object.keys(equiposCatalogo).concat(Object.keys(equiposFicha)));
         Object.keys(usuariosDB).forEach(u => Object.keys((usuariosDB[u] && usuariosDB[u].roles) || {}).forEach(t => s.add(t)));
         return ordenarEquipos(Array.from(s));
     }
@@ -1862,12 +1859,14 @@
                     const r = e.roles[t] || {};
                     // el nombre ya no se duplica por equipo: si viene aqui es formato anterior
                     if (!nombre && r.nombre) nombre = r.nombre;
-                    roles[t] = rolesDeUnRol(unRol(r));
+                    // OJO: el flag admin hay que pasarlo. Sin esto se leia la base
+                    // y se descartaba el admin: nadie era admin en ningun cliente.
+                    roles[t] = rolesDeUnRol(unRol(r), r.admin === true);
                 });
             } else {
                 // formato antiguo (roles sueltos, sin equipo): secea como CABINA
                 const r = { usuario: !!(e.usuario || e.acceso), tech: !!e.tech, tl: !!e.tl, admin: !!e.admin };
-                roles[EQUIPO_DEFECTO] = Object.assign({ nombre: e.nombre || '' }, rolesDeUnRol(unRol(r)));
+                roles[EQUIPO_DEFECTO] = Object.assign({ nombre: e.nombre || '' }, rolesDeUnRol(unRol(r), r.admin === true));
             }
             usuariosDB[key] = { email: email, nombre: nombre, roles: roles };
         };
@@ -1975,7 +1974,6 @@
 
     // Las referencias dependen del equipo activo: se crean al suscribirse.
     const equiposRef = ref(db, 'mantenimiento/pd/equipos');
-    const equiposCfgRef = ref(db, 'mantenimiento/pd/equipos_cfg');
     const globalTechsRef = () => ref(db, datosPath() + '/global_techs');
     const predefTasksRef = () => ref(db, datosPath() + '/predefined_task');
 
@@ -2109,13 +2107,6 @@
                 combinarCatalogo();
                 // el catalogo decide que equipos estan activos: si el que se estaba viendo
                 // se desactivo, aqui se cambia de equipo y se re-suscriben los datos
-                updateTeamSwitcherYRecargar();
-                refreshAdminListIfOpen();
-                renderNewTeamsGrid();
-            }, readErr),
-            onValue(equiposCfgRef, (snapshot) => {
-                equiposCfg = snapshot.val() || {};
-                combinarCatalogo();
                 updateTeamSwitcherYRecargar();
                 refreshAdminListIfOpen();
                 renderNewTeamsGrid();
@@ -2269,9 +2260,21 @@
 
     // ─── PANEL ADMIN (SOLO PARA ADMINISTRADORES) ───
     // Admin del equipo que se esta viendo (o super admin)
+    // ¿Administra AL MENOS un equipo? Se recorre el registro del usuario: en el cliente eso
+    // se puede (a diferencia de las reglas de seguridad, que no pueden recorrer equipos).
+    // OJO: adminList guarda CLAVES de la base (con los puntos como "_") y myEmail es el
+    // CORREO de Google, asi que comparar uno contra otro nunca daba true: por eso antes
+    // ningun admin de equipo era reconocido y solo entraba el super admin.
+    function administraAlgunEquipo(user) {
+        if (!user) return false;
+        if (isSuperAdmin(user)) return true;
+        const rec = usuariosDB[userKeyFor(user)] || {};
+        return Object.keys(rec.roles || {}).some(t => puede(user, 'administrar', t));
+    }
+    // El panel se abre con el flag ADMIN, no con ser líder. Un admin que es además admin
+    // (sin ser TL) también entra a administrar: para el turno ya existe su propio permiso.
     function isAdminUser() {
-        if (isSuperAdmin(myEmail)) return isTeamLeader;
-        return isTeamLeader && adminList.includes(myEmail);
+        return !!myEmail && administraAlgunEquipo(myEmail);
     }
 
     function updateAdminUI() {
@@ -2299,8 +2302,8 @@
             console.error('FIREBASE WRITE ERROR', e);
             let msg = '⚠️ NO SE GUARDÓ' + (label ? ' (' + label + ')' : '') + ': ' + (e.code || e.message);
             if ((e.code || '').includes('permission')) {
-                if (String(r || '').indexOf('equipos_cfg') > -1) {
-                    msg = '🔒 FALTAN LAS REGLAS NUEVAS: PUBLICA REGLAS_FIREBASE.json (pd/equipos_cfg)';
+                if (String(r || '').indexOf('/pd/equipos/') > -1) {
+                    msg = '🔒 FALTAN LAS REGLAS NUEVAS: PUBLICA REGLAS_FIREBASE.json (pd/equipos)';
                 } else {
                     msg = !googleUser()
                         ? '🔒 SIN PERMISO DE ESCRITURA: CIERRA SESIÓN Y ENTRA CON GOOGLE'
@@ -2457,7 +2460,7 @@
             if (!nombre) return showToast('⚠️ EL NOMBRE NO PUEDE QUEDAR VACÍO');
             equiposCatalogo[team] = equiposCatalogo[team] || {};
             equiposCatalogo[team].nombre = nombre.toUpperCase();
-            dbSet(ref(db, 'mantenimiento/pd/equipos_cfg/' + team + '/nombre'), nombre.toUpperCase(), 'RENOMBRAR EQUIPO');
+            dbSet(ref(db, 'mantenimiento/pd/equipos/' + team + '/nombre'), nombre.toUpperCase(), 'RENOMBRAR EQUIPO');
             showToast('✅ EQUIPO ' + nombre.toUpperCase());
             renderAdminTeamBar();
             renderTeamSwitcher();
@@ -2488,9 +2491,9 @@
             `⚠️ ESTO NO SE PUEDE DESHACER. ¿CONTINUAR?`, () => {
             const tareas = [];
             // OJO: hay que borrar hoja por hoja. En Firebase las reglas NO son filtros, asi que
-            // pd/datos/<equipo> y pd/equipos_cfg/<equipo> no tienen permiso de escritura para
-            // NADIE (solo sus hojas lo tienen): un remove() del nodo entero se rechazaria y el
-            // equipo volveria a aparecer por su configuracion.
+            // pd/datos/<equipo> no tiene permiso de escritura para NADIE (solo sus hojas lo
+            // tienen): un remove() del nodo entero se rechazaria y el equipo volveria a
+            // aparecer. En pd/equipos el permiso de borrar el equipo SI es del super admin.
             usuariosConRolEn(team).forEach(key => {
                 const rec = usuariosDB[key];
                 if (rec && rec.roles) delete rec.roles[team];
@@ -2498,8 +2501,6 @@
             });
             ['global_techs', 'predefined_task', 'historial'].forEach(hoja =>
                 tareas.push(remove(ref(db, 'mantenimiento/pd/datos/' + team + '/' + hoja))));
-            ['nombre', 'activo'].forEach(campo =>
-                tareas.push(remove(ref(db, 'mantenimiento/pd/equipos_cfg/' + team + '/' + campo))));
             // el indice de admins tambien se va con el equipo
             tareas.push(remove(ref(db, 'mantenimiento/pd/admins/' + sanitizeTeamId(team))));
             tareas.push(remove(ref(db, 'mantenimiento/pd/equipos/' + team)));
@@ -2511,7 +2512,6 @@
                 const fallidas = ok.filter(x => !x).length;
                 delete equiposCatalogo[team];
                 delete equiposFicha[team];
-                delete equiposCfg[team];
                 syncRoleArrays();
                 adminEquipoSel = (allTeams()[0] || null);
                 if (currentTeam === team) { currentTeam = null; localStorage.removeItem(LS_EQUIPO); }
@@ -2577,9 +2577,9 @@
         let id = sanitizeTeamId(nombre.toLowerCase().replace(/\s+/g, '-'));
         if (!id) return showToast('⚠️ NOMBRE DE EQUIPO NO VÁLIDO');
         if (equiposCatalogo[id]) id = id + '-' + (allTeams().length + 1);
-        // OJO: aqui NO se escribe 'activo'. Ese campo vive solo en pd/equipos_cfg, que es
-        // donde las reglas dejan escribir a un admin de equipo (crear equipos es del super
-        // admin). Un equipo sin 'activo' en ningun lado esta activo, que es el default.
+        // OJO: aqui NO se escribe 'activo'. Un equipo sin ese campo esta activo (es el
+        // default), y asi lo activan y desactivan despues el admin del equipo o el super
+        // admin escribiendo solo ese campo.
         equiposFicha[id] = { nombre: nombre.toUpperCase(), orden: allTeams().length + 1 };
         combinarCatalogo();
         dbSet(ref(db, 'mantenimiento/pd/equipos/' + id), equiposFicha[id], 'CREAR EQUIPO');
@@ -2598,7 +2598,7 @@
             : `¿ACTIVAR DE NUEVO EL EQUIPO ${equipoNombre(team).toUpperCase()}?`, () => {
             equiposCatalogo[team] = equiposCatalogo[team] || {};
             equiposCatalogo[team].activo = !activo;
-            dbSet(ref(db, 'mantenimiento/pd/equipos_cfg/' + team + '/activo'), !activo, activo ? 'DESACTIVAR EQUIPO' : 'ACTIVAR EQUIPO');
+            dbSet(ref(db, 'mantenimiento/pd/equipos/' + team + '/activo'), !activo, activo ? 'DESACTIVAR EQUIPO' : 'ACTIVAR EQUIPO');
             showToast((activo ? '⛔ EQUIPO DESACTIVADO: ' : '✅ EQUIPO ACTIVADO: ') + equipoNombre(team).toUpperCase());
             // Activar o desactivar cambia quien tiene acceso al equipo, asi que hay que
             // recalcular todo igual que cuando llegan los roles: el equipo que se ve, los
