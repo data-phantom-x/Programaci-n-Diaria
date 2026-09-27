@@ -97,7 +97,8 @@
 
         /* Barra superior general */
         .top-bar {
-            display: flex; justify-content: space-between; margin-bottom: 8px; min-height: 32px;
+            display: flex; justify-content: space-between; gap: 6px; flex-wrap: wrap; row-gap: 4px;
+            margin-bottom: 8px; min-height: 32px;
             background-color: var(--light-gray); padding: 4px 10px;
             border-radius: 12px 0 12px 0; align-items: center; position: relative;
         }
@@ -122,6 +123,7 @@
             background: transparent; padding: 0; border-radius: 0;
             border: 0; box-shadow: none;
             align-items: stretch; justify-content: center; height: 32px; box-sizing: border-box;
+            margin-left: auto;
         }
         .clock-zone {
             display: flex; flex: 1; min-width: 0; align-items: center; justify-content: center; gap: 9px;
@@ -159,36 +161,143 @@
         body.team-leader-mode .hide-from-leader { display: none !important; }
         .hide-desktop { display: none; }
 
-        /* Controles de vista y filtros locales */
+        /* Barra de herramientas de la programación.
+           Un solo registro visual: todos los controles miden y seeves igual, y
+           la jerarquía se marca solo con el color (turno = marca, vista = neutro). */
         .view-controls {
-            display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 8px;
-            background: var(--surface); padding: 6px 10px; border-radius: 12px 0 12px 0;
-            border: 1px solid var(--border); align-items: center; justify-content: space-between;
+            display: flex; flex-wrap: wrap; align-items: center; justify-content: center;
+            gap: 7px 14px; margin-bottom: 8px;
+            background: var(--surface-soft); border: 1px solid var(--border-soft);
+            border-radius: 12px 0 12px 0; padding: 7px 12px;
         }
-        .view-controls input, .view-controls select, .view-controls button { height: var(--button-height); }
-        .view-filters-wrap { flex: 1; min-width: 0; }
+        .view-controls input, .view-controls select, .view-controls button {
+            height: var(--button-height); box-sizing: border-box; border-radius: var(--button-radius);
+        }
+        .view-group { display: flex; align-items: center; gap: 6px; }
+        .view-filters-wrap { flex: 0 1 auto; min-width: 0; display: flex; align-items: center; gap: 10px; }
+
+        /* Micro-rótulos: mismo idioma que las etiquetas de los relojes. */
+        .view-ctl-label {
+            font-size: 8.5px; font-weight: 800; letter-spacing: 0.6px;
+            color: var(--text-muted); white-space: nowrap;
+        }
+
+        /* Controles del turno: llevan el peso de la marca. */
+        .view-shift {
+            background: var(--surface); color: var(--primary); font-size: 10px; font-weight: 700;
+            border: 1px solid color-mix(in srgb, var(--primary) 28%, var(--border));
+            cursor: pointer;
+        }
+        .view-shift:hover { border-color: var(--primary); }
+        .view-shift-date { width: 132px; }
+        .view-shift-turno { min-width: 112px; }
+
+        /* Controles de vista: neutros, no compiten con el turno. */
+        .view-filter {
+            background: var(--surface); color: var(--text-soft); font-size: 10px; font-weight: 600;
+            border: 1px solid var(--border); cursor: pointer;
+        }
+        .view-filter:hover { border-color: var(--border-hover); }
+
+        /* Acciones secundarias: discretas, sin gritar. */
+        .view-action {
+            background: transparent; color: var(--primary-light); font-size: 9px; font-weight: 700;
+            border: 1px solid var(--primary-light); padding: 0 10px; cursor: pointer;
+        }
+        .view-action:hover:not(:disabled) { background: var(--primary-light); color: var(--surface); }
+        .view-action-quiet { color: var(--text-muted); border-color: var(--border-alt); }
+        .view-action-quiet:hover:not(:disabled) { background: var(--surface-muted); color: var(--text-soft); }
+
+        /* Separador con degradado: controles de turno | controles de vista. */
+        .view-controls > .view-filters-wrap { position: relative; margin-left: 20px; padding-left: 20px; }
+        .view-controls > .view-filters-wrap::before {
+            content: ''; position: absolute; left: 0; top: 12%; bottom: 12%; width: 1px;
+            background: linear-gradient(to bottom, transparent, var(--border-alt) 30%, var(--border-alt) 70%, transparent);
+        }
+        /* La barra solo alcanza su ancho completo a 1040px. Por debajo se parte en
+           dos filas, así que el separador se retira para no dejar una línea suelta. */
+        @media (max-width: 1040px) {
+            .view-controls > .view-filters-wrap { margin-left: 0; padding-left: 0; }
+            .view-controls > .view-filters-wrap::before { display: none; }
+        }
 
         /* PANEL DE CONTROL TEAM LEADER */
+        /* Panel de control del Team Leader.
+           Tres zonas separadas por filetes: datos del turno, búsqueda y acciones. */
         .header-controls {
-            background-color: var(--light-gray); border: 1px solid var(--border);
-            border-left: 6px solid var(--leader-color); padding: 10px;
-            border-radius: 12px 0 12px 0; margin-bottom: 8px; transition: opacity 0.3s;
+            background-color: color-mix(in srgb, var(--celeste) 62%, #FFFFFF);
+            border: 1px solid var(--border-tech); border-left: 5px solid var(--leader-color);
+            padding: 10px; border-radius: 12px 0 12px 0; margin-bottom: 8px;
+            transition: opacity 0.3s;
         }
 
+        /* La búsqueda vive en la fila del título: aprovecha el ancho libre y
+           elimina una banda completa, que es de donde sale el ahorro de alto. */
         .leader-panel-header {
             display: flex; justify-content: space-between; align-items: center;
-            border-bottom: 1px solid var(--border-lavender); padding-bottom: 7px; margin-bottom: 8px;
+            gap: 12px; margin-bottom: 9px;
         }
 
-        .leader-title { font-size: 0.95em; font-weight: 800; color: var(--leader-color); display: flex; align-items: center; gap: 7px; }
-        .leader-grid { display: flex; flex-direction: column; gap: 7px; }
+        /* Título de sección con filete que se prolonga hacia la derecha. */
+        .leader-title {
+            font-size: 0.8em; font-weight: 800; letter-spacing: 1px; color: var(--primary);
+            display: flex; align-items: center; gap: 8px; flex: 1; min-width: 0;
+        }
+        .leader-title::after { content: ''; flex: 1; height: 1px; background: var(--border-tech); }
+
+        .leader-grid { display: flex; flex-direction: column; gap: 6px; }
         .control-group { display: flex; flex-wrap: wrap; gap: 7px; align-items: center; }
-        .control-label { flex: 0 0 62px; width: 62px; color: var(--primary); font-size: 9px; font-weight: bold; }
-        .leader-search-row { margin-top: 6px; }
+        /* Mismo micro-rótulo que la barra de herramientas, y sin partirse en dos líneas. */
+        .control-label {
+            flex: 0 0 auto; min-width: 80px; white-space: nowrap;
+            color: var(--text-muted); font-size: 8.5px; font-weight: 800; letter-spacing: 0.6px;
+        }
+        .header-controls input[type="text"], .header-controls input[list] { height: var(--button-height); }
+
+        /* Buscador: solo se ve la lupa. El campo se despliega al presionarla,
+           así el panel no gasta ancho ni alto en algo que casi siempre está vacío. */
+        .leader-search { display: flex; align-items: center; gap: 6px; flex: 0 0 auto; min-width: 0; }
+        /* Al abrir, el grupo reserva el ancho del campo (320 + lupa + cerrar + gaps)
+           y puede encogerse si el panel es angosto. La lupa se mueve a la izquierda
+           y el campo nunca se sale del panel. */
+        .leader-search.is-open { flex: 0 1 390px; }
+        .search-toggle {
+            flex: none; width: var(--button-height); height: var(--button-height); padding: 0;
+            display: inline-flex; align-items: center; justify-content: center;
+            font-size: 13px; cursor: pointer;
+            background: var(--surface); color: var(--comment);
+            border: 1px solid var(--border); border-radius: var(--button-radius);
+        }
+        .search-toggle:hover { background: var(--comment); color: var(--surface); }
+        .leader-search .search-field {
+            flex: 0 1 0; width: 0; min-width: 0; max-width: 320px; overflow: hidden;
+            padding: 0; border-width: 0; opacity: 0; pointer-events: none; box-sizing: border-box;
+            transition: flex-basis .2s ease, opacity .15s ease, padding .2s ease;
+        }
+        .leader-search.is-open .search-field {
+            flex-basis: 320px; max-width: 320px;
+            padding: 6px 10px; border-width: 1px; opacity: 1; pointer-events: auto;
+        }
+        .search-clear { flex: none; width: var(--button-height); padding: 0; font-size: 12px; }
         .leader-search-results { margin-top: 6px !important; }
-        .leader-add-buttons { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0 0 !important; }
+        .leader-add-buttons {
+            display: flex; gap: 8px; flex-wrap: wrap;
+            margin: 9px 0 0 !important; padding-top: 9px; border-top: 1px solid var(--border-tech);
+        }
         .leader-add-buttons button { box-shadow: none; gap: 4px; }
         .leader-add-buttons .btn-txt { font-size: 9px; }
+        /* Jerarquía: agregar avión es la acción principal, las otras la acompañan. */
+        .leader-add-buttons button {
+            background: var(--surface); color: var(--primary); font-weight: 800;
+            border: 1px solid color-mix(in srgb, var(--primary) 35%, var(--border));
+        }
+        .leader-add-buttons button:hover:not(:disabled) {
+            background: color-mix(in srgb, var(--primary) 10%, #FFFFFF); opacity: 1;
+        }
+        .leader-add-buttons button:first-child {
+            background: var(--gradient-primary); color: var(--surface); border-color: transparent;
+        }
+        .leader-add-buttons button:first-child:hover:not(:disabled) { opacity: 0.9; }
 
         /* Estilos generales corregidos para altura uniforme de controles */
         input[type="text"], input[type="date"], select, button, textarea {
@@ -241,8 +350,9 @@
         .btn-primary-light-outline:hover:not(:disabled) { background: var(--primary-light); color: var(--surface); }
 
         #tech-pills-container {
-            display: flex; flex-wrap: wrap; gap: 6px; width: auto;
-            padding: 6px; background: var(--surface-soft); border-radius: 7px; border: 1px solid var(--border-soft);
+            display: flex; flex-wrap: wrap; gap: 6px; width: auto; padding: 6px;
+            background: color-mix(in srgb, var(--surface) 60%, transparent);
+            border-radius: var(--button-radius);
         }
 
         .tech-pill {
@@ -596,7 +706,7 @@
             .top-bar-left { width: 100%; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 5px; }
             .top-bar-left > * { flex: 1; min-width: 0; }
             #btn-mode-toggle { flex: 1 1 0; max-width: none; min-width: 0; }
-            .live-clock { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); width: 100%; height: auto; padding: 0; position: static; transform: none; gap: 4px; }
+            .live-clock { display: grid; grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); width: 100%; height: auto; padding: 0; position: static; transform: none; gap: 4px; margin-left: 0; }
             .clock-zone { min-width: 0; gap: 7px; padding: 4px 5px; }
             .clock-divider { height: 24px; }
             
@@ -609,15 +719,21 @@
             .view-filters-wrap > button { grid-column: 1 / -1; justify-self: center; margin-top: 2px; }
             
             .header-controls { padding: 10px; }
-            .leader-panel-header { flex-direction: column; gap: 6px; text-align: center; }
+            .leader-panel-header { flex-direction: column; gap: 8px; text-align: center; }
             .leader-panel-header div, .leader-panel-header button { width: 100%; }
+            .leader-title::after { display: none; }
+            .leader-search { width: 100%; justify-content: center; }
+            .leader-search.is-open { flex: 0 0 auto; }
+            .leader-panel-header .search-toggle,
+            .leader-panel-header .search-clear { width: var(--button-height); flex: none; }
+            .leader-search.is-open .search-field { flex: 0 1 auto; width: 190px; max-width: 190px; }
             .admin-modal-content { width: 98% !important; min-height: 0; max-height: 92vh; margin: 4% auto; }
             .admin-modal-layout { grid-template-columns: minmax(0, 1fr); }
             .admin-user-list { height: 300px; max-height: 46vh; }
             
             .control-group { flex-direction: row; flex-wrap: wrap; align-items: center; gap: 6px; }
             .control-group span { width: auto !important; white-space: nowrap; text-align: left; margin-bottom: 0px; }
-            .control-label { flex: 0 0 auto; }
+            .control-label { flex: 0 0 auto; min-width: 0; }
             .control-group input[type="date"] { width: 130px !important; flex: none !important; max-width: none !important; }
             .control-group input[type="text"], 
             .control-group input[list] { flex: 1 !important; min-width: 100px !important; width: auto !important; }
@@ -906,49 +1022,51 @@
     </div>
 
     <div class="view-controls no-print">
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 9px; font-weight: bold; color: var(--primary-light);">FECHA:</span>
-            <input type="date" id="global-date-select" onchange="changeDate()" style="font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light); min-width: 130px;" title="Ver programación de otro día">
-            <button class="btn-primary-light-outline" onclick="goToToday()" style="padding: 0 10px; font-size: 9px;" title="Ir al día de hoy">📅 HOY</button>
-        </div>
-
-        <div style="display: flex; gap: 8px; align-items: center;">
-            <span style="font-size: 9px; font-weight: bold; color: var(--primary-light);">TURNO:</span>
-            <select id="global-turno-select" onchange="changeTurno()" style="min-width: 100px; font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light);">
-                <option value="Turno Día">DÍA</option>
-                <option value="Turno Tarde">TARDE</option>
-                <option value="Turno Noche">NOCHE</option>
+        <div class="view-group">
+            <input type="date" id="global-date-select" class="view-shift view-shift-date" onchange="changeDate()" title="Ver la programación de otro día">
+            <button class="view-action" onclick="goToToday()" title="Ir al día de hoy">📅 HOY</button>
+            <select id="global-turno-select" class="view-shift view-shift-turno" onchange="changeTurno()" title="Turno que estás viendo">
+                <option value="Turno Día">TURNO DÍA</option>
+                <option value="Turno Tarde">TURNO TARDE</option>
+                <option value="Turno Noche">TURNO NOCHE</option>
             </select>
         </div>
-        
-        <div class="view-filters-wrap" style="display:flex; gap:8px; align-items:center;">
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <span style="font-size: 9px; font-weight: bold; color: var(--comment);">ORGANIZAR POR:</span>
-                <select id="view-mode-select" onchange="changeViewMode()" style="min-width: 130px;">
+
+        <div class="view-filters-wrap">
+            <div class="view-group">
+                <span class="view-ctl-label">Organizar por</span>
+                <select id="view-mode-select" class="view-filter" onchange="changeViewMode()" title="Cómo se ordena la programación" style="min-width: 128px;">
                     <option value="default">✈️ AVIÓN</option>
                     <option value="time">🕒 HORA DE INICIO</option>
                     <option value="tech">👨‍🔧 TÉCNICO</option>
                     <option value="tech-group">👥 GRUPO</option>
                 </select>
             </div>
-            <div style="display: flex; gap: 8px; align-items: center;">
-                <span style="font-size: 9px; font-weight: bold; color: var(--comment);">VER A:</span>
-                <select id="local-tech-filter" onchange="applyLocalFilter()" style="min-width: 150px;">
+            <div class="view-group">
+                <span class="view-ctl-label">Ver a</span>
+                <select id="local-tech-filter" class="view-filter" onchange="applyLocalFilter()" title="Ver solo las tareas de un técnico" style="min-width: 168px;">
                     <option value="">TODOS LOS TÉCNICOS</option>
                 </select>
             </div>
-            <button class="btn-outline" onclick="resetLocalFilter()" style="padding: 0 10px; font-size: 9px;">RESTABLECER</button>
+            <button class="view-action view-action-quiet" onclick="resetLocalFilter()" title="Volver a la vista normal">↺ RESTABLECER</button>
         </div>
     </div>
 
     <div class="header-controls leader-only no-print">
         <div class="leader-panel-header">
             <div class="leader-title">⚙️ PANEL DE CONTROL TEAM LEADER</div>
+            <div class="leader-search" id="leader-search">
+                <button type="button" id="btn-search-toggle" class="search-toggle" onclick="toggleSearch()" title="Buscar" aria-label="Buscar">🔍</button>
+                <input type="text" id="global-search-input" class="search-field" placeholder="BUSCAR SOLO ÚLTIMOS 30 DÍAS - TAREA, TANGO, WP, COMENTARIO...">
+                <button class="btn-outline search-clear" onclick="closeSearch()" title="Cerrar búsqueda" style="display:none;" id="btn-clear-search">✖</button>
+            </div>
         </div>
+
+        <div id="search-results" class="leader-search-results" style="display:none; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 10px;"></div>
 
         <div class="leader-grid" id="leader-controls-grid">
             <div class="control-group leader-field">
-                <span class="control-label">TEAM LEADER:</span>
+                <span class="control-label">Team Leader</span>
                 <input type="text" id="in-jefe" placeholder="NOMBRE DEL TEAM LEADER" list="tl-sugerencias" autocomplete="off" onfocus="updateTlSuggestions()" oninput="updateHeader()" onchange="commitHeader()" onkeypress="if(event.key === 'Enter') { commitHeader(); this.blur(); }">
                 <datalist id="tl-sugerencias"></datalist>
                 <button id="btn-lock-shift-mobile" class="btn-danger-outline btn-shift" onclick="toggleLockShift()" style="padding: 0 10px; display:none; align-items:center; gap:2px;"><span class="btn-ico">🔒</span><span class="btn-lbl">CERRAR TURNO</span></button>
@@ -956,7 +1074,7 @@
             </div>
             
             <div class="control-group leader-field">
-                <span class="control-label">TÉCNICOS:</span>
+                <span class="control-label">Técnicos</span>
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()" onchange="addTech()">
                 <button class="btn-leader btn-agregar" onclick="addTech()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">+</span><span class="btn-lbl">AGREGAR <span style="white-space:nowrap">AL TURNO</span></span></button>
                 <button class="btn-outline btn-listado" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px; display:inline-flex; align-items:center; gap:2px;" title="Editar Base Global de Técnicos"><span class="btn-ico">👥</span><span class="btn-lbl">LISTADO DE TECNICOS</span></button>
@@ -965,12 +1083,6 @@
             <div id="tech-pills-container"></div>
         </div>
 
-        <div class="control-group leader-search-row">
-            <span class="control-label">🔍 BUSCAR:</span>
-            <input type="text" id="global-search-input" placeholder="🔍 BUSCAR SOLO ÚLTIMOS 30 DÍAS - TAREA, TANGO, WP, COMENTARIO..." style="flex:1;">
-            <button class="btn-outline" onclick="clearSearch()" style="padding: 0 10px; font-size: 14px; display:none; height:var(--button-height);" id="btn-clear-search">✖</button>
-        </div>
-        <div id="search-results" class="leader-search-results" style="display:none; max-height: 400px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); padding: 10px;"></div>
         
         <div id="leader-add-buttons" class="leader-add-buttons leader-only no-print">
             <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 0 12px; font-size: 11px; border-radius: var(--button-radius); height: var(--button-height);">✈️<span class="btn-txt">AGREGAR AVIÓN</span></button>
@@ -4981,6 +5093,30 @@
         document.getElementById('btn-clear-search').style.display = 'none';
     }
 
+    /* El buscador collapsed es solo la lupa; el campo se despliega al abrirlo. */
+    function setSearchOpen(open) {
+        const box = document.getElementById('leader-search');
+        const input = document.getElementById('global-search-input');
+        const btn = document.getElementById('btn-search-toggle');
+        if (!box || !input) return;
+        box.classList.toggle('is-open', open);
+        if (btn) btn.title = open ? 'Cerrar búsqueda' : 'Buscar';
+        if (open) {
+            input.focus();
+        } else {
+            clearSearch();
+        }
+    }
+    function toggleSearch() {
+        const box = document.getElementById('leader-search');
+        if (box) setSearchOpen(!box.classList.contains('is-open'));
+    }
+    function closeSearch() { setSearchOpen(false); }
+    document.addEventListener('click', function(e) {
+        const box = document.getElementById('leader-search');
+        if (box && box.classList.contains('is-open') && !box.contains(e.target)) setSearchOpen(false);
+    });
+
     // Auto-search with debounce
     let searchTimer = null;
     document.getElementById('global-search-input').addEventListener('input', function() {
@@ -4997,6 +5133,9 @@
         if (e.key === 'Enter') {
             clearTimeout(searchTimer);
             performSearch(true);
+        }
+        if (e.key === 'Escape') {
+            setSearchOpen(false);
         }
     });
     Object.assign(window, {
@@ -5015,6 +5154,7 @@
         openManageTechsModal, addGlobalTech, removeGlobalTech,
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
+        toggleSearch, closeSearch, setSearchOpen,
         openAdminModal, adminAddUser, adminRemoveUser, refreshAdminList, adminSugerir, adminAlternarFiltroEquipo,
         adminAlternarEquipoUsuario,
         // editar usuario (lápiz de la lista del panel admin)
