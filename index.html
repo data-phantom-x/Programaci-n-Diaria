@@ -649,22 +649,32 @@
            solo se desplaza el cuerpo. Así los botones del pie (incluido
            ELIMINAR USUARIO) quedan siempre a la vista. */
         #user-modal .modal-content {
-            max-width: 520px; width: 96%; box-sizing: border-box; height: 88vh; max-height: 88vh; margin: 6vh auto;
-            display: flex; flex-direction: column; overflow: hidden; padding: 20px;
+            max-width: 520px; width: 96%; box-sizing: border-box; max-height: 88vh; margin: 4vh auto;
+            display: flex; flex-direction: column; overflow: hidden; padding: 16px;
         }
+        /* La caja se ajusta a lo que se ve y solo se desplaza si no cabe: antes medía
+           88vh fijos, así que sobraba un bloque vacío aunque todo el contenido fuera corto. */
         #user-modal .modal-header { flex: none; }
-        .user-modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 8px; padding-right: 2px; }
-        .user-modal-body .admin-card { padding: 8px; }
-        .user-modal-footer { flex: none; margin: 8px 0 0; padding-top: 10px; flex-direction: column; gap: 0; }
-        /* Los tres botones del pie tienen que caber en un teléfono angosto: si no,
+        .user-modal-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; display: flex; flex-direction: column; gap: 6px; padding-right: 2px; }
+        .user-modal-body .admin-card { padding: 7px; }
+        .user-modal-footer { flex: none; margin: 6px 0 0; padding-top: 8px; flex-direction: column; gap: 0; }
+        /* Los botones del pie tienen que caber en un teléfono angosto: si no,
            el que se sale empuja el modal y aparece una franja blanca debajo. */
         .user-modal-foot-row { display: flex; flex-wrap: wrap; gap: 8px; }
         .user-modal-foot-row .btn-modal-action { flex: 1 1 auto; min-width: 0; font-size: 9px; }
         .user-modal-eliminar-nota { color: var(--comment); }
         .btn-danger { background: var(--danger); color: var(--surface); }
-        .user-modal-team-bar { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 8px; }
+        .user-modal-team-bar { display: flex; align-items: center; gap: 7px; flex-wrap: wrap; margin-bottom: 2px; }
         .user-modal-team-bar label { font-size: 9px; font-weight: 800; color: var(--comment); }
+        /* mismo descentrado que en la barra del panel: el margen global de los select
+           los baja 6px respecto a su etiqueta */
+        .user-modal-team-bar select.admin-team-select { margin: 0; }
         .user-modal-note { font-size: 9px; margin-top: 6px; line-height: 1.4; }
+        /* Campo + botón de guardar en una sola línea: cada uno por su lado ocupaba
+           el doble de alto, y el botón se pulsaba una vez y se olvidaba. */
+        .user-modal-fila { display: flex; gap: 6px; align-items: center; margin-top: 5px; }
+        .user-modal-fila .admin-field { flex: 1 1 auto; min-width: 0; margin: 0; }
+        .user-modal-fila .btn-modal-action { flex: 0 0 auto; width: auto; padding: 0 10px; white-space: nowrap; }
         .admin-rol-grid2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; margin-top: 5px; }
         .admin-rol-btn {
             width: 100%; height: var(--button-height) !important; padding: 0 6px; font-size: 9px; font-weight: 800;
@@ -694,19 +704,52 @@
         /* ── PESTANAS DEL PANEL ADMIN ── */
         /* selector de equipo del panel admin */
         .admin-team-bar { display: flex; align-items: center; gap: 7px; padding: 8px 10px; background: var(--surface-soft); border-bottom: 1px solid var(--border-soft); flex-wrap: wrap; flex: none; }
-        .admin-team-bar label { font-size: 9px; font-weight: 800; color: var(--comment); }
+        /* Desplegable + sus botones: un solo bloque, para que la nota de abajo no los
+           parta en dos filas. Los botones se empujan a la derecha con margin-left:auto. */
+        .admin-team-bar-main { display: flex; align-items: center; gap: 7px; flex-wrap: nowrap; min-width: 0; flex: 1 1 auto; }
+        /* El grupo de botones es indivisible: si le queda poco ancho, se encoge el
+           desplegable (que puede) antes que dejar un boton abajo. */
+        .admin-team-bar-acciones { display: flex; align-items: center; gap: 5px; margin-left: auto; flex: 0 0 auto; flex-wrap: nowrap; }
+        /* La nota se queda SIEMPRE en su propia fila. Si compartiera ancho con el
+           desplegable, el grupo de botones se estrangularia y los botones caian a una
+           segunda fila, que es justo lo que se queria evitar. */
+        .admin-team-bar > .team-note { flex: 1 0 100%; }
+        .admin-team-bar label {
+            font-size: 9px; font-weight: 800; color: var(--comment);
+            /* misma altura que el desplegable y con el texto centrado dentro: si se
+               dejara al alto de la linea, el flex lo centraria pero la caja quedaria
+               mas alta y "EQUIPO:" se veria desfasado respecto al desplegable */
+            height: 28px; box-sizing: border-box; display: inline-flex; align-items: center;
+        }
         select.admin-team-select {
             height: 28px; border: 1px solid var(--primary); border-radius: 6px; padding: 0 8px;
-            font-size: 10px; font-weight: 800; color: var(--primary); background: var(--surface); min-width: 170px;
+            font-size: 10px; font-weight: 800; color: var(--primary); background: var(--surface);
+            min-width: 170px; box-sizing: border-box;
+        }
+        /* En la barra del panel el desplegable cede espacio: sus 170px fijos eran justo
+           lo que empujaba los botones a una segunda fila. El max-width evita que crezca
+           de mas con nombres de equipo largos.
+           El margin: 0 no es cosmetico: .modal-content select mete margin-bottom 12px a
+           TODO select de un modal, y con align-items:center ese margen baja la caja del
+           desplegable 6px y lo deja por encima de la etiqueta "EQUIPO:". */
+        .admin-team-bar select.admin-team-select { flex: 0 1 auto; width: 210px; min-width: 0; max-width: 300px; margin: 0; }
         }
         .admin-team-bar .team-note { margin: 0; }
         .admin-search-row { display: flex; gap: 5px; align-items: center; }
         .admin-search-row .admin-search { flex: 1; min-width: 0; }
         .admin-search-row .team-btn { flex: 0 0 auto; }
         .admin-team-nombre { display: none; font-size: 11px; font-weight: 800; color: var(--primary); padding: 0 4px; }
-        .admin-new-team-inline { display: inline-flex; gap: 4px; align-items: center; flex-wrap: wrap; }
-        .admin-new-team-inline input { height: 26px; font-size: 10px; border: 1px solid var(--border); border-radius: 6px; padding: 0 7px; background: var(--surface); color: var(--text); width: 130px; }
+        /* ── ALTA DE EQUIPO ── */
+        /* Solo lo que ayuda a decidir: el identificador que se generará y el problema
+           detectado. El resto (que el equipo quedará vacío, etc.) no hace falta decirlo. */
+        #new-team-modal .modal-content .admin-field { margin-top: 5px; }
+        #new-team-preview { color: var(--primary); font-weight: 800; font-size: 9px; }
+        #new-team-nota.admin-sugerencia-ok { color: var(--success); }
+        #new-team-nota.admin-sugerencia-aviso { color: var(--danger); }
+        #new-team-crear:disabled { opacity: .4; cursor: not-allowed; }
         .admin-existente { border-color: var(--success) !important; }
+        /* Nombrefilled por el email: se ve que no se puede tocar, no solo que "no responde" */
+        .admin-field.admin-bloqueado { border-color: var(--success) !important; background: var(--light-gray); cursor: default; }
         .admin-sugerencia-ok { color: var(--success); }
         .admin-sugerencia-aviso { color: var(--danger); }
 
@@ -734,7 +777,17 @@
         .team-note { font-size: 8px; color: var(--comment); margin-top: 6px; line-height: 1.4; }
 
         /* AJUSTES PARA CELULARES */
-        @media (max-width: 900px) {
+        /* ── FORMATO DE PANTALLA PEQUEÑA ─────────────────────────────────────
+           Se aplica por ANCHO y, además, solo en vertical. Un celular en horizontal
+           mide 667-932px de ancho, asi que por ancho entraba aqui igual, aunque en
+           horizontal lo que falta es alto, no ancho: por eso se queda con el formato
+           normal.
+           No se baja el numero de 900px porque las ventanas angostas de escritorio
+           tambien miden menos, y esas si necesitan el formato chico. Con la orientacion
+           se distinguen sin tocar ese limite.
+           Ojo: una ventana de escritorio angosta Y mas baja que ancha (p.ej. 600x500)
+           queda fuera de aqui y recibe el formato normal, que le va justo. */
+        @media (max-width: 900px) and (orientation: portrait) {
             body { padding: 8px; }
             .container { padding: 12px; }
             
@@ -813,6 +866,18 @@
         }
 
         /* Pantalla muy pequeña: FECHA y TURNO en columnas individuales */
+        @media (max-width: 620px) {
+            /* Pantalla chica: el desplegable toma el ancho completo y los botones pasan
+               abajo, alineados a la derecha. Apretarlos en una sola fila dejaba el
+               desplegable en ~100px, donde no se lee el nombre del equipo. */
+            .admin-team-bar { gap: 5px; padding: 6px 8px; }
+            .admin-team-bar-main { flex-wrap: wrap; gap: 5px 5px; }
+            .admin-team-bar > label { display: none; }
+            .admin-team-bar select.admin-team-select { flex: 1 1 100%; width: 100%; max-width: none; padding: 0 4px; }
+            .admin-team-bar-acciones { margin-left: 0; width: 100%; gap: 4px; justify-content: flex-end; }
+            .admin-team-bar .team-btn { padding: 0 7px; font-size: 8px; }
+        }
+
         @media (max-width: 500px) {
             .live-clock { grid-template-columns: minmax(0, 1fr) 1px minmax(0, 1fr); gap: 3px; }
             .clock-divider { display: block; height: 23px; }
@@ -821,9 +886,12 @@
             .leader-title { font-size: 0.7em; letter-spacing: 0.6px; }
             .admin-modal-layout { padding: 10px; gap: 10px; }
             .admin-role-option { padding: 2px; font-size: 8px; }
-            .admin-user-row { align-items: flex-start; flex-wrap: wrap; }
-            .admin-user-main { width: 100%; }
-            .admin-user-actions { width: 100%; justify-content: flex-end; }
+            /* El lapiz de editar se queda en la MISMA fila que el nombre: antes se le
+               ponia width 100% a cada bloque y el boton caia a una segunda fila sin
+               necesidad. El nombre se acorta con puntos suspensivos si no cabe. */
+            .admin-user-row { align-items: center; flex-wrap: nowrap; }
+            .admin-user-main { width: auto; flex: 1 1 auto; min-width: 0; }
+            .admin-user-actions { width: auto; flex: none; justify-content: flex-end; }
             .view-controls { grid-template-columns: 1fr; }
             .view-filters-wrap { grid-template-columns: 1fr !important; }
         }
@@ -964,9 +1032,9 @@
             .avion-pos, .avion-times { background: color-mix(in srgb, var(--surface) 20%, transparent); color: var(--surface); padding: 2px 6px; font-weight: bold; font-size: 0.8em; border-radius: 4px; }
             .avion-comment { color: var(--text-lavender); font-size: 0.85em; white-space: nowrap; }
             /* En impresión va TODO en una sola línea: matrícula, POS y horas.
-               Sin esto se aplica la regla de móvil (max-width:900px), que pone la
-               matrícula al 100% y manda POS/horas a la línea de abajo (la hoja
-               mide ~816px CSS, así que entra en ese media query). */
+               Sin esto se aplica la regla de pantalla chica (max-width:900px en
+               vertical), que pone la matrícula al 100% y manda POS/horas a la línea
+               de abajo (la hoja mide ~816px CSS, así que entra en ese media query). */
             .avion-info-main { flex-direction: row !important; flex-wrap: wrap !important; align-items: baseline !important; justify-content: flex-start !important; gap: 4px 6px !important; }
             .avion-info-main > .avion-reg { flex: 0 0 auto !important; }
             .avion-info-main > .avion-pos, .avion-info-main > .avion-times { flex: 0 0 auto !important; white-space: nowrap; }
@@ -1436,23 +1504,30 @@
     <div class="modal-content admin-modal-content">
         <div class="modal-header admin-modal-header">⚙ PANEL ADMIN</div>
         <div class="admin-team-bar">
-            <label for="admin-team-select">EQUIPO:</label>
-            <select id="admin-team-select" class="admin-team-select" onchange="adminCambiaEquipoPanel(this.value)"></select>
-            <span class="admin-team-nombre" id="admin-team-nombre"></span>
-            <button class="team-btn" id="admin-team-rename" onclick="adminRenombrarEquipoSeleccion()" title="CAMBIAR EL NOMBRE DEL EQUIPO">✎</button>
-            <button class="team-btn warn" id="admin-team-activo" onclick="adminAlternarEquipoSeleccion()" title="ACTIVAR / DESACTIVAR EL EQUIPO">ACTIVO</button>
-            <button class="team-btn" id="admin-team-borrar" onclick="adminEliminarEquipoSeleccion()" title="ELIMINAR EL EQUIPO DEFINITIVAMENTE" style="display:none;">ELIMINAR</button>
+            <!-- El desplegable y sus botones van juntos: si no, el texto de la barra
+                 los empuja a una segunda línea y dejan de verse "al costado". -->
+            <div class="admin-team-bar-main">
+                <label for="admin-team-select">EQUIPO:</label>
+                <select id="admin-team-select" class="admin-team-select" onchange="adminCambiaEquipoPanel(this.value)"></select>
+                <span class="admin-team-nombre" id="admin-team-nombre"></span>
+                <div class="admin-team-bar-acciones">
+                    <button class="team-btn" id="admin-team-rename" onclick="adminRenombrarEquipoSeleccion()" title="CAMBIAR EL NOMBRE DEL EQUIPO">✎</button>
+                    <button class="team-btn warn" id="admin-team-activo" onclick="adminAlternarEquipoSeleccion()" title="ACTIVAR / DESACTIVAR EL EQUIPO">ACTIVO</button>
+                    <button class="team-btn" id="admin-team-borrar" onclick="adminEliminarEquipoSeleccion()" title="ELIMINAR EL EQUIPO DEFINITIVAMENTE" style="display:none;">ELIMINAR</button>
+                    <button class="team-btn on" id="admin-new-team-btn" onclick="abrirNuevoEquipo()" title="CREAR UN EQUIPO NUEVO" style="display:none;">+ AGREGAR EQUIPO</button>
+                </div>
+            </div>
             <span class="team-note" id="admin-team-nota"></span>
-            <span id="admin-new-team-box" class="admin-new-team-inline"></span>
         </div>
         <div class="admin-modal-layout">
             <div class="admin-side">
                 <div class="admin-card">
                     <div class="admin-card-title">AGREGAR USUARIO AL EQUIPO</div>
-                    <input type="text" id="admin-name" class="admin-field" list="admin-sugerencias" placeholder="USUARIO · EJ: juan.perez@latam.cl" autocomplete="off" oninput="adminSugerir()" onkeypress="if(event.key === 'Enter') adminAddUser()">
+                    <input type="text" id="admin-realname" class="admin-field" list="admin-sugerencias-nombre" placeholder="NOMBRE · EJ: JUAN PEREZ" autocomplete="off" oninput="adminSugerir('nombre')" onchange="adminCompletar('nombre')" onkeypress="if(event.key === 'Enter') adminAddUser()">
+                    <input type="text" id="admin-name" class="admin-field" list="admin-sugerencias" placeholder="EMAIL · EJ: juan.perez@latam.cl" autocomplete="off" oninput="adminSugerir('email')" onchange="adminCompletar('email')" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <datalist id="admin-sugerencias"></datalist>
+                    <datalist id="admin-sugerencias-nombre"></datalist>
                     <div class="team-note" id="admin-sugerencia-nota"></div>
-                    <input type="text" id="admin-realname" class="admin-field" placeholder="NOMBRE · EJ: JUAN PEREZ" autocomplete="off" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <div class="admin-card-title">ROL EN ESTE EQUIPO <span style="font-weight:400;opacity:.7">· UNO SOLO</span></div>
                     <div class="admin-role-grid">
                         <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-user" value="usuario" checked> USUARIO</label>
@@ -1462,8 +1537,6 @@
                     <label class="admin-role-option" style="margin-top:4px" id="admin-opt-admin">
                         <input type="checkbox" id="admin-is-admin"> ADMIN <span style="font-weight:400;opacity:.75">· SE SUMA AL ROL, SOLO ABRE EL PANEL</span>
                     </label>
-                    <div class="admin-card-title" style="margin-top: 7px;">EQUIPO:</div>
-                    <div class="admin-team-grid" id="admin-new-teams"></div>
                 </div>
                 <button class="btn-leader admin-add-button" onclick="adminAddUser()">AGREGAR AL EQUIPO</button>
                 <div class="admin-card admin-manto-card" id="admin-mantenimiento-card" style="display:none;">
@@ -1476,13 +1549,13 @@
                 <div class="admin-list-title" id="admin-list-title">USUARIOS</div>
                 <div class="admin-search-row">
                     <input type="text" id="admin-search" class="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE..." autocomplete="off" oninput="refreshAdminList()">
-                    <button class="team-btn" id="admin-filtro-equipo" onclick="adminAlternarFiltroEquipo()" title="MOSTRAR SOLO LOS USUARIOS DE ESTE EQUIPO">SOLO ESTE EQUIPO</button>
+                    <button class="team-btn" id="admin-filtro-equipo" onclick="adminAlternarFiltroEquipo()" title="MOSTRAR SOLO LOS USUARIOS DE ESTE EQUIPO" style="display:none;">SOLO ESTE EQUIPO</button>
                 </div>
                 <div id="admin-list" class="admin-user-list"></div>
             </div>
         </div>
         <div class="modal-footer admin-modal-footer">
-            <button class="btn-outline" onclick="closeModal('admin-modal')">CERRAR</button>
+            <button class="btn-outline" onclick="cerrarAdminModal()">CERRAR</button>
         </div>
     </div>
 </div>
@@ -1493,15 +1566,19 @@
         <div class="user-modal-body">
             <div class="admin-card">
                 <div class="admin-card-title">NOMBRE</div>
-                <input type="text" id="user-modal-nombre" class="admin-field" placeholder="EJ: JUAN PEREZ" autocomplete="off" oninput="userModalEscribeNombre()" onkeypress="if(event.key === 'Enter') userModalGuardarNombre()">
-                <button class="btn-leader admin-add-button" style="margin-top: 6px;" onclick="userModalGuardarNombre()">GUARDAR NOMBRE</button>
+                <div class="user-modal-fila">
+                    <input type="text" id="user-modal-nombre" class="admin-field" placeholder="EJ: JUAN PEREZ" autocomplete="off" oninput="userModalEscribeNombre()" onkeypress="if(event.key === 'Enter') userModalGuardarNombre()">
+                    <button class="btn-leader btn-modal-action" onclick="userModalGuardarNombre()">GUARDAR</button>
+                </div>
             </div>
 
             <div class="admin-card">
                 <div class="admin-card-title">EMAIL DE LA CUENTA</div>
-                <input type="text" id="user-modal-email" class="admin-field" placeholder="EJ: JUAN.PEREZ@LATAM.COM" autocomplete="off" oninput="userModalEscribeEmail()" onkeypress="if(event.key === 'Enter') userModalGuardarEmail()">
-                <div class="team-note" id="user-modal-email-nota">Es el correo con el que la persona entra a la plataforma. Si lo corriges, tendrá que entrar con la cuenta nueva.</div>
-                <button class="btn-leader admin-add-button" id="user-modal-guardar-email" style="margin-top: 6px;" onclick="userModalGuardarEmail()">GUARDAR EMAIL</button>
+                <div class="user-modal-fila">
+                    <input type="text" id="user-modal-email" class="admin-field" placeholder="EJ: JUAN.PEREZ@LATAM.COM" autocomplete="off" oninput="userModalEscribeEmail()" onkeypress="if(event.key === 'Enter') userModalGuardarEmail()">
+                    <button class="btn-leader btn-modal-action" id="user-modal-guardar-email" onclick="userModalGuardarEmail()">GUARDAR</button>
+                </div>
+                <div class="team-note" id="user-modal-email-nota"></div>
             </div>
 
             <div class="user-modal-team-bar">
@@ -1519,20 +1596,41 @@
             </div>
 
             <div class="admin-card">
-                <div class="admin-card-title">ADMIN DE OTROS EQUIPOS</div>
+                <div class="admin-card-title">EQUIPOS DE ESTA PERSONA</div>
                 <div class="admin-team-grid" id="user-modal-equipos"></div>
-                <div class="team-note">Marca los equipos en los que esta persona es admin. Para que entre a otro equipo, un admin de ese equipo debe agregarlo como miembro.</div>
+                <div class="team-note">Toca un equipo para agregarlo o quitarlo. Solo salen los que administras tú. Al agregarlo entra como USUARIO (solo lectura): arriba le cambias el rol.</div>
             </div>
         </div>
 
         <div class="modal-footer user-modal-footer">
             <div class="team-note user-modal-eliminar-nota" id="user-modal-eliminar-nota" style="margin: 0 0 6px;"></div>
             <div class="user-modal-foot-row">
-                <button class="btn-danger-outline btn-modal-action" id="user-modal-quitar" onclick="userModalQuitarDeEquipo()">✖ QUITAR DEL EQUIPO</button>
                 <button class="btn-danger btn-modal-action" id="user-modal-borrar" onclick="userModalEliminar()"
                     title="BORRA LA CUENTA COMPLETA DE ESTE USUARIO EN TODOS LOS EQUIPOS">🗑 ELIMINAR USUARIO</button>
                 <button class="btn-outline btn-modal-action" onclick="closeModal('user-modal')">CERRAR</button>
             </div>
+        </div>
+    </div>
+</div>
+
+<!-- Alta de equipo. Ventana propia (y no un campo suelto en la barra) porque crearla
+     deja un equipo de verdad en la base: conviene ver el nombre, el identificador que
+     se va a generar y el aviso de duplicado antes de confirmar. -->
+<div id="new-team-modal" class="modal" style="z-index: 1300;">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">+ NUEVO EQUIPO</div>
+        <div style="display:flex; flex-direction:column; gap:7px;">
+            <div>
+                <div class="admin-card-title">NOMBRE DEL EQUIPO</div>
+                <input type="text" id="new-team-input" class="admin-field" placeholder="EJ: MANTENIMIENTO" autocomplete="off"
+                    oninput="newTeamEscribe()" onkeypress="if(event.key === 'Enter') adminCrearEquipo()">
+            </div>
+            <div class="team-note" id="new-team-preview" style="margin:0;"></div>
+            <div class="team-note" id="new-team-nota" style="margin:0;"></div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-outline btn-modal-action" onclick="cerrarNuevoEquipo()">CANCELAR</button>
+            <button class="btn-leader btn-modal-action" id="new-team-crear" onclick="adminCrearEquipo()" disabled>CREAR EQUIPO</button>
         </div>
     </div>
 </div>
@@ -2848,6 +2946,12 @@
         if (chkAdmin) chkAdmin.checked = false;
         const nota = document.getElementById('admin-sugerencia-nota');
         if (nota) { nota.textContent = ''; nota.className = 'team-note'; }
+        ['admin-name', 'admin-realname'].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.classList.remove('admin-existente');
+        });
+        adminBloquearNombre(false);
+        nombreAutocompletado = null;
         adminEquipoSel = currentTeam;
         adminSoloEquipo = false;
         const btnFiltro = document.getElementById('admin-filtro-equipo');
@@ -2859,35 +2963,11 @@
         renderAdminTeamBar();   // el desplegable manda: deja el equipo en uno que si se administre
     }
 
-    // El usuario nuevo se crea en el equipo que está seleccionado en el panel
-    function renderNewTeamsGrid() {
-        const grid = document.getElementById('admin-new-teams');
-        if (!grid) return;
-        const team = equipoDelPanel();
-        grid.innerHTML = `<div class="team-note">EL USUARIO SE CREA EN <b>${escapeHtml(equipoNombre(team).toUpperCase())}</b>. Para agregarlo a otro equipo, cambia el equipo aquí arriba y agrágalo de nuevo.</div>`;
-    }
+    // El equipo de destino ya lo dice el desplegable de arriba, asi que el alta de
+    // usuarios no repite ninguna nota: solo el equipo, el nombre y el rol.
+    function renderNewTeamsGrid() { /* el equipo lo elige el desplegable del panel */ };
     function adminToggleNuevoEquipo() { /* el equipo lo elige el desplegable del panel */ };
 
-    // Resumen del equipo: total de miembros y conteo por rol (cada persona cuenta una
-    // sola vez, por su rol más alto: admin > tl > technician > solo lectura).
-    function resumenEquipo(team) {
-        const miembros = usuariosDeEquipo(team);
-        let admins = 0, tls = 0, techs = 0, soloLectura = 0;
-        miembros.forEach(u => {
-            if (rolDe(u, ROLES_ADMIN.id, team)) admins++;   // el admin cuenta aparte
-            const rol = rolDeUsuario(u, team);
-            if (rol === 'tl') tls++;
-            else if (rol === 'tech') techs++;
-            else soloLectura++;
-        });
-        const partes = [miembros.length + ' MIEMBRO(S)'];
-        if (admins) partes.push(admins + (admins === 1 ? ' ADMIN' : ' ADMINS'));
-        else partes.push('SIN ADMIN');
-        if (tls) partes.push(tls + (tls === 1 ? ' TL' : ' TL'));
-        if (techs) partes.push(techs + (techs === 1 ? ' TÉCNICO' : ' TÉCNICOS'));
-        if (soloLectura) partes.push(soloLectura + (soloLectura === 1 ? ' SOLO LECTURA' : ' SOLO LECTURA'));
-        return partes.join(' · ');
-    }
     // ─── GESTIÓN DEL EQUIPO SELECCIONADO ────────────────────────────────────
     // Sin pestañas: todo gira en torno al equipo del desplegable.
     //   ✎  renombra el equipo   ·   ACTIVO lo activa/desactiva   ·   + lo crea (solo super admin)
@@ -2897,7 +2977,8 @@
         const btnActivo = document.getElementById('admin-team-activo');
         const btnRename = document.getElementById('admin-team-rename');
         const btnBorrar = document.getElementById('admin-team-borrar');
-        const nuevo = document.getElementById('admin-new-team-box');
+        const nuevo = document.getElementById('admin-new-team-btn');
+        const btnFiltro = document.getElementById('admin-filtro-equipo');
         if (!sel) return;
         const lista = equiposDelPanel();
         if (!adminEquipoSel || lista.indexOf(adminEquipoSel) === -1) {
@@ -2928,19 +3009,32 @@
             btnBorrar.style.display = (isSuperAdmin(sessionUser()) && adminEquipoSel) ? 'inline-block' : 'none';
             btnBorrar.title = nMiembros + ' MIEMBRO(S) · SE BORRA TODO';
         }
+        if (nuevo) nuevo.style.display = isSuperAdmin(sessionUser()) ? 'inline-block' : 'none';
         if (nota) {
-            nota.textContent = adminEquipoSel
-                ? resumenEquipo(adminEquipoSel)
-                  + (isSuperAdmin(sessionUser()) ? ' · VES TODOS LOS EQUIPOS' : (puedo ? '' : ' · NO ERES ADMIN DE ESTE EQUIPO'))
-                : '';
+            nota.textContent = avisosEquipoBar(adminEquipoSel);
+            // vacia no ocupa fila (ni el hueco del gap de la barra)
+            nota.style.display = nota.textContent ? '' : 'none';
         }
-        if (nuevo) {
-            nuevo.innerHTML = isSuperAdmin(sessionUser())
-                ? `<input type="text" id="admin-new-team-name" placeholder="NOMBRE DEL EQUIPO NUEVO" autocomplete="off" onkeypress="if(event.key === 'Enter') adminCrearEquipo()">
-                   <button class="team-btn on" onclick="adminCrearEquipo()">+ AGREGAR EQUIPO</button>`
-                : '';
+        // El filtro solo tiene sentido si de verdad se ven usuarios de más de un equipo.
+        // Para un admin de equipo la lista ya está acotada a su equipo, y el botón no
+        // cambiaría nada: dejarlo visible sería un control que no hace nada.
+        if (btnFiltro) {
+            const aplica = isSuperAdmin(sessionUser()) && lista.length > 1;
+            btnFiltro.style.display = aplica ? 'inline-block' : 'none';
+            if (!aplica) adminSoloEquipo = false;
         }
         renderSugerencias();
+    }
+    // Lo unico que la barra dice del equipo son los avisos que cambian lo que se puede
+    // hacer. Los numeros de miembros y de roles ya se ven en la lista de usuarios.
+    // No hace falta un aviso de "no eres admin": el desplegable solo trae los equipos que
+    // administras (equiposDondeSoyAdmin), asi que ese caso no se puede dar.
+    function avisosEquipoBar(team) {
+        if (!team) return '';
+        if (!equipoActivo(team)) return '⛔ EQUIPO DESACTIVADO: NADIE PUEDE ENTRAR';
+        // sin admin propio: solo le puede pasar al super admin, que ve todos los equipos
+        if (!usuariosDeEquipo(team).some(u => puede(u, 'administrar', team))) return '⚠️ ESTE EQUIPO NO TIENE ADMIN';
+        return '';
     }
     function adminRenombrarEquipoSeleccion() {
         const team = equipoDelPanel();
@@ -3017,34 +3111,135 @@
     }
 
     // ─── SUGERENCIAS AL AGREGAR USUARIOS (evita duplicados) ───────────────
+    // Nombre y email se sugieren con la MISMA lista y se autocompletan entre si.
+    // La lista sale de TODOS los usuarios de la base, no solo de los equipos que
+    // administra quien esta usando el panel: pd/usuarios es legible por cualquier
+    // usuario autenticado, asi que un admin de un equipo ve tambien a la gente de
+    // los demas y no vuelve a dar de alta a la misma persona.
+    function catalogoUsuarios() {
+        return Object.keys(usuariosDB)
+            .filter(k => !isSuperAdmin((usuariosDB[k] || {}).email || k))
+            .map(k => {
+                const rec = usuariosDB[k] || {};
+                return {
+                    key: k,
+                    email: String(rec.email || k).trim() || k,
+                    nombre: String(rec.nombre || '').trim()
+                };
+            })
+            .filter(u => u.email)
+            .sort((a, b) => a.nombre.localeCompare(b.nombre) || a.email.localeCompare(b.email));
+    }
     function renderSugerencias() {
+        const cat = catalogoUsuarios();
         const dl = document.getElementById('admin-sugerencias');
-        if (dl) dl.innerHTML = Object.keys(usuariosDB)
-            .filter(u => !isSuperAdmin(u))
-            .sort()
-            .map(u => `<option value="${escapeAttr(u)}">${escapeHtml(String(nombreDe(u)).toUpperCase())}</option>`)
+        if (dl) dl.innerHTML = cat
+            .map(u => `<option value="${escapeAttr(u.email)}">${escapeHtml(u.nombre || u.email)}</option>`)
+            .join('');
+        // por nombre: sin nombre guardado no hay nada que sugerir
+        const dlNombre = document.getElementById('admin-sugerencias-nombre');
+        if (dlNombre) dlNombre.innerHTML = cat.filter(u => u.nombre)
+            .map(u => `<option value="${escapeAttr(u.nombre)}">${escapeHtml(u.email)}</option>`)
             .join('');
     }
-    function adminSugerir() {
-        const inp = document.getElementById('admin-name');
+    // Busca por email. El correo es la identidad de la persona y no se repite, asi que
+    // cuando se escribe uno que ya existe, ese es el dato bueno: el nombre sale de ahi.
+    function buscarPorEmail(texto) {
+        const v = normalizeEmail(texto);
+        if (!v) return null;
+        return catalogoUsuarios()
+            .find(u => normalizeEmail(u.email) === v || normalizeEmail(u.key) === v) || null;
+    }
+    // Busca por nombre. Puede devolver mas de una persona (dos "JUAN PEREZ"), y en ese
+    // caso no se autocompleta nada: se completaria con la cuenta equivocada.
+    function buscarPorNombre(texto) {
+        const v = normalizeEmail(texto);
+        if (!v) return [];
+        return catalogoUsuarios().filter(u => u.nombre && normalizeEmail(u.nombre) === v);
+    }
+    function buscarUsuarioPorTexto(texto) {
+        const porEmail = buscarPorEmail(texto);
+        if (porEmail) return { usuario: porEmail, otros: [] };
+        const otros = buscarPorNombre(texto);
+        return { usuario: otros.length === 1 ? otros[0] : null, otros };
+    }
+    // Equipos en los que esta persona ya tiene un rol (para no duplicarla sin querer).
+    function equiposDeUsuarioEnBase(u) {
+        const rec = usuariosDB[u.key] || {};
+        return Object.keys(rec.roles || {}).filter(t => esMiembroDe(u.key, t));
+    }
+    // El nombre ya escrito por la app (no por el admin) se recuerda texto a texto, para
+    // poder borrarlo si despues se rompe el email. Se compara con lo que hay ahora: si
+    // el admin escribio otra cosa, ese nombre es suyo y no se toca.
+    let nombreAutocompletado = null;
+    // Con el email de una cuenta existente, el nombre se escribe solo y se bloquea: si se
+    // pudiera cambiar, se guardaria un nombre que no es el de esa persona y quedaria
+    // conflictivo con el resto de la base. Para corregirlo, el lapiz de la lista.
+    function adminBloquearNombre(bloquear) {
+        const inp = document.getElementById('admin-realname');
+        if (!inp) return;
+        inp.readOnly = bloquear;
+        inp.title = bloquear
+            ? 'ESTE NOMBRE VIENE DEL EMAIL ELEGIDO. PARA CAMBIARLO, USA EL LÁPIZ EN LA LISTA DE USUARIOS'
+            : '';
+        inp.classList.toggle('admin-bloqueado', bloquear);
+    }
+    // Al elegir una sugerencia del nombre se rellena el email, pero solo si esta vacio:
+    // el nombre puede estar repetido, el email nunca.
+    function adminCompletar(campo) {
+        const inpNombre = document.getElementById('admin-realname');
+        const inpEmail = document.getElementById('admin-name');
+        if (!inpNombre || !inpEmail) return;
+        if (campo === 'nombre' && !normalizeEmail(inpEmail.value)) {
+            const r = buscarUsuarioPorTexto(inpNombre.value);
+            if (r && r.usuario) inpEmail.value = r.usuario.email;
+        }
+        adminSugerir(campo);
+    }
+    function adminSugerir(origen) {
+        const inpNombre = document.getElementById('admin-realname');
+        const inpEmail = document.getElementById('admin-name');
         const nota = document.getElementById('admin-sugerencia-nota');
-        if (!inp || !nota) return;
-        const v = normalizeEmail(inp.value);
-        if (!v) { nota.textContent = ''; nota.className = 'team-note'; inp.classList.remove('admin-existente'); return; }
-        const key = userKeyFor(v);
-        const existe = !!usuariosDB[key] && !!usuariosDB[key].roles;
-        if (existe) {
+        if (!inpNombre || !inpEmail || !nota) return;
+        // El email se mira SIEMPRE, se este escribiendo en el campo que se este: es el
+        // que identifica a la persona. Por eso el nombre se autocompleta al escribirlo,
+        // sin necesidad de elegir la sugerencia.
+        const hit = buscarPorEmail(inpEmail.value);
+        if (hit) {
+            if (hit.nombre) { inpNombre.value = hit.nombre; nombreAutocompletado = hit.nombre; }
+            // una cuenta que todavia no tiene nombre guardado deja el campo editable: es
+            // la unica oportunidad de completarlo, y bloquearlo dejaria a la persona sin
+            // nombre en la base
+            adminBloquearNombre(!!hit.nombre);
+            inpEmail.classList.add('admin-existente');
             const team = equipoDelPanel();
-            const dentro = esMiembroDe(key, team);
+            const dentro = esMiembroDe(hit.key, team);
             nota.className = dentro ? 'team-note admin-sugerencia-ok' : 'team-note admin-sugerencia-aviso';
             nota.textContent = dentro
-                ? 'YA EXISTE Y YA ESTÁ EN ' + String(equipoNombre(team)).toUpperCase() + ': PUEDES EDITAR SUS ROLES ABAJO'
-                : 'YA EXISTE, PERO NO ESTÁ EN ' + String(equipoNombre(team)).toUpperCase() + ': AL AGREGARLO LE DARÁS ACCESO A ESTE EQUIPO';
-            inp.classList.add('admin-existente');
+                ? '✓ YA EXISTE · YA ESTÁ EN ' + String(equipoNombre(team)).toUpperCase() + ': ABAJO PUEDES EDITAR SUS ROLES'
+                : 'YA EXISTE (' + equiposDeUsuarioEnBase(hit).map(t => String(equipoNombre(t)).toUpperCase()).join(', ') + '): AL AGREGARLO ENTRA A ' + String(equipoNombre(team)).toUpperCase();
+            return;
+        }
+        // el email no corresponde a nadie: el nombre vuelve a ser editable y, si era el
+        // que puso la app, se retira (si lo escribio el admin, se respeta)
+        if (nombreAutocompletado !== null && normalizeEmail(inpNombre.value) === normalizeEmail(nombreAutocompletado)) {
+            inpNombre.value = '';
+        }
+        nombreAutocompletado = null;
+        adminBloquearNombre(false);
+        inpEmail.classList.remove('admin-existente');
+        const emailV = normalizeEmail(inpEmail.value);
+        const mismoNombre = buscarPorNombre(inpNombre.value);
+        nota.className = 'team-note';
+        if (mismoNombre.length > 1) {
+            nota.className = 'team-note admin-sugerencia-aviso';
+            nota.textContent = mismoNombre.length + ' PERSONAS CON ESE NOMBRE: ESCRIBE EL EMAIL';
+        } else if (mismoNombre.length === 1) {
+            nota.textContent = 'ESCRIBE EL EMAIL DE ' + mismoNombre[0].email.toUpperCase();
+        } else if (!emailV) {
+            nota.textContent = '';
         } else {
-            nota.className = 'team-note';
-            nota.textContent = v.includes('@') ? 'USUARIO NUEVO' : 'ESCRIBE EL CORREO COMPLETO';
-            inp.classList.remove('admin-existente');
+            nota.textContent = emailV.includes('@') ? 'USUARIO NUEVO' : 'ESCRIBE EL CORREO COMPLETO';
         }
     }
 
@@ -3057,27 +3252,94 @@
         refreshAdminList();
     }
 
-    // Alta de equipo (solo super admin)
+    // El alta de equipo se abre encima del panel: al cerrarlo se cierra tambien, para no
+    // dejar una ventana huérfana sobre la aplicación.
+    function cerrarAdminModal() {
+        cerrarNuevoEquipo();
+        closeModal('admin-modal');
+    }
+    // ─── ALTA DE EQUIPO (solo super admin) ─────────────────────────────────
+    // El nombre que se escribe es la etiqueta; del nombre sale la clave con la que el
+    // equipo vive en la base. Como esa clave no se puede cambiar sin romper los roles ya
+    // guardados, la ventana la enseña y avisa ANTES de crearlo.
+    function abrirNuevoEquipo() {
+        if (!isSuperAdmin(sessionUser())) return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE AGREGAR EQUIPOS');
+        const modal = document.getElementById('new-team-modal');
+        if (!modal) return;
+        modal.style.display = 'block';
+        const inp = document.getElementById('new-team-input');
+        if (inp) inp.value = '';
+        newTeamEscribe();
+        setTimeout(() => inp && inp.focus(), 60);
+    }
+    function cerrarNuevoEquipo() {
+        const modal = document.getElementById('new-team-modal');
+        if (modal) modal.style.display = 'none';
+    }
+    // Identificador libre a partir del nombre. Si ya existe, se propone el siguiente
+    // "-2", "-3"... y se dice: asi el admin ve con que nombre va a quedar y no descubre
+    // el cambio recien creado, como pasaba al oculto.
+    function idEquipoPropuesto(nombre) {
+        // el recorte va aqui (y no solo al crear) para que lo que muestra la vista previa
+        // sea exactamente la clave que se va a escribir
+        const base = sanitizeTeamId(String(nombre || '').trim().toLowerCase().replace(/\s+/g, '-'));
+        if (!base) return { id: '', valido: false, motivo: 'ESCRIBE UN NOMBRE' };
+        const existe = k => !!(equiposCatalogo[k] || equiposFicha[k]);
+        if (!existe(base)) return { id: base, valido: true, colision: false };
+        for (let i = 2; i < 200; i++) {
+            const cand = base + '-' + i;
+            if (!existe(cand)) return { id: cand, valido: true, colision: true, original: base };
+        }
+        return { id: base, valido: false, motivo: 'NO SE PUDO ENCONTRAR UN NOMBRE LIBRE' };
+    }
+    // Revisa lo tecleado y deja el botón de crear listo (o no) según se pueda crear.
+    function newTeamEscribe() {
+        const inp = document.getElementById('new-team-input');
+        const prev = document.getElementById('new-team-preview');
+        const nota = document.getElementById('new-team-nota');
+        const btn = document.getElementById('new-team-crear');
+        if (!inp || !prev || !nota || !btn) return;
+        // el nombre se guarda en mayusculas: se ven asi en todas partes
+        const pos = inp.selectionStart;
+        const nombre = inp.value.toUpperCase();
+        if (inp.value !== nombre) { inp.value = nombre; try { inp.setSelectionRange(pos, pos); } catch (e) {} }
+        const r = idEquipoPropuesto(nombre);
+        prev.textContent = r.id ? 'SE GUARDARÁ COMO: ' + r.id : '';
+        btn.disabled = !r.valido;
+        if (!nombre) {
+            nota.className = 'team-note';
+            nota.textContent = '';
+        } else if (!r.valido) {
+            nota.className = 'team-note admin-sugerencia-aviso';
+            nota.textContent = r.motivo;
+        } else if (r.colision) {
+            nota.className = 'team-note';
+            nota.textContent = 'YA EXISTE UN EQUIPO "' + r.original + '": ESTE SE CREARÁ COMO "' + r.id + '"';
+        } else {
+            nota.className = 'team-note';
+            nota.textContent = '';
+        }
+    }
     function adminCrearEquipo() {
         if (!isSuperAdmin(sessionUser())) return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE AGREGAR EQUIPOS');
-        const inp = document.getElementById('admin-new-team-name');
+        const inp = document.getElementById('new-team-input');
         if (!inp) return;
         const nombre = (inp.value || '').trim();
+        const r = idEquipoPropuesto(nombre);
         if (!nombre) return showToast('⚠️ ESCRIBE EL NOMBRE DEL EQUIPO');
-        let id = sanitizeTeamId(nombre.toLowerCase().replace(/\s+/g, '-'));
-        if (!id) return showToast('⚠️ NOMBRE DE EQUIPO NO VÁLIDO');
-        if (equiposCatalogo[id]) id = id + '-' + (allTeams().length + 1);
+        if (!r.valido) return showToast('⚠️ ' + (r.motivo || 'NOMBRE DE EQUIPO NO VÁLIDO'));
         // OJO: aqui NO se escribe 'activo'. Un equipo sin ese campo esta activo (es el
         // default), y asi lo activan y desactivan despues el admin del equipo o el super
         // admin escribiendo solo ese campo.
-        equiposFicha[id] = { nombre: nombre.toUpperCase(), orden: allTeams().length + 1 };
+        equiposFicha[r.id] = { nombre: nombre.toUpperCase(), orden: allTeams().length + 1 };
         combinarCatalogo();
-        dbSet(ref(db, 'mantenimiento/pd/equipos/' + id), equiposFicha[id], 'CREAR EQUIPO');
-        showToast('✅ EQUIPO CREADO: ' + nombre.toUpperCase() + ' · AGREGA ALGOUN MIEMBRO');
-        inp.value = '';
-        adminEquipoSel = id;
+        dbSet(ref(db, 'mantenimiento/pd/equipos/' + r.id), equiposFicha[r.id], 'CREAR EQUIPO');
+        cerrarNuevoEquipo();
+        // el equipo nuevo queda elegido: la lista sale vacia y se sigue agregando gente
+        adminEquipoSel = r.id;
         renderAdminTeamBar();
         refreshAdminList();
+        showToast('✅ EQUIPO CREADO: ' + nombre.toUpperCase() + ' · AGREGA ALGOUN MIEMBRO');
     }
     // Desactivar en vez de borrar: el equipo y sus datos quedan intactos
     function adminAlternarEquipo(team) {
@@ -3231,8 +3493,14 @@
     // ese equipo (así no se duplican). Para otro equipo: cambia el desplegable y agrágalo.
     function adminAddUser() {
         if (!isAdminUser()) return;
+        // Si se escribio solo el nombre y ese nombre identifica a una persona, se completa
+        // el email: asi se agrega a la persona que ya existe en vez de crear un duplicado
+        // (o de salir con el error de "falta el correo").
+        if (!normalizeEmail(document.getElementById('admin-name').value)) {
+            adminCompletar('nombre');
+        }
         const name = normalizeEmail(document.getElementById('admin-name').value);
-        if (!name) return showConfirm("INGRESE EL CORREO DEL USUARIO (EJ: juan.perez@latam.cl).", null);
+        if (!name) return showConfirm("INGRESE EL EMAIL DEL USUARIO (EJ: juan.perez@latam.cl).", null);
         if (!name.includes('@')) return showConfirm("INGRESE EL CORREO COMPLETO, INCLUYENDO EL DOMINIO (EJ: juan.perez@latam.cl).", null);
         if (isSuperAdmin(name)) return showToast('⚠️ ESE USUARIO YA ES SUPER ADMIN');
         const team = equipoDelPanel();
@@ -3265,6 +3533,12 @@
             document.getElementById('admin-realname').value = '';
             const nota = document.getElementById('admin-sugerencia-nota');
             if (nota) { nota.textContent = ''; nota.className = 'team-note'; }
+            ['admin-name', 'admin-realname'].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) el.classList.remove('admin-existente');
+            });
+            adminBloquearNombre(false);
+            nombreAutocompletado = null;
             renderSugerencias();
             showToast(`✅ ${yaExistia ? 'AGREGADO AL EQUIPO' : 'USUARIO CREADO EN'} ${equipoNombre(team).toUpperCase()}: ${String(nombreDe(key, team)).toUpperCase()}`
                       + (admin ? ' · ADMIN' : '')
@@ -3465,7 +3739,8 @@
     }
 
     // ─── AGREGAR / QUITAR USUARIO DE UN EQUIPO ─────────────────────────────
-    // Se usa desde el modal de edición de usuario (apartado "ADMIN DE OTROS EQUIPOS").
+    // Se usa desde el modal de edición de usuario ("EQUIPOS DE ESTA PERSONA"): tocar
+    // un equipo lo mete o lo saca, segun este dentro o no.
     function adminAlternarEquipoUsuario(team, key) {
         if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
         const dentro = esMiembroDe(key, team);
@@ -3544,32 +3819,39 @@
         const notaEmail = document.getElementById('user-modal-email-nota');
         if (notaEmail) {
             const puedeEmail = editable && isSuperAdmin(sessionUser());
+            // igual que la nota de eliminar: solo dice algo cuando el campo esta apagado
+            // y hay que explicar por que
             notaEmail.textContent = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
                 : !puedeEmail ? 'SOLO EL SUPER ADMIN PUEDE CORREGIRLO: EL EMAIL ES LA CUENTA.'
-                : 'Es el correo con el que la persona entra a la plataforma. Si lo corriges, tendrá que entrar con la cuenta nueva.';
+                : '';
             notaEmail.style.color = puedeEmail ? '' : 'var(--comment)';
+            // vacia no ocupa nada: si no, el margen dejaba un hueco entre tarjetas
+            notaEmail.style.display = notaEmail.textContent ? '' : 'none';
         }
 
         // BORRADO COMPLETO. Solo el super admin puede (las reglas también lo filtran):
         // un admin de equipo saca a la gente de SU equipo, no borra cuentas ajenas.
-        const nEquipos = usuariosConRolEn(userKeyFor(key));
         const propio = esElPropio(key);
         const soySuper = isSuperAdmin(sessionUser());
         const btnBorrar = document.getElementById('user-modal-borrar');
         if (btnBorrar) {
             btnBorrar.disabled = !editable || !soySuper || propio;
             btnBorrar.title = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : !soySuper ? 'SOLO EL SUPER ADMIN PUEDE BORRAR UNA CUENTA COMPLETA · PARA SACARLO DE UN EQUIPO USA "✖ QUITAR DEL EQUIPO"'
+                : !soySuper ? 'SOLO EL SUPER ADMIN PUEDE BORRAR UNA CUENTA COMPLETA · PARA SACARLO DE UN EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA"'
                 : propio ? 'NO TE PUEDES ELIMINAR A TI MISMO'
                 : 'BORRA LA CUENTA COMPLETA EN TODOS LOS EQUIPOS · PIDE CONFIRMAR ESCRIBIENDO EL USUARIO';
         }
+        // La nota solo aparece cuando el botón está apagado y hay que decir por qué.
+        // Si se puede borrar, la explicación ya está en el title del botón y en la
+        // confirmación: repetirla acá abajo solo agrega ruido.
         const notaBorrar = document.getElementById('user-modal-eliminar-nota');
         if (notaBorrar) {
             notaBorrar.textContent = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : !soySuper ? 'BORRAR LA CUENTA COMPLETA ES SOLO DEL SUPER ADMIN. PARA SACARLO DE UN EQUIPO USA "✖ QUITAR DEL EQUIPO".'
+                : !soySuper ? 'BORRAR LA CUENTA COMPLETA ES SOLO DEL SUPER ADMIN. PARA SACARLO DE UN EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA".'
                 : propio ? '⚠️ NO PUEDES ELIMINARTE A TI MISMO'
-                : 'BORRA LA CUENTA COMPLETA EN ' + nEquipos.length + ' EQUIPO(S) Y SU REGISTRO. NO SE PUEDE DESHACER.';
+                : '';
             notaBorrar.style.color = (editable && soySuper && !propio) ? 'var(--comment)' : 'var(--danger)';
+            notaBorrar.style.display = notaBorrar.textContent ? '' : 'none';
         }
 
         // selector de equipo (solo los que administras)
@@ -3593,7 +3875,7 @@
                 return `<button type="button" class="admin-rol-btn${on ? ' on ' + r.cls : ''}" aria-pressed="${on}"
                     onclick="userModalPonerRol('${r.id}')" ${(!puedo || !dentro || esElPropio(key)) ? 'disabled' : ''}
                     title="${!dentro ? 'PRIMERO AGREGALO AL EQUIPO'
-                        : on ? 'YA TIENE ESTE ROL · PARA SACARLO USA QUITAR DEL EQUIPO'
+                        : on ? 'YA TIENE ESTE ROL · PARA SACARLO DEL EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA"'
                         : 'CAMBIAR A ' + r.txt}">${r.txt}</button>`;
             }).join('');
         }
@@ -3615,7 +3897,7 @@
         if (nota) {
             const propio = esElPropio(key);
             nota.textContent = !puedo ? avisoEquipo(team)
-                : !dentro ? '⚠️ NO ESTÁ EN ESTE EQUIPO: AGGREGÁLO DESDE "ADMIN DE OTROS EQUIPOS"'
+                : !dentro ? '⚠️ NO ESTÁ EN ESTE EQUIPO: AGGREGÁLO EN "EQUIPOS DE ESTA PERSONA"'
                 : propio ? '⚠️ NO PUEDES QUITARTE TUS PROPIOS ROLES NI SALIR DEL EQUIPO: TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO'
                 : '';
             nota.style.color = (puedo && dentro && !propio) ? 'var(--comment)' : 'var(--danger)';
@@ -3628,7 +3910,8 @@
             else if (document.activeElement !== inp) inp.value = String(nombreDe(key, team) || '').trim();
         }
 
-        // equipos que administras (agregar / quitar)
+        // equipos que administras (agregar / quitar). Este listado ES la forma de
+        // meter y sacar a la persona de un equipo: por eso alcanza con tocar el equipo.
         const box = document.getElementById('user-modal-equipos');
         if (box) {
             box.innerHTML = mios.map(t => {
@@ -3636,13 +3919,9 @@
                 return `<button type="button" class="admin-team-btn${dentroT ? ' active' : ''}" data-team="${escapeAttr(t)}"
                     style="width: auto; padding: 0 10px; height: var(--button-height); display: inline-flex; gap: 6px; align-items: center;"
                     onclick="userModalAlternarEquipo('${escapeAttr(t)}')" aria-pressed="${dentroT}"
-                    title="${dentroT ? 'QUITAR DE' : 'AGREGAR A'} ${escapeAttr(equipoNombre(t))}">${escapeHtml(equipoNombre(t))}</button>`;
+                    title="${dentroT ? 'SACAR DE ' : 'AGREGAR A'} ${escapeAttr(equipoNombre(t))}">${escapeHtml(equipoNombre(t))}</button>`;
             }).join('') || '<div class="admin-empty">NO TIENES EQUIPOS QUE GESTIONAR</div>';
         }
-
-        // quitar del equipo que se está editando
-        const btnQuitar = document.getElementById('user-modal-quitar');
-        if (btnQuitar) btnQuitar.style.display = (dentro && !esElPropio(key)) ? 'inline-flex' : 'none';
     }
     // Enciende o apaga el flag ADMIN del usuario en el equipo del modal. Es independiente
     // del rol funcional: admin + técnico, admin + tl, admin + solo usuario...
@@ -3657,15 +3936,15 @@
     }
 
     // Cambia el rol funcional del usuario en el equipo del modal. Los roles funcionales
-    // son excluyentes: al elegir uno se apagan los demas. Para sacarlo del equipo esta
-    // "QUITAR DEL EQUIPO", y el admin se cambia aparte.
+    // son excluyentes: al elegir uno se apagan los demas. Para sacarlo del equipo se
+    // toca su nombre en "EQUIPOS DE ESTA PERSONA", y el admin se cambia aparte.
     function userModalPonerRol(rol) {
         const key = userModalUser;
         const team = userModalTeam;
         if (!key || !team) return;
         if (!esMiembroDe(key, team)) return showToast('⚠️ AGREGÁLO AL EQUIPO PRIMERO (ABAJO)');
         if (rolDeUsuario(key, team) === rol) {
-            return showToast('ℹ️ PARA SACARLO DEL EQUIPO USA "✖ QUITAR DEL EQUIPO"');
+            return showToast('ℹ️ PARA SACARLO DEL EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA"');
         }
         adminCambiarRol(key, rol, team);
         renderUserModal();
@@ -3703,13 +3982,6 @@
                 renderUserModal();
                 showToast('⚠️ NO SE PUDO GUARDAR EL NOMBRE (' + (e.code || e.message) + '). REVISA QUE LAS REGLAS ESTÉN PUBLICADAS.');
             });
-    }
-    function userModalQuitarDeEquipo() {
-        const key = userModalUser;
-        const team = userModalTeam;
-        if (!key || !team) return;
-        adminRemoveUser(key, team);
-        renderUserModal();
     }
 
     // ─── EMAIL DE LA CUENTA (editable, igual que el nombre real) ───────────
@@ -3790,9 +4062,10 @@
     }
 
     // ─── BORRAR UN USUARIO COMPLETO ────────────────────────────────────────
-    // A diferencia de "QUITAR DEL EQUIPO" (que solo saca a la persona del equipo
-    // abierto), esto borra la CUENTA en todos los equipos. Por eso es del super
-    // admin, y por eso hay que escribir el usuario para confirmar: no hay vuelta atrás.
+    // A diferencia de quitarlo de un equipo (que solo saca a la persona de ese equipo,
+    // tocando su nombre en "EQUIPOS DE ESTA PERSONA"), esto borra la CUENTA en todos
+    // los equipos. Por eso es del super admin, y por eso hay que escribir el usuario
+    // para confirmar: no hay vuelta atrás.
     function userModalEliminar() {
         const key = userModalUser ? userKeyFor(userModalUser) : null;
         if (!key) return;
@@ -5308,20 +5581,26 @@
         });
     }
 
-    // FIX PRINT: Mide con los mismos estilos de impresión (0.25em) y aprovecha el blanco
+    // ─── AJUSTE DE LA IMPRESIÓN A UNA HOJA ──────────────────────────────────
+    // La escala sale de MEDIR el contenido, y hay que medirlo AL ANCHO CON EL QUE SE
+    // VA A IMPRIMIR, que es el de la hoja. Medir con el ancho de la ventana (375px en
+    // un celular) hace que cada linea envuelva al doble de veces, la altura medida sale
+    // casi el doble y la escala se cae a la mitad: por eso en pantalla chica la
+    // impresion salia comprimida de mas. El ancho de la hoja no depende de la pantalla.
+    // Datos de la hoja, los mismos de @media print: 216mm x 279mm con 1.2cm de margen.
+    const HOJA_ANCHO_MM = 216, HOJA_ALTO_MM = 279, HOJA_MARGEN_MM = 12;
+    const MM_A_PX = 96 / 25.4;                                            // 1mm a 96dpi
+    const IMPRESION_ANCHO_PX = Math.round((HOJA_ANCHO_MM - 2 * HOJA_MARGEN_MM) * MM_A_PX) - 6; // 720px
+    const IMPRESION_ALTO_PX = (HOJA_ALTO_MM - 2 * HOJA_MARGEN_MM - 8) * MM_A_PX;                // 933px, con 8mm de holgura
+    const IMPRESION_FONT_PX = 15;                                         // --print-font-size sin escala
     function getPrintScale() {
-        const cmToPx = 37.795;
-        const usableHeightPx = (27.94 - 3.2) * cmToPx; // 934px
         const printArea = document.getElementById('print-area');
-        // Usa el ancho real del contenedor impreso, no un fijo, para medir alto real
-        const measureWidth = Math.min(printArea.offsetWidth, 720); // 720px ≈ ancho carta útil
 
         const m = document.createElement('div');
         m.style.cssText = `position:absolute;top:-99999px;left:0;visibility:hidden;`;
-        m.style.width = measureWidth + 'px';
-        m.style.fontSize = '15px';
-        m.style.lineHeight = '1.1';
-        m.classList.add('measure-print'); // usa mismos paddings que impresión (0.25em)
+        m.style.width = IMPRESION_ANCHO_PX + 'px';
+        m.style.fontSize = IMPRESION_FONT_PX + 'px';
+        m.style.lineHeight = '1.15';   // el mismo line-height que usa @media print
 
         const c = printArea.cloneNode(true);
         c.querySelectorAll('.no-print, .leader-only').forEach(el => el.remove());
@@ -5332,15 +5611,16 @@
         const h = m.scrollHeight;
         document.body.removeChild(m);
 
-        const targetH = usableHeightPx; // usa 100% del alto útil para no dejar blanco
-        console.log(`PRINT SCALE: h=${Math.round(h)} usable=${Math.round(usableHeightPx)} target=${Math.round(targetH)} raw=${(targetH/h).toFixed(3)}`);
-        if (h <= targetH) return 1;
-        return Math.max((targetH / h), 0.53); // 8px mínimo
+        // La impresion usa margenes mas justos que la pantalla (por ejemplo .task-item
+        // pasa de 6px a 0.28em), asi que la altura medida aqui es un poco mayor que la
+        // real: la escala sale un pelo corta, que es el lado seguro (nunca una 2a hoja).
+        if (h <= IMPRESION_ALTO_PX) return 1;
+        return Math.max((IMPRESION_ALTO_PX / h), 0.53);
     }
 
     window.addEventListener('beforeprint', () => {
         const s = getPrintScale();
-        document.documentElement.style.setProperty('--print-font-size', (15 * s) + 'px');
+        document.documentElement.style.setProperty('--print-font-size', (IMPRESION_FONT_PX * s) + 'px');
     });
 
     window.addEventListener('afterprint', () => {
@@ -5796,20 +6076,23 @@
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
         toggleSearch, closeSearch, setSearchOpen,
-        openAdminModal, adminAddUser, adminRemoveUser, refreshAdminList, adminSugerir, adminAlternarFiltroEquipo,
+        openAdminModal, adminAddUser, adminRemoveUser, refreshAdminList, adminSugerir, adminCompletar,
+        catalogoUsuarios, buscarUsuarioPorTexto, adminAlternarFiltroEquipo,
         adminAlternarEquipoUsuario,
         // editar usuario (lápiz de la lista del panel admin)
         abrirEditarUsuario, renderUserModal, userModalCambiaEquipo, userModalEscribeNombre,
         userModalPonerRol, userModalAlternarAdmin, userModalAlternarEquipo,
-        userModalGuardarNombre, userModalQuitarDeEquipo,
+        userModalGuardarNombre,
         userModalEscribeEmail, userModalGuardarEmail, userModalEliminar, limpiarRegistrosBasura, registrosBasura,
         adminCambiarRol, adminCambiarAdmin,
         switchTeam, adminToggleNuevoEquipo,
-        adminCambiaEquipoPanel, adminCrearEquipo, adminAlternarEquipo, adminQuitarDeEquipo,
+        adminCambiaEquipoPanel, adminCrearEquipo, abrirNuevoEquipo, cerrarNuevoEquipo, newTeamEscribe,
+        cerrarAdminModal,
+        adminAlternarEquipo, adminQuitarDeEquipo,
         adminRenombrarEquipoSeleccion, adminAlternarEquipoSeleccion, adminEliminarEquipoSeleccion,
         // mantenimiento (solo super admin)
         adminAlternarMantenimiento,
-        estadoActual, equiposDelPanel, puedoGestionarEquipo, usuariosDeEquipo, resumenEquipo,
+        estadoActual, equiposDelPanel, puedoGestionarEquipo, usuariosDeEquipo, avisosEquipoBar,
         doGoogleLogin, logoutFull
     });
 
