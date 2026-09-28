@@ -617,7 +617,6 @@
         /* La lista se estira hasta el alto disponible (y nunca más de la mitad de
            la ventana), en vez de medir 400px fijos como antes. */
         .admin-list-panel { min-width: 0; min-height: 0; display: flex; flex-direction: column; }
-        .admin-list-title { margin-bottom: 4px; color: var(--text-soft); font-size: 9px; font-weight: 800; letter-spacing: 0.3px; }
         .modal-content .admin-search { width: 100%; height: 30px; flex: none; box-sizing: border-box; margin: 0 0 6px; background: var(--surface); }
         .admin-user-list { flex: 1 1 auto; min-height: 180px; max-height: 52vh; overflow-y: auto; font-size: 10px; border: 1px solid var(--border-soft); border-radius: 8px; padding: 5px; background: var(--light-gray); }
         .admin-empty { padding: 12px 6px; text-align: center; color: var(--comment); font-size: 9px; font-weight: 800; }
@@ -1097,6 +1096,16 @@
             margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border-subtle);
             font-size: 8.5px; font-weight: 800; letter-spacing: 0.6px; color: var(--comment);
         }
+        /* Salir de la pantalla de mantenimiento. Se ofrece solo a quien YA tiene
+           sesión (para cambiar de cuenta: quien va a levantar el mantenimiento entra
+           con otra). Si no hay sesión, en su lugar se muestra el botón de Google:
+           sin él, un equipo nuevo sin sesión no podría ni entrar a apagar nada. */
+        .login-manto-salir {
+            display: none; width: 100%; height: 34px !important; margin-top: 12px;
+            font-size: 10px; border: 1px solid var(--primary); border-radius: var(--button-radius) !important;
+            background: transparent; color: var(--primary);
+        }
+        .login-manto-salir:hover:not(:disabled) { background: var(--primary); color: var(--surface); opacity: 1; }
 
         /* Pantalla de carga profesional */
         #boot-splash { position: fixed; inset: 0; z-index: 10000; background: var(--gradient-boot); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: opacity .35s ease; }
@@ -1131,6 +1140,7 @@
             <p class="login-maint-txt">Durante este período no es posible leer ni registrar información en la plataforma. El servicio se restablece de forma automática una vez finalizado el trabajo.</p>
             <p class="login-maint-txt">Si tienes una operación en curso, comunícate con tu Team Leader. Gracias por tu comprensión.</p>
             <div class="login-maint-since" id="login-mantenimiento-desde">MANTENIMIENTO EN CURSO</div>
+            <button type="button" id="login-manto-salir" class="login-manto-salir" onclick="logoutFull()">✖ CERRAR SESIÓN</button>
         </div>
         <div id="login-error-msg" class="login-error"></div>
     </div>
@@ -1154,7 +1164,7 @@
     <div class="view-controls no-print">
         <div class="view-group">
             <input type="date" id="global-date-select" class="view-shift view-shift-date" onchange="changeDate()" title="Ver la programación de otro día">
-            <button class="view-action" onclick="goToToday()" title="Ir al día de hoy">📅 HOY</button>
+            <button class="view-action" id="btn-hoy" onclick="goToToday()" title="Ir al día de hoy">📅 HOY</button>
             <select id="global-turno-select" class="view-shift view-shift-turno" onchange="changeTurno()" title="Turno que estás viendo">
                 <option value="Turno Día">TURNO DÍA</option>
                 <option value="Turno Tarde">TURNO TARDE</option>
@@ -1178,7 +1188,7 @@
                     <option value="">TODOS LOS TÉCNICOS</option>
                 </select>
             </div>
-            <button class="view-action view-action-quiet" onclick="resetLocalFilter()" title="Volver a la vista normal">↺ RESTABLECER</button>
+            <button class="view-action view-action-quiet" id="btn-restablecer" onclick="resetLocalFilter()" title="Volver a la vista normal">↺ RESTABLECER</button>
         </div>
     </div>
 
@@ -1528,14 +1538,14 @@
                     <datalist id="admin-sugerencias"></datalist>
                     <datalist id="admin-sugerencias-nombre"></datalist>
                     <div class="team-note" id="admin-sugerencia-nota"></div>
-                    <div class="admin-card-title">ROL EN ESTE EQUIPO <span style="font-weight:400;opacity:.7">· UNO SOLO</span></div>
+                    <div class="admin-card-title">ROL EN ESTE EQUIPO</div>
                     <div class="admin-role-grid">
                         <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-user" value="usuario" checked> USUARIO</label>
                         <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-tech" value="tech"> TÉCNICO</label>
                         <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-tl" value="tl"> TL</label>
                     </div>
                     <label class="admin-role-option" style="margin-top:4px" id="admin-opt-admin">
-                        <input type="checkbox" id="admin-is-admin"> ADMIN <span style="font-weight:400;opacity:.75">· SE SUMA AL ROL, SOLO ABRE EL PANEL</span>
+                        <input type="checkbox" id="admin-is-admin"> ADMIN
                     </label>
                 </div>
                 <button class="btn-leader admin-add-button" onclick="adminAddUser()">AGREGAR AL EQUIPO</button>
@@ -1546,7 +1556,6 @@
                 </div>
             </div>
             <div class="admin-list-panel">
-                <div class="admin-list-title" id="admin-list-title">USUARIOS</div>
                 <div class="admin-search-row">
                     <input type="text" id="admin-search" class="admin-search" placeholder="🔍 BUSCAR USUARIO O NOMBRE..." autocomplete="off" oninput="refreshAdminList()">
                     <button class="team-btn" id="admin-filtro-equipo" onclick="adminAlternarFiltroEquipo()" title="MOSTRAR SOLO LOS USUARIOS DE ESTE EQUIPO" style="display:none;">SOLO ESTE EQUIPO</button>
@@ -1589,7 +1598,6 @@
             <div class="admin-card">
                 <div class="admin-card-title">ROL EN ESTE EQUIPO <span style="font-weight:400;opacity:.7">· UNO SOLO</span></div>
                 <div class="admin-rol-grid2" id="user-modal-roles"></div>
-                <div class="team-note" style="margin-top:6px">EL ADMIN SE SUMA ARRIBA DEL ROL: NO LO REEMPLAZA Y NO DA PODERES DE TURNO.</div>
                 <button type="button" class="admin-rol-btn admin-rol-admin" id="user-modal-admin"
                     onclick="userModalAlternarAdmin()">ADMIN</button>
                 <div class="team-note user-modal-note" id="user-modal-nota"></div>
@@ -1606,7 +1614,7 @@
             <div class="team-note user-modal-eliminar-nota" id="user-modal-eliminar-nota" style="margin: 0 0 6px;"></div>
             <div class="user-modal-foot-row">
                 <button class="btn-danger btn-modal-action" id="user-modal-borrar" onclick="userModalEliminar()"
-                    title="BORRA LA CUENTA COMPLETA DE ESTE USUARIO EN TODOS LOS EQUIPOS">🗑 ELIMINAR USUARIO</button>
+                    title="ELIMINAR A ESTE USUARIO">🗑 ELIMINAR USUARIO</button>
                 <button class="btn-outline btn-modal-action" onclick="closeModal('user-modal')">CERRAR</button>
             </div>
         </div>
@@ -2193,7 +2201,39 @@
                 // entrada, o userKeyFor() dejaria de encontrar a la persona y perderia
                 // sus roles en pantalla hasta recargar la pagina
                 if (i !== valor) { delete usuariosDB[i]; usuariosDB[valor] = rec; }
-                return { nodo: nuevo, movido: nuevo !== viejo };
+                // 'clave' es la forma de buscarlo en memoria despues (usuariosDB se
+                // indexa por el correo, no por la clave del nodo)
+                return { nodo: nuevo, clave: valor, movido: nuevo !== viejo };
+            })
+            .catch((e) => {
+                rec.email = previo;
+                console.error('FIREBASE WRITE ERROR (email)', e);
+                throw e;
+            });
+    }
+    // Cambio de email que NO mueve el nodo: se reescribe solo el campo 'email'. El
+    // registro sigue en su clave original, asi que no hace falta permiso de escritura
+    // sobre el nodo entero (que es del super admin) y por eso lo puede hacer tambien
+    // un admin de equipo. No se pierde nada: la identidad con la que la persona entra
+    // es el campo 'email', no el nombre del nodo, asi que el login y los roles siguen
+    // funcionando con el correo nuevo (los indices de uids y de admins apuntan al
+    // nodo, que no se movio).
+    function guardarEmailEnElMismoNodo(user, email) {
+        const valor = normalizeEmail(email);
+        const nodo = claveNodoDe(user);
+        const i = idxLocalDe(nodo);
+        if (!usuariosDB[i]) usuariosDB[i] = { email: '', nombre: '', roles: {} };
+        const rec = usuariosDB[i];
+        const previo = rec.email;
+        rec.email = valor;
+        return set(ref(db, 'mantenimiento/pd/usuarios/' + nodo + '/email'), valor)
+            .then(() => {
+                // el mapa de claves reales se actualiza al correo nuevo, apuntando al
+                // MISMO nodo, y la entrada en memoria se reindexa por el correo
+                delete nodoRealDe[i];
+                nodoRealDe[valor] = nodo;
+                if (i !== valor) { delete usuariosDB[i]; usuariosDB[valor] = rec; }
+                return { nodo: nodo, clave: valor, movido: false };
             })
             .catch((e) => {
                 rec.email = previo;
@@ -2264,7 +2304,15 @@
             // Firebase cancela solo los listeners a los que se le niegan los
             // permisos: al levantar el mantenimiento hay que volver a suscribirlos,
             // si no el personal se quedaría con los datos congelados de antes.
-            if (estaba && !activo) { lastRolesUid = null; subscribeRoles(); }
+            if (estaba && !activo) {
+                lastRolesUid = null;
+                subscribeRoles();
+                // Al terminar el mantenimiento la pagina se recarga sola en todos los
+                // equipos: durante el mantenimiento la app estuvo congelada, y asi
+                // cada uno carga la version nueva del sitio sin tener que hacer nada.
+                forzarRecarga();
+                return;
+            }
             if (typeof evaluateGate === 'function') evaluateGate();
         }, (e) => console.warn('_estado:', e.code)));
         rolesUnsubs.push(onValue(tlUsersRef, (snapshot) => {
@@ -2378,6 +2426,7 @@
     document.getElementById('global-turno-select').value = activeTurno;
     document.getElementById('view-mode-select').value = currentViewMode;
     document.getElementById('global-date-select').value = viewingDate;
+    updateViewActionsUI();
 
     // Reloj Dinámico Mejorado
     function updateClock() {
@@ -2619,8 +2668,17 @@
         const err = document.getElementById('login-error-msg');
         if (t) t.innerText = 'MANTENIMIENTO EN CURSO';
         if (s) s.innerText = 'PROGRAMACIÓN DIARIA · NO DISPONIBLE';
-        if (g) g.style.display = 'none';
-        if (gs) gs.style.display = 'none';
+        // Con sesión activa lo único que hay que ofrecer es cambiar de cuenta: entrar
+        // de nuevo con la misma no serviría de nada, seguiría viendo este aviso. Sin
+        // sesión, en cambio, se muestra el botón de Google: sin él, un equipo que
+        // llega sin sesión no podría ni entrar a levantar el mantenimiento.
+        const haySesion = !!sessionUser();
+        if (g) g.style.display = haySesion ? 'none' : '';
+        if (gs) gs.style.display = haySesion ? 'none' : '';
+        const btnSalirManto = document.getElementById('login-manto-salir');
+        // con valor explicito: la clase CSS lo deja oculto, y al vaciar el estilo en
+        // linea volveria a manda esa, no la de mostrarse
+        if (btnSalirManto) btnSalirManto.style.display = haySesion ? 'inline-flex' : 'none';
         if (err) err.innerText = '';
         const desde = document.getElementById('login-mantenimiento-desde');
         const hora = horaMantenimiento(mantenimientoDesde);
@@ -2641,9 +2699,14 @@
         const gs = document.getElementById('login-google-sub');
         if (g) g.style.display = '';
         if (gs) gs.style.display = '';
+        // el botón de salir de la pantalla de mantenimiento tampoco puede quedar
+        // a la vista cuando ya no hay mantenimiento
+        const btnSalirManto = document.getElementById('login-manto-salir');
+        if (btnSalirManto) btnSalirManto.style.display = 'none';
         if (t) t.innerText = 'PROGRAMACIÓN DIARIA';
         if (s) s.innerText = 'ACCESO RESTRINGIDO · PERSONAL AUTORIZADO';
     }
+
 
     function evaluateGate() {
         const overlay = document.getElementById('login-obligatorio');
@@ -2804,6 +2867,30 @@
             return new Date(ts).toLocaleTimeString('es-ES', { timeZone: TZ_SANTIAGO, hour: '2-digit', minute: '2-digit' });
         } catch (e) { return ''; }
     }
+    // Recarga la pagina, una sola vez, cuando el mantenimiento ya se levanto. Se
+    // deja un instante para que el aviso se alcance a leer, y se centraliza en una
+    // sola funcion porque el reinicio tiene que ser el MISMO en todos los equipos
+    // abiertos, sea cual sea quien haya apagado el mantenimiento.
+    let recargaProgramada = null;
+    function forzarRecarga() {
+        if (recargaProgramada) return;
+        recargaProgramada = setTimeout(() => {
+            recargaProgramada = null;
+            // Se recarga con una marca en la URL: el hosting guarda el HTML en cache
+            // (GitHub, por ejemplo, unos minutos) y una recarga normal podria
+            // conformarse con la copia guardada, dejando al personal mirando la
+            // version anterior al mantenimiento. La marca se queda en la direccion,
+            // asi las siguientes recargas tambien parten de la ultima version.
+            // replace y no reload para no dejar una entrada atras que se pueda volver.
+            try {
+                const url = new URL(location.href);
+                url.searchParams.set('_v', String(Date.now()));
+                location.replace(url.toString());
+            } catch (e) {
+                location.reload();
+            }
+        }, 2000);
+    }
     function updateMantenimientoUI() {
         const card = document.getElementById('admin-mantenimiento-card');
         const btn = document.getElementById('admin-mantenimiento-btn');
@@ -2853,6 +2940,9 @@
                         showToast(activar
                             ? '🔧 MANTENIMIENTO ACTIVADO · SOLO EL SUPER ADMIN PUEDE OPERAR'
                             : '✅ MANTENIMIENTO DESACTIVADO · ACCESO NORMAL');
+                        // el que apaga el mantenimiento tambien recarga: su propio
+                        // listener no lo haria porque el estado local ya estaba al dia
+                        if (!activar) forzarRecarga();
                     })
                     .catch((e) => {
                         console.error('FIREBASE WRITE ERROR', e);
@@ -3441,11 +3531,6 @@
         // equipo sin miembros cada usuario salia duplicado
         const lista = ordenUsuarios(Array.from(new Set(base.concat(delEquipo))));
         const puedo = puedoGestionarEquipo(team);
-        const titleEl = document.getElementById('admin-list-title');
-        if (titleEl) {
-            titleEl.textContent = 'USUARIOS · ' + String(equipoNombre(team)).toUpperCase()
-                + (adminSoloEquipo ? '' : ' · TODOS');
-        }
         if (!lista.length) {
             listEl.innerHTML = '<div class="admin-empty">SIN USUARIOS EN ESTE EQUIPO</div>';
             updateAdminUI();
@@ -3502,7 +3587,7 @@
         const name = normalizeEmail(document.getElementById('admin-name').value);
         if (!name) return showConfirm("INGRESE EL EMAIL DEL USUARIO (EJ: juan.perez@latam.cl).", null);
         if (!name.includes('@')) return showConfirm("INGRESE EL CORREO COMPLETO, INCLUYENDO EL DOMINIO (EJ: juan.perez@latam.cl).", null);
-        if (isSuperAdmin(name)) return showToast('⚠️ ESE USUARIO YA ES SUPER ADMIN');
+        if (isSuperAdmin(name)) return showToast('⚠️ ESE USUARIO YA TIENE ACCESO A TODO EL SISTEMA');
         const team = equipoDelPanel();
         const aviso = avisoEquipoPanel();
         if (aviso) return showToast(aviso);
@@ -3525,7 +3610,12 @@
             if (!ok) return;
             // el correo lo valida el indice uids: si no se puede guardar, el alta
             // igual quedó hecha, asi que se avisa en vez de romper la promesa suelta
-            if (!yaExistia) guardarEmail(key).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL EMAIL (' + (e.code || e.message) + ')'));
+            //
+            // OJO: se pasa el CORREO escrito (name), no la clave. La clave del registro
+            // va con guiones bajos (Firebase no admite puntos en el nombre de un nodo)
+            // y guardarla como correo dejaba a la persona con 'juan_perez@latam_com':
+            // no podia entrar y habia que corregirlo a mano.
+            if (!yaExistia) guardarEmail(key, name).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL EMAIL (' + (e.code || e.message) + ')'));
             if (nombre !== nombreDe(key, team)) {
                 guardarNombre(key, nombre).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL NOMBRE (' + (e.code || e.message) + ')'));
             }
@@ -3666,7 +3756,7 @@
             });
         };
         if (dejaSinAdmin) {
-            showConfirm(`⚠️ ${nombreDe(user, team).toUpperCase()} ES EL ÚLTIMO QUE ADMINISTRA ${equipoNombre(team).toUpperCase()}.\n\nSi le quitas el admin, el equipo se queda sin nadie que lo administre y solo el super admin podría corregirlo.\n\n¿QUITARLE EL ADMIN IGUAL?`, aplicar);
+            showConfirm(`⚠️ ${nombreDe(user, team).toUpperCase()} ES EL ÚLTIMO QUE ADMINISTRA ${equipoNombre(team).toUpperCase()}.\n\nSi le quitas el admin, el equipo se queda sin nadie que lo administre.\n\n¿QUITARLE EL ADMIN IGUAL?`, aplicar);
         } else {
             aplicar();
         }
@@ -3676,7 +3766,7 @@
     function preparaCambio(user, teamEq) {
         // isSuperAdmin() solo reconoce el correo completo, y desde la lista solo llega la clave
         const rec0 = usuariosDB[userKeyFor(user)] || {};
-        if (isSuperAdmin(rec0.email || user)) { showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN'); return false; }
+        if (isSuperAdmin(rec0.email || user)) { showToast('⚠️ NO SE PUEDE MODIFICAR ESA CUENTA'); return false; }
         const team = teamEq || equipoDelPanel();
         const aviso = avisoEquipo(team);
         if (aviso) { showToast(aviso); return false; }
@@ -3703,7 +3793,7 @@
     // teamEq permite quitarlo de un equipo concreto (lo usa el modal de usuario).
     function adminRemoveUser(user, teamEq) {
         if (!isAdminUser()) return;
-        if (isSuperAdmin(user)) return showToast('\u26a0\ufe0f EL SUPER ADMIN NO PUEDE SER ELIMINADO');
+        if (isSuperAdmin(user)) return showToast('⚠️ ESA CUENTA NO SE PUEDE ELIMINAR');
         const team = teamEq || equipoDelPanel();
         const aviso = avisoEquipo(team);
         if (aviso) return showToast(aviso);
@@ -3772,7 +3862,7 @@
         // isSuperAdmin() solo reconoce el correo completo, así que se le pasa el
         // correo del registro (la lista solo tiene la clave corta)
         const rec = usuariosDB[key] || {};
-        if (isSuperAdmin(rec.email || user)) return showToast('⚠️ NO SE PUEDE MODIFICAR AL SUPER ADMIN');
+        if (isSuperAdmin(rec.email || user)) return showToast('⚠️ NO SE PUEDE MODIFICAR ESA CUENTA');
         userModalUser = key;
         userModalNombre = null;
         userModalEmail = null;
@@ -3797,49 +3887,55 @@
         // ── Datos de la cuenta (independientes del equipo abierto) ──
         // Se pintan antes de todo porque se ven igual con cualquier equipo elegido.
         const editable = userModalTeam ? puedoGestionarEquipo(userModalTeam) : puedoGestionarEquipo(equipoDelPanel());
+        // Corregir el email o borrar al usuario ya no es solo del super admin: lo
+        // puede cualquier admin del equipo. Lo unico que se respeta siempre, sin
+        // importar el cargo, es que nadie se cambia a si mismo.
+        const propio = esElPropio(key);
+        const puedeCuenta = editable && !propio;
         // email: si el admin ya está tecleando algo, no se le pisa al redibujar
+        const recE = usuariosDB[userKeyFor(key)] || {};
+        const emailGuardado = String(recE.email || '').trim();
         const inpEmail = document.getElementById('user-modal-email');
         if (inpEmail) {
-            const recE = usuariosDB[userKeyFor(key)] || {};
             if (userModalEmail !== null && document.activeElement !== inpEmail) inpEmail.value = userModalEmail;
-            else if (document.activeElement !== inpEmail) inpEmail.value = String(recE.email || '').trim();
-            // el email corre el nodo del usuario, asi que solo el super admin lo cambia
-            const puedeEmail = editable && isSuperAdmin(sessionUser());
-            inpEmail.disabled = !puedeEmail;
+            else if (document.activeElement !== inpEmail) inpEmail.value = emailGuardado;
+            inpEmail.disabled = !puedeCuenta;
             inpEmail.title = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : !puedeEmail ? 'CAMBIAR EL EMAIL MUEVE LA CUENTA: SOLO EL SUPER ADMIN PUEDE HACERLO'
+                : propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL'
                 : 'EL CORREO CON EL QUE ENTRA A LA PLATAFORMA';
         }
         const btnGuardarEmail = document.getElementById('user-modal-guardar-email');
         if (btnGuardarEmail) {
-            const puedeEmail = editable && isSuperAdmin(sessionUser());
-            btnGuardarEmail.disabled = !puedeEmail;
+            btnGuardarEmail.disabled = !puedeCuenta;
             btnGuardarEmail.title = inpEmail ? inpEmail.title : '';
         }
+        // Un guion bajo en el dominio delata un correo roto: se guardó la clave del
+        // registro (que lleva "_" porque Firebase no admite puntos) en vez del correo,
+        // y con eso la persona no puede entrar. Solo se avisa: se corrige en el campo.
+        const correoRoto = emailGuardado.indexOf('@') > -1 && emailGuardado.split('@')[1].indexOf('_') > -1;
         const notaEmail = document.getElementById('user-modal-email-nota');
         if (notaEmail) {
-            const puedeEmail = editable && isSuperAdmin(sessionUser());
             // igual que la nota de eliminar: solo dice algo cuando el campo esta apagado
             // y hay que explicar por que
             notaEmail.textContent = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : !puedeEmail ? 'SOLO EL SUPER ADMIN PUEDE CORREGIRLO: EL EMAIL ES LA CUENTA.'
+                : propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL.'
+                : correoRoto ? '⚠️ ESTE CORREO ESTÁ MAL: TIENE "_" EN VEZ DE ".". ESCRÍBELO DE NUEVO Y GUÁRDALO.'
                 : '';
-            notaEmail.style.color = puedeEmail ? '' : 'var(--comment)';
+            notaEmail.style.color = (!puedeCuenta || correoRoto) ? 'var(--comment)' : '';
             // vacia no ocupa nada: si no, el margen dejaba un hueco entre tarjetas
             notaEmail.style.display = notaEmail.textContent ? '' : 'none';
         }
 
-        // BORRADO COMPLETO. Solo el super admin puede (las reglas también lo filtran):
-        // un admin de equipo saca a la gente de SU equipo, no borra cuentas ajenas.
-        const propio = esElPropio(key);
-        const soySuper = isSuperAdmin(sessionUser());
+        // BORRADO. Lo puede hacer cualquier admin del equipo, no solo quien administra
+        // todos: si con esto el usuario se queda sin equipos, su cuenta se borra entera.
+        // Lo unico que se respeta siempre, sin importar el cargo, es que nadie se
+        // borra a si mismo.
         const btnBorrar = document.getElementById('user-modal-borrar');
         if (btnBorrar) {
-            btnBorrar.disabled = !editable || !soySuper || propio;
+            btnBorrar.disabled = !puedeCuenta;
             btnBorrar.title = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : !soySuper ? 'SOLO EL SUPER ADMIN PUEDE BORRAR UNA CUENTA COMPLETA · PARA SACARLO DE UN EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA"'
                 : propio ? 'NO TE PUEDES ELIMINAR A TI MISMO'
-                : 'BORRA LA CUENTA COMPLETA EN TODOS LOS EQUIPOS · PIDE CONFIRMAR ESCRIBIENDO EL USUARIO';
+                : 'LO SACA DE LOS EQUIPOS QUE ADMINISTRAS TÚ, Y BORRA SU CUENTA SI SE QUEDA SIN NINGUNO · PIDE CONFIRMAR ESCRIBIENDO EL USUARIO';
         }
         // La nota solo aparece cuando el botón está apagado y hay que decir por qué.
         // Si se puede borrar, la explicación ya está en el title del botón y en la
@@ -3847,10 +3943,9 @@
         const notaBorrar = document.getElementById('user-modal-eliminar-nota');
         if (notaBorrar) {
             notaBorrar.textContent = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : !soySuper ? 'BORRAR LA CUENTA COMPLETA ES SOLO DEL SUPER ADMIN. PARA SACARLO DE UN EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA".'
                 : propio ? '⚠️ NO PUEDES ELIMINARTE A TI MISMO'
                 : '';
-            notaBorrar.style.color = (editable && soySuper && !propio) ? 'var(--comment)' : 'var(--danger)';
+            notaBorrar.style.color = puedeCuenta ? 'var(--comment)' : 'var(--danger)';
             notaBorrar.style.display = notaBorrar.textContent ? '' : 'none';
         }
 
@@ -3895,7 +3990,6 @@
         }
         const nota = document.getElementById('user-modal-nota');
         if (nota) {
-            const propio = esElPropio(key);
             nota.textContent = !puedo ? avisoEquipo(team)
                 : !dentro ? '⚠️ NO ESTÁ EN ESTE EQUIPO: AGGREGÁLO EN "EQUIPOS DE ESTA PERSONA"'
                 : propio ? '⚠️ NO PUEDES QUITARTE TUS PROPIOS ROLES NI SALIR DEL EQUIPO: TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO'
@@ -4009,19 +4103,13 @@
         // the check is against the team that is open in the modal, not the panel's
         const aviso = userModalTeam ? avisoEquipo(userModalTeam) : avisoEquipoPanel();
         if (aviso) return showToast(aviso);
-        // cambiar el email mueve el nodo del usuario, y eso solo lo puede hacer el super
-        // admin (es el unico con permiso de escritura sobre el nodo). Ademas, si cualquiera
-        // pudiera hacerlo, bastaba con escribirle un correo a otra persona para quedarse
-        // con su cuenta.
-        if (!isSuperAdmin(sessionUser())) {
-            return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE CAMBIAR EL EMAIL DE UN USUARIO');
-        }
+        if (esElPropio(key)) return showToast('⚠️ NO PUEDES CAMBIAR TU PROPIO EMAIL');
         const email = normalizeEmail(document.getElementById('user-modal-email')?.value || '');
         if (!email) return showConfirm('ESCRIBE EL EMAIL DE LA CUENTA (EJ: JUAN.PEREZ@LATAM.COM).', null);
         if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
             return showConfirm('EL EMAIL NO ES VÁLIDO. TIENE QUE INCLUIR EL DOMINIO (EJ: JUAN.PEREZ@LATAM.COM).', null);
         }
-        if (isSuperAdmin(email)) return showToast('⚠️ ESE CORREO ES EL DEL SUPER ADMIN');
+        if (isSuperAdmin(email)) return showToast('⚠️ ESE CORREO NO SE PUEDE USAR');
         const actualKey = userKeyFor(key);
         const actual = normalizeEmail((usuariosDB[actualKey] || {}).email || '');
         if (actual === email) {
@@ -4033,6 +4121,11 @@
         if (repetido) {
             return showConfirm('YA EXISTE OTRO USUARIO CON ESE EMAIL:\n' + String(repetido).toUpperCase() + '\n\nCADA PERSONA TIENE SU PROPIO CORREO.', null);
         }
+        // El super admin conserva el comportamiento anterior: mueve el registro al nodo
+        // del correo nuevo (escribir sobre el nodo entero es de el). Un admin de equipo
+        // no puede, asi que reescribe solo el campo 'email': el registro se queda donde
+        // esta y la persona entra igual con el correo nuevo.
+        const mover = isSuperAdmin(sessionUser()) && sanitizeKey(email) !== claveNodoDe(key);
         // el registro se cambia de nodo, asi que se pide una confirmacion de verdad
         const nombre = String((usuariosDB[actualKey] || {}).nombre || '').trim().toUpperCase();
         showConfirm(
@@ -4041,15 +4134,16 @@
             + '· DESPUÉS: ' + email.toUpperCase() + '\n\n'
             + '⚠️ LA PERSONA TENDRÁ QUE VOLVER A ENTRAR CON EL EMAIL NUEVO.\n'
             + '⚠️ SI EL NUEVO ESTÁ MAL ESCRITO, NADIE PODRÁ ENTRAR CON ESA CUENTA.',
-            () => guardarEmail(key, email)
+            () => (mover ? guardarEmail(key, email) : guardarEmailEnElMismoNodo(key, email))
                 .then((r) => {
                     userModalEmail = null;   // ya está guardado: se puede volver a pintar
-                    // si el nodo se movio, el modal sigue abierto pero sobre la clave nueva
-                    if (r && r.movido) userModalUser = r.nodo;
+                    // el registro se reindexa por el correo nuevo: el modal sigue abierto
+                    // pero hay que seguir apuntando a la clave que existe en memoria
+                    if (r && r.clave) userModalUser = r.clave;
                     refreshAdminList();
                     renderSugerencias();
                     showToast('✅ EMAIL GUARDADO: ' + email.toUpperCase()
-                        + (r && r.movido ? ' · AVISA A LA PERSONA QUE ENTRE DE NUEVO' : ''));
+                        + (mover ? ' · AVISA A LA PERSONA QUE ENTRE DE NUEVO' : ''));
                 })
                 .catch((e) => {
                     console.error('FIREBASE WRITE ERROR', e);
@@ -4061,19 +4155,28 @@
         );
     }
 
-    // ─── BORRAR UN USUARIO COMPLETO ────────────────────────────────────────
-    // A diferencia de quitarlo de un equipo (que solo saca a la persona de ese equipo,
-    // tocando su nombre en "EQUIPOS DE ESTA PERSONA"), esto borra la CUENTA en todos
-    // los equipos. Por eso es del super admin, y por eso hay que escribir el usuario
-    // para confirmar: no hay vuelta atrás.
+    // ─── BORRAR UN USUARIO ──────────────────────────────────────────────────
+    // Se le quita de los equipos que se están administrando y, si con eso se queda
+    // sin ninguno (o sea, ya no puede entrar a nada), su cuenta se borra completa.
+    // El que administra todos los equipos pasa la lista completa y por eso termina
+    // borrando la cuenta entera. En los dos casos hay que escribir el usuario para
+    // confirmar, y nunca se hace sobre uno mismo.
     function userModalEliminar() {
         const key = userModalUser ? userKeyFor(userModalUser) : null;
         if (!key) return;
-        if (!isSuperAdmin(sessionUser())) {
-            return showToast('⚠️ SOLO EL SUPER ADMIN PUEDE BORRAR UNA CUENTA COMPLETA');
-        }
+        // el permiso se mira sobre el equipo abierto en el modal, no el del panel
+        const aviso = userModalTeam ? avisoEquipo(userModalTeam) : avisoEquipoPanel();
+        if (aviso) return showToast(aviso);
         if (esElPropio(key)) return showToast('⚠️ NO TE PUEDES ELIMINAR A TI MISMO');
-        const teams = usuariosConRolEn(key);
+        const soySuper = isSuperAdmin(sessionUser());
+        const teams = soySuper
+            ? usuariosConRolEn(key)
+            : equiposDondeSoyAdmin().filter(t => esMiembroDe(key, t));
+        // Si no lo tengo en mis equipos solo se toca cuando ya no está en ninguno:
+        // si estuviera en otro equipo suyo, aquí no se puede llegar.
+        if (!soySuper && !teams.length && usuariosConRolEn(key).length) {
+            return showToast('⚠️ NO TIENE NINGÚN ROL EN LOS EQUIPOS QUE ADMINISTRAS');
+        }
         // Equipos que se quedarían sin admin si esta persona los administra
         const sinAdmin = teams.filter(t => {
             if (!puede(key, 'administrar', t)) return false;
@@ -4084,69 +4187,108 @@
         const equiposTxt = teams.length
             ? teams.map(t => String(equipoNombre(t)).toUpperCase()).join(', ')
             : 'NO ESTÁ EN NINGÚN EQUIPO';
+        // ¿le queda algún equipo? se calcula antes de escribir nada
+        const quedaEn = usuariosConRolEn(key).filter(t => teams.indexOf(t) === -1);
+        const seBorraTodo = !quedaEn.length;
+        const cabecera = seBorraTodo
+            ? '⚠️ SE BORRARÁ DEFINITIVAMENTE LA CUENTA DE\n' + quien + '\n\n'
+              + (equiposTxt === 'NO ESTÁ EN NINGÚN EQUIPO' ? '' : '• SUS ROLES EN: ' + equiposTxt + '\n')
+              + '• SU NOMBRE, EMAIL Y TODO SU REGISTRO\n\n'
+            : '⚠️ SE SACARÁ A ' + quien + ' DE: ' + equiposTxt + '\n\n'
+              + '• SE BORRA SU ROL EN ESOS EQUIPOS\n'
+              + '• EN LOS DEMÁS EQUIPOS NO SE TOCA NADA\n\n';
         showConfirm(
-            '⚠️ SE BORRARÁ DEFINITIVAMENTE LA CUENTA DE\n' + quien + '\n\n' +
-            '• SUS ROLES EN: ' + equiposTxt + '\n' +
-            '• SU NOMBRE, EMAIL Y TODO SU REGISTRO\n\n' +
-            (sinAdmin.length
+            cabecera
+            + (sinAdmin.length
                 ? '⚠️ ' + sinAdmin.map(t => String(equipoNombre(t)).toUpperCase()).join(', ') + ' SE QUEDARÍA SIN ADMIN.\n\n'
-                : '') +
-            '⚠️ ESTO NO SE PUEDE DESHACER.',
-            () => borrarUsuarioCompleto(key, teams),
+                : '')
+            + '⚠️ ESTO NO SE PUEDE DESHACER.',
+            () => borrarUsuario(key, teams, soySuper),
             key    // hay que ESCRIBIR el usuario para habilitar el borrado
         );
         const yes = document.getElementById('confirm-yes-btn');
-        if (yes) yes.innerText = 'SÍ, ELIMINAR';
+        if (yes) yes.innerText = seBorraTodo ? 'SÍ, ELIMINAR' : 'SÍ, SACAR';
     }
-    function borrarUsuarioCompleto(key, teams) {
+    // Quita al usuario de los equipos indicados y, si con eso se queda sin ninguno,
+    // borra tambien su cuenta. No se borra el nodo entero: eso en Firebase concede
+    // escritura sobre TODO lo que cuelga de el, y con eso un admin podria colar a
+    // un usuario en un equipo que no administra. Se borran los campos sueltos
+    // (email y nombre, que si puede escribir un admin) y, como en Realtime Database
+    // un nodo sin hijos desaparece solo, la cuenta se va completa sin tocar permisos
+    // mas amplios. El super admin si puede borrar el nodo entero y lo hace.
+    function borrarUsuario(key, teams, completo) {
+        const quitar = teams || [];
         const ruta = 'mantenimiento/pd/usuarios/' + claveNodoDe(key);
-        const tareas = [];
-        // hoja por hoja: en Firebase las reglas NO son filtros, asi que un remove()
-        // del nodo completo no pasaria por el permiso de roles/<equipo>.
-        (teams || []).forEach(t => tareas.push(remove(ref(db, ruta + '/roles/' + t))));
-        // el indice de admins se va con la cuenta
-        tareas.push(remove(ref(db, 'mantenimiento/pd/admins/' + claveNodoDe(key))));
-        // y por ultimo la cuenta entera. En Realtime Database un remove() es un
-        // .write, asi que el permiso vive en usuarios/$user/.write (super admin).
-        tareas.push(remove(ref(db, ruta)));
-        Promise.all(tareas.map(t => t.then(() => true).catch(e => {
-            console.error('FIREBASE WRITE ERROR (borrar usuario)', e);
-            return false;
-        }))).then(ok => {
-            const fallidas = ok.filter(x => !x).length;
-            if (fallidas) {
-                // La base quedo a medias: no se cierra el modal ni se anuncia el borrado,
-                // porque la pantalla no puede mostrar un cambio que no se guardo.
-                showToast('⚠️ NO SE PUDO BORRAR TODO (' + fallidas + ' ESCRITURA(S) RECHAZADA(S)). REVISA QUE LAS REGLAS ESTÉN PUBLICADAS.');
-                return;
-            }
+        const quedaEn = usuariosConRolEn(key).filter(t => quitar.indexOf(t) === -1);
+        const seBorraTodo = completo || !quedaEn.length;
+        const quitarRol = (t) => remove(ref(db, ruta + '/roles/' + t))
+            .then(() => true)
+            .catch(e => { console.error('FIREBASE WRITE ERROR (borrar usuario)', e); return false; });
+        const borrarCampo = (campo) => set(ref(db, ruta + '/' + campo), null)
+            .then(() => true)
+            .catch(e => { console.error('FIREBASE WRITE ERROR (borrar usuario)', e); return false; });
+        // Los roles se van de a uno, y en ese orden: el borrado de la cuenta se
+        // dispara despues, cuando la base ya los ve fuera.
+        quitar.reduce((p, t) => p.then(ok => ok ? quitarRol(t) : false), Promise.resolve(true))
+            .then(ok => {
+                if (!ok) {
+                    showToast('⚠️ NO SE PUDO QUITARLO DE LOS EQUIPOS. REVISA QUE LAS REGLAS ESTÉN PUBLICADAS.');
+                    return;
+                }
+                if (!seBorraTodo) return terminarBorrado(key, quitar, false);
+                // ya no esta en ningun equipo: la cuenta es un cascaron sin acceso
+                const fin = completo
+                    ? Promise.all([remove(ref(db, 'mantenimiento/pd/admins/' + claveNodoDe(key))), remove(ref(db, ruta))])
+                    : Promise.all([borrarCampo('email'), borrarCampo('nombre')]);
+                return fin.then(r => {
+                    const mal = r.filter(x => x === false).length;
+                    if (mal) {
+                        showToast('⚠️ SE SACÓ DE LOS EQUIPOS PERO LA CUENTA NO SE PUDO BORRAR DEL TODO (' + mal + ' ESCRITURA(S) RECHAZADA(S)).');
+                        return;
+                    }
+                    terminarBorrado(key, quitar, true);
+                }).catch(e => {
+                    console.error('FIREBASE WRITE ERROR (borrar usuario)', e);
+                    showToast('⚠️ SE SACÓ DE LOS EQUIPOS PERO LA CUENTA NO SE PUDO BORRAR DEL TODO (' + (e.code || e.message) + ').');
+                });
+            });
+    }
+    // Cierra el modal y avisa. Solo se llama cuando la base ya guardo el cambio.
+    function terminarBorrado(key, quitar, seBorraTodo) {
+        if (seBorraTodo) {
             delete usuariosDB[key];
             userModalUser = null; userModalTeam = null;
             userModalNombre = null; userModalEmail = null;
-            syncRoleArrays();
-            updateTeamSwitcher();
-            closeModal('user-modal');
-            refreshAdminListIfOpen();
-            renderAdminTeamBar();
-            updateAdminUI();
-            showToast('🗑 USUARIO ELIMINADO: ' + key.toUpperCase());
-        });
+        }
+        syncRoleArrays();
+        updateTeamSwitcher();
+        closeModal('user-modal');
+        refreshAdminListIfOpen();
+        renderAdminTeamBar();
+        updateAdminUI();
+        showToast(seBorraTodo
+            ? '🗑 USUARIO ELIMINADO: ' + key.toUpperCase()
+            : '✖ SACADO DE ' + quitar.map(t => String(equipoNombre(t)).toUpperCase()).join(', ') + ': ' + key.toUpperCase());
     }
 
     function changeTurno() {
         activeTurno = document.getElementById('global-turno-select').value;
         localStorage.setItem('latam_active_turno', activeTurno);
+        // el turno decide cuál es el "hoy" (de noche todavía es el día anterior)
+        updateViewActionsUI();
         listenToTurno(activeTurno);
     }
 
     function changeDate() {
         viewingDate = document.getElementById('global-date-select').value;
+        updateViewActionsUI();
         listenToTurno(activeTurno);
     }
 
     function goToToday() {
         viewingDate = getLogicalTodayDate();
         document.getElementById('global-date-select').value = viewingDate;
+        updateViewActionsUI();
         listenToTurno(activeTurno);
     }
 
@@ -4664,6 +4806,8 @@
             currentTechFilter = '';
             localStorage.removeItem('pd_ver_a_filter');
         }
+        // el filtro puede acabarse de caer solo: RESTABLECER tiene que desaparecer
+        updateViewActionsUI();
         select.innerHTML = '<option value="">TODOS LOS TÉCNICOS</option>';
         shiftTechs.forEach(tech => {
             const selected = tech === currentTechFilter ? 'selected' : '';
@@ -4673,6 +4817,7 @@
 
     function changeViewMode() {
         currentViewMode = document.getElementById('view-mode-select').value;
+        updateViewActionsUI();
         render();
     }
 
@@ -4680,6 +4825,7 @@
         currentTechFilter = document.getElementById('local-tech-filter').value;
         if (currentTechFilter) localStorage.setItem('pd_ver_a_filter', currentTechFilter);
         else localStorage.removeItem('pd_ver_a_filter');
+        updateViewActionsUI();
         render();
     }
 
@@ -4689,7 +4835,19 @@
         document.getElementById('local-tech-filter').value = '';
         currentViewMode = 'default';
         document.getElementById('view-mode-select').value = 'default';
+        updateViewActionsUI();
         render();
+    }
+
+    // Botones que solo tienen sentido cuando hay algo que deshacer: HOY aparece
+    // cuando se está viendo otro día (hoy no es "ir a" ningún lado) y RESTABLECER
+    // cuando hay un filtro puesto. Se recalcula al cambiar la fecha, el turno o
+    // cualquier filtro, porque el "hoy" del turno noche/tarde es el día anterior.
+    function updateViewActionsUI() {
+        const btnHoy = document.getElementById('btn-hoy');
+        if (btnHoy) btnHoy.style.display = (viewingDate !== getLogicalTodayDate()) ? '' : 'none';
+        const btnReset = document.getElementById('btn-restablecer');
+        if (btnReset) btnReset.style.display = (currentViewMode !== 'default' || currentTechFilter) ? '' : 'none';
     }
 
     function handleTaskDescInput(inputElem, tangoElemId) {
