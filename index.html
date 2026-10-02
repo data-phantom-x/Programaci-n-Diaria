@@ -1371,7 +1371,7 @@
                 <span class="control-label">Técnicos</span>
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()" onchange="addTech()">
                 <button class="btn-leader btn-agregar" onclick="addTech()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">+</span><span class="btn-lbl">AGREGAR <span style="white-space:nowrap">AL TURNO</span></span></button>
-                <button class="btn-outline btn-listado" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px; display:inline-flex; align-items:center; gap:2px;" title="Editar Base Global de Técnicos"><span class="btn-ico">👥</span><span class="btn-lbl">LISTADO DE TECNICOS</span></button>
+                <button class="btn-outline btn-listado" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px; display:inline-flex; align-items:center; gap:2px;" title="Editar Base Global de Técnicos"><span class="btn-ico">👥</span><span class="btn-lbl">LISTADO DE TÉCNICOS</span></button>
             </div>
 
             <div id="tech-pills-container"></div>
@@ -3014,7 +3014,7 @@
         // en vez de intentar una escritura que Firebase va a rechazar.
         if (!rec) {
             if (!isSuperAdmin(correo)) {
-                toastThrottled('⚠️ AÚN NO ESTÁS DADO DE ALTA: PIDE QUE UN ADMIN TE AGREGUE A UN EQUIPO');
+                toastThrottled('⚠️ AÚN NO ESTÁS DADO DE ALTA: PIDE QUE UN ADMIN TE AGREGUE AL EQUIPO');
             }
             return;
         }
@@ -3788,8 +3788,8 @@
             adminCompletar('nombre');
         }
         const name = normalizeEmail(document.getElementById('admin-name').value);
-        if (!name) return showConfirm("INGRESE EL EMAIL DEL USUARIO (EJ: juan.perez@latam.cl).", null);
-        if (!name.includes('@')) return showConfirm("INGRESE EL CORREO COMPLETO, INCLUYENDO EL DOMINIO (EJ: juan.perez@latam.cl).", null);
+        if (!name) return showConfirm("INGRESA EL EMAIL DEL USUARIO (EJ: juan.perez@latam.cl).", null);
+        if (!name.includes('@')) return showConfirm("INGRESA EL CORREO COMPLETO, INCLUYENDO EL DOMINIO (EJ: juan.perez@latam.cl).", null);
         if (isSuperAdmin(name)) return showToast('⚠️ ESE USUARIO YA TIENE ACCESO A TODO EL SISTEMA');
         const team = equipoDelPanel();
         const aviso = avisoEquipoPanel();
@@ -4194,7 +4194,7 @@
         const nota = document.getElementById('user-modal-nota');
         if (nota) {
             nota.textContent = !puedo ? avisoEquipo(team)
-                : !dentro ? '⚠️ NO ESTÁ EN ESTE EQUIPO: AGGREGÁLO EN "EQUIPOS DE ESTA PERSONA"'
+                : !dentro ? '⚠️ NO ESTÁ EN ESTE EQUIPO: AGREGALO EN "EQUIPOS DE ESTA PERSONA"'
                 : propio ? '⚠️ NO PUEDES QUITARTE TUS PROPIOS ROLES NI SALIR DEL EQUIPO: TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO'
                 : '';
             nota.style.color = (puedo && dentro && !propio) ? 'var(--comment)' : 'var(--danger)';
@@ -4226,7 +4226,7 @@
         const key = userModalUser;
         const team = userModalTeam;
         if (!key || !team) return;
-        if (!esMiembroDe(key, team)) return showToast('⚠️ AGREGÁLO AL EQUIPO PRIMERO (ABAJO)');
+        if (!esMiembroDe(key, team)) return showToast('⚠️ AGREGALO AL EQUIPO PRIMERO (ABAJO)');
         const rr = rolesDe(key, team) || {};
         adminCambiarAdmin(key, !rr[ROLES_ADMIN.id], team);
         renderUserModal();
@@ -4239,7 +4239,7 @@
         const key = userModalUser;
         const team = userModalTeam;
         if (!key || !team) return;
-        if (!esMiembroDe(key, team)) return showToast('⚠️ AGREGÁLO AL EQUIPO PRIMERO (ABAJO)');
+        if (!esMiembroDe(key, team)) return showToast('⚠️ AGREGALO AL EQUIPO PRIMERO (ABAJO)');
         if (rolDeUsuario(key, team) === rol) {
             return showToast('ℹ️ PARA SACARLO DEL EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA"');
         }
@@ -4958,10 +4958,10 @@
     // Vacío = válido. Devuelve el motivo si no se puede compartir ahí.
     function shareDestinoInvalido(fecha, turno) {
         if (!shareFechaValida(fecha)) return 'LA FECHA DEL TURNO DESTINO NO ES VÁLIDA.';
-        if (!String(turno || '').trim()) return 'ELEGÍ EL TURNO QUE LA VA A RECIBIR.';
+        if (!String(turno || '').trim()) return 'ELIGE EL TURNO QUE LA VA A RECIBIR.';
         if (String(fecha) < shareHoy()) return 'NO SE PUEDE COMPARTIR A UN TURNO PASADO. ESOS TURNOS YA NO SE TRABAJAN: SON SOLO PARA CONTROL.';
         if (String(fecha) === shareHoy() && shareTurnoOrden(turno) < shareTurnoOrden(activeTurno)) {
-            return 'NO SE PUEDE COMPARTIR AL ' + String(turno).toUpperCase() + ' DE HOY: YA PASÓ. ELEGÍ ' + String(activeTurno).toUpperCase() + ' O UN TURNO DE HOY MÁS TARDE, O UN DÍA FUTURO.';
+            return 'NO SE PUEDE COMPARTIR AL ' + String(turno).toUpperCase() + ' DE HOY: YA PASÓ. ELIGE ' + String(activeTurno).toUpperCase() + ' O UN TURNO DE HOY MÁS TARDE, O UN DÍA FUTURO.';
         }
         return '';
     }
@@ -6302,7 +6302,7 @@
                 animateComplete(aId, tId, avion);
             });
         } else {
-            showConfirm("¿CONFIRMAS QUE DESEAS REABLIR ESTA TAREA?", () => {
+            showConfirm("¿CONFIRMAS QUE QUIERAS REABRIR ESTA TAREA?", () => {
                 tarea.done = false;
                 animateReopen(aId, tId, avion);
             });
@@ -6438,7 +6438,7 @@
         const checkboxes = document.querySelectorAll('.add-act-techs-cb:checked');
         const techs = Array.from(checkboxes).map(cb => cb.value).join(' - ');
 
-        if (!title) return showConfirm("INGRESE EL TÍTULO DE LA ACTIVIDAD.", null);
+        if (!title) return showConfirm("INGRESA EL TÍTULO DE LA ACTIVIDAD.", null);
 
         avionesData.push({ 
             id: Date.now(), 
@@ -6465,7 +6465,7 @@
     function saveEditActivityGroup() {
         if(checkLock()) return;
         const title = document.getElementById('edit-act-group-title').value.trim().toUpperCase();
-        if (!title) return showConfirm("INGRESE UN TÍTULO PARA EL GRUPO DE ACTIVIDADES.", null);
+        if (!title) return showConfirm("INGRESA UN TÍTULO PARA EL GRUPO DE ACTIVIDADES.", null);
         actividadGrupoTitulo = title;
         dbSet(ref(db, `${getBasePath()}/header/actividadTitulo`), title, 'GUARDAR TÍTULO');
         closeModal('edit-activity-group-modal');
@@ -6708,7 +6708,7 @@
         let tango = lock ? lock.tango : document.getElementById('add-task-tango').value.trim().toUpperCase();
         const comment = document.getElementById('add-task-comment').value.trim().toUpperCase();
         
-        if (!desc) return showConfirm("INGRESE EL TÍTULO DE LA TAREA.", null);
+        if (!desc) return showConfirm("INGRESA EL TÍTULO DE LA TAREA.", null);
         if (tango && tango.length !== 8) return showConfirm("EL TANGO DEBE TENER 8 CARACTERES.", null);
 
         const checkboxes = document.querySelectorAll('.add-task-techs-cb:checked');
@@ -6770,7 +6770,7 @@
         if(checkLock()) return;
         const input = document.getElementById('new-predef-desc');
         const desc = input.value.trim().toUpperCase();
-        if (!desc) return showConfirm("INGRESE UNA DESCRIPCIÓN PARA LA TAREA.", null);
+        if (!desc) return showConfirm("INGRESA UNA DESCRIPCIÓN PARA LA TAREA.", null);
         
         if (!predefTasks.includes(desc)) {
             predefTasks.push(desc);
