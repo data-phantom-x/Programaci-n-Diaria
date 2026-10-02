@@ -302,7 +302,161 @@
         }
         .leader-add-buttons button:first-child:hover:not(:disabled) { opacity: 0.9; }
 
-        /* Estilos generales corregidos para altura uniforme de controles */
+        /* ─── COMPARTIR TAREAS ENTRE EQUIPOS ─── */
+        /* Una sola voz para las tres superficies (caja de compartir, ficha y
+           botón): fondo blanco, una sola regla de acento a la izquierda y texto
+           en dos niveles. Nada de colores compitiendo. */
+        .share-sec {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 8.5px; font-weight: 800; letter-spacing: .7px;
+            color: var(--comment); text-transform: uppercase;
+            margin: 14px 0 8px;
+        }
+        .share-sec:first-of-type { margin-top: 2px; }
+        .share-sec::after {
+            content: ""; flex: 1; height: 1px;
+            background: color-mix(in srgb, var(--border) 70%, transparent);
+        }
+        .share-sec .share-n { font-weight: 700; color: var(--text-muted); }
+
+        /* ── La ficha: una tarea por resolver ── */
+        .share-card {
+            position: relative; margin-bottom: 8px; padding: 10px 12px 10px 14px;
+            background: var(--surface); border: 1px solid var(--border);
+            border-left: 3px solid var(--accent); border-radius: var(--button-radius);
+        }
+        .share-card:last-child { margin-bottom: 0; }
+        .share-card .sc-title {
+            font-size: 11px; font-weight: 700; line-height: 1.35; color: var(--primary);
+            margin-bottom: 7px;
+        }
+        .share-card .sc-title .tango-link { font-size: 10px; }
+        /* Datos: clave estrecha a la izquierda, valor a la derecha */
+        .share-card .sc-grid { display: flex; flex-direction: column; gap: 3px; }
+        .share-card .sc-row { display: flex; gap: 8px; align-items: baseline; }
+        .share-card .sc-key {
+            flex: none; width: 26px; padding-top: 1px;
+            font-size: 8px; font-weight: 800; letter-spacing: .5px;
+            color: var(--text-muted); text-transform: uppercase;
+        }
+        .share-card .sc-val {
+            flex: 1; min-width: 0; font-size: 9.5px; line-height: 1.45; color: var(--text-soft);
+        }
+        .share-card .sc-val .tango-link { font-size: 9.5px; }
+        /* "PARA" es una etiqueta, no un titular */
+        .share-card .sc-turno {
+            display: inline-block; padding: 1px 6px; border-radius: 3px;
+            font-size: 8.5px; font-weight: 800; letter-spacing: .4px;
+            color: var(--primary); background: var(--surface-lavender);
+            border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+        }
+        .share-card .sc-turno.es-este { background: var(--surface-soft); color: var(--text-soft); }
+        .share-card .sc-nota {
+            margin: 6px 0 0 34px; padding-left: 8px;
+            border-left: 2px solid color-mix(in srgb, var(--border) 80%, transparent);
+            font-size: 9px; line-height: 1.45; color: var(--text-soft);
+        }
+        .share-card .sc-nota b {
+            font-size: 8px; font-weight: 800; letter-spacing: .4px;
+            color: var(--text-muted); margin-right: 4px;
+        }
+        /* La X para retirar un envío: discreta, pero se ve al pasar el mouse */
+        .share-card .sc-x {
+            width: 20px; height: 20px; min-width: 20px; padding: 0;
+            margin-left: auto; font-size: 11px; line-height: 1; font-weight: 800;
+            color: var(--text-muted); background: transparent;
+            border: 1px solid var(--border); border-radius: 5px; box-shadow: none;
+        }
+        .share-card .sc-x:hover {
+            color: var(--red-dark); border-color: color-mix(in srgb, var(--danger) 45%, transparent);
+            background: color-mix(in srgb, var(--danger) 8%, #FFFFFF);
+        }
+        .share-card .sc-acciones {
+            display: flex; gap: 6px; justify-content: flex-end; margin-top: 9px;
+        }
+        .share-card .sc-acciones button {
+            width: auto; height: 22px; padding: 0 10px;
+            font-size: 9px; font-weight: 800; border-radius: 5px; box-shadow: none;
+        }
+        .share-empty {
+            padding: 10px 2px; font-size: 9.5px; color: var(--text-muted);
+        }
+        .share-list-plain { display: flex; flex-direction: column; gap: 8px; }
+
+        /* ── La caja de compartir, dentro del modal de editar tarea ── */
+        .share-box {
+            margin-top: 14px; padding: 12px; border-radius: var(--button-radius);
+            background: var(--surface-muted); border: 1px solid var(--border);
+        }
+        .share-box .share-cap {
+            display: flex; align-items: center; gap: 6px;
+            font-size: 8.5px; font-weight: 800; letter-spacing: .7px;
+            color: var(--comment); text-transform: uppercase; margin-bottom: 8px;
+        }
+        .share-box .share-fila { display: flex; gap: 8px; }
+        .share-box .share-fila + .share-fila { margin-top: 8px; }
+        .share-box .share-fila > * { flex: 1; min-width: 0; }
+        .share-box .share-send-btn { flex: none; width: auto; font-weight: 800; }
+        /* Aviso del estado: una línea discreta con un punto de color, no un grito */
+        .share-estado {
+            display: flex; align-items: flex-start; gap: 6px; margin-top: 9px;
+            font-size: 9px; line-height: 1.4; color: var(--text-soft);
+        }
+        .share-estado::before {
+            content: ""; flex: none; width: 5px; height: 5px; margin-top: 4px;
+            border-radius: 50%; background: var(--text-muted);
+        }
+        .share-estado.ok::before  { background: var(--success); }
+        .share-estado.avisa::before{ background: var(--orange-alert); }
+        .share-estado.fuera::before{ background: var(--danger); }
+        /* Envíos ya hechos desde esta tarea */
+        .share-list { margin-top: 10px; display: flex; flex-direction: column; gap: 6px; }
+        .share-list:empty { display: none; }
+        .share-row {
+            display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+            padding: 6px 9px; border-radius: 5px; font-size: 9.5px;
+            background: var(--surface); border: 1px solid var(--border);
+        }
+        .share-row .share-to { flex: 1; min-width: 80px; font-weight: 700; color: var(--primary); }
+        /* Etiqueta de turno, la misma pastilla que dentro de la ficha */
+        .share-turno {
+            display: inline-block; padding: 1px 6px; border-radius: 3px;
+            font-size: 8.5px; font-weight: 800; letter-spacing: .4px; white-space: nowrap;
+            color: var(--primary); background: var(--surface-lavender);
+            border: 1px solid color-mix(in srgb, var(--primary) 14%, transparent);
+        }
+        .share-row button { width: auto; height: 20px; padding: 0 8px; font-size: 8.5px; font-weight: 800; }
+
+
+        /* Campos que vienen de una tarea compartida: se ven pero no se tocan */
+        .campo-bloqueado {
+            background: var(--surface-muted) !important;
+            border: 1px dashed var(--border) !important;
+            border-left: 3px solid var(--accent) !important;
+            color: var(--primary) !important; cursor: not-allowed;
+        }
+
+        /* Distintivo pegado a la tarea en el turno */
+        .share-badge {
+            display: inline-block; margin-left: 6px; padding: 1px 6px;
+            font-size: 8px; font-weight: 800; letter-spacing: .4px;
+            border-radius: 3px; vertical-align: middle;
+            color: var(--accent); background: color-mix(in srgb, var(--accent) 9%, #FFFFFF);
+            border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent);
+        }
+
+        /* El botón late solo si hay algo pendiente EN ESTE TURNO. Halo suave. */
+        @keyframes share-pulse {
+            0%, 100% { box-shadow: 0 0 0 0 rgba(238, 23, 80, 0); }
+            50%      { box-shadow: 0 0 0 4px rgba(238, 23, 80, .13); }
+        }
+        #btn-compartidas.compartidas-alerta { animation: share-pulse 2.6s ease-in-out infinite; }
+        @media (prefers-reduced-motion: reduce) {
+            #btn-compartidas.compartidas-alerta { animation: none;
+                box-shadow: 0 0 0 2px rgba(238, 23, 80, .16); }
+        }
+
+/* Estilos generales corregidos para altura uniforme de controles */
         input[type="text"], input[type="date"], select, button, textarea {
             padding: 6px 10px; border: 1px solid var(--border);
             border-radius: var(--button-radius); font-size: 10px; outline: none; box-sizing: border-box;
@@ -1228,6 +1382,7 @@
             <button class="btn-leader" onclick="openAddAvionModal()" style="flex: 1; min-width: 200px; padding: 0 12px; font-size: 11px; border-radius: var(--button-radius); height: var(--button-height);">✈️<span class="btn-txt">AGREGAR AVIÓN</span></button>
             <button class="btn-accent" onclick="openAddActivityModal()" style="flex: 1; min-width: 200px; padding: 0 12px; font-size: 11px; border-radius: var(--button-radius); height: var(--button-height);">⭐<span class="btn-txt">AGREGAR ACTIVIDAD EXTRA</span></button>
             <button class="btn-accent" onclick="openAddMessageModal()" style="flex: 1; min-width: 200px; padding: 0 12px; font-size: 11px; border-radius: var(--button-radius); height: var(--button-height);">💬<span class="btn-txt">AGREGAR MENSAJE</span></button>
+            <button id="btn-compartidas" onclick="abrirModalCompartidas()" style="flex: 1; min-width: 200px; padding: 0 12px; font-size: 11px; border-radius: var(--button-radius); height: var(--button-height); display: none;">📥<span class="btn-txt" id="btn-compartidas-txt">TAREAS COMPARTIDAS</span></button>
         </div>
     </div>
 
@@ -1446,10 +1601,45 @@
         
         <input type="text" id="edit-task-comment" placeholder="NOTA DE LA TAREA">
         
+        <div id="edit-task-share" class="share-box leader-only" style="display: none;">
+            <div class="share-cap">📤 Compartir con otro equipo</div>
+            <div class="share-fila">
+                <select id="share-team-sel" onchange="cambioDestinoCompartida()"></select>
+                <button id="btn-share-enviar" class="btn-accent share-send-btn" onclick="compartirTareaActual()">📤 ENVIAR</button>
+            </div>
+            <div class="share-fila">
+                <input type="date" id="share-fecha" onchange="cambioDestinoCompartida()" title="FECHA DEL TURNO QUE LA VA A RECIBIR. NO SE COMPARTE A TURNOS PASADOS.">
+                <select id="share-turno" onchange="cambioDestinoCompartida()" title="TURNO QUE LA VA A RECIBIR">
+                    <option value="Turno Día">TURNO DÍA</option>
+                    <option value="Turno Tarde">TURNO TARDE</option>
+                    <option value="Turno Noche">TURNO NOCHE</option>
+                </select>
+            </div>
+            <div id="share-estado" class="share-estado"></div>
+            <div class="share-fila"><input type="text" id="share-nota" placeholder="NOTA PARA EL OTRO EQUIPO (OPCIONAL)"></div>
+            <div id="share-list" class="share-list"></div>
+        </div>
+        
         <div class="modal-footer">
             <button class="btn-danger-outline btn-modal-action" onclick="confirmDeleteTask()">ELIMINAR</button>
             <button class="btn-outline btn-modal-action" onclick="closeModal('edit-task-modal')">CANCELAR</button>
             <button class="btn-leader btn-modal-action" onclick="saveEditTask()">GUARDAR</button>
+        </div>
+    </div>
+</div>
+
+<div id="compartidas-modal" class="modal">
+    <div class="modal-content">
+        <div class="modal-header">📥 TAREAS COMPARTIDAS</div>
+
+        <div class="share-sec">📥 Recibidas de otros equipos <span class="share-n" id="compartidas-inbox-n"></span></div>
+        <div id="compartidas-inbox" class="share-list-plain" style="max-height: 250px; overflow-y: auto;"></div>
+
+        <div class="share-sec">📤 Enviadas a otros equipos <span class="share-n" id="compartidas-outbox-n"></span></div>
+        <div id="compartidas-outbox" class="share-list-plain" style="max-height: 200px; overflow-y: auto;"></div>
+
+        <div class="modal-footer">
+            <button class="btn-outline btn-modal-action" onclick="closeModal('compartidas-modal')">CERRAR</button>
         </div>
     </div>
 </div>
@@ -2377,6 +2567,12 @@
         updateAdminUI();
         refreshAdminListIfOpen();
         updateTlSuggestions();
+        // el catalogo de equipos ya esta completo: las carpetas de salida de
+        // compartidas se definitivas aqui
+        seguroCompartidas(attachCompartidas);
+        // Con los nombres ya cargados, las fichas compartidas dejan de mostrar el
+        // correo del remitente y pasan a mostrar su nombre.
+        seguroCompartidas(renderCompartidas);
         evaluateGate();
         }, (e) => console.warn('usuarios:', e.code)));
     }
@@ -2491,6 +2687,7 @@
         updateLockUI();
         updateAdminUI();
         render();
+        seguroCompartidas(() => { renderBotonCompartidas(); renderShareListTarea(); });
     }
 
     function deactivateLeaderUI() {
@@ -2512,6 +2709,7 @@
         updateLockUI();
         updateAdminUI();
         render();
+        seguroCompartidas(() => { renderBotonCompartidas(); renderShareListTarea(); });
     }
 
     function toggleMode() {
@@ -2604,6 +2802,9 @@
                 updateTeamSwitcherYRecargar();
                 refreshAdminListIfOpen();
                 renderNewTeamsGrid();
+                // el catalogo decide a quien se le puede compartir: si aparece o
+                // desaparece un equipo, las carpetas de salida cambian
+                seguroCompartidas(attachCompartidas);
             }, readErr),
             onValue(globalTechsRef(), (snapshot) => {
                 globalTechs = snapshot.val() || [];
@@ -2615,6 +2816,7 @@
             }, readErr)
         );
         listenToTurno(activeTurno);
+        seguroCompartidas(attachCompartidas);
     }
 
     function detachData() {
@@ -2625,6 +2827,7 @@
         if (unsubAviones) { unsubAviones(); unsubAviones = null; }
         if (unsubTechs) { unsubTechs(); unsubTechs = null; }
         if (unsubHeader) { unsubHeader(); unsubHeader = null; }
+        seguroCompartidas(detachCompartidas);
         avionesData = [];
         shiftTechs = [];
         groupMessages = [];
@@ -4393,6 +4596,7 @@
 
         unsubHeader = onValue(dbRefs.header, (snapshot) => {
             const data = snapshot.val() || {};
+            seguroCompartidas(publicarIndiceTareas);
             shiftState.estado = data.estado || 'abierto';
             shiftState.cerradoPor = data.cerradoPor || '';
             actividadGrupoTitulo = data.actividadTitulo || '⭐ ACTIVIDADES EXTRA';
@@ -4424,6 +4628,861 @@
             renderGroupMessages();
             hideSplash(); // primeros datos recibidos: fin de la pantalla de carga
         }, readErr);
+    }
+
+    // ─── TAREAS COMPARTIDAS ENTRE EQUIPOS ────────────────────────────────
+    // Nodo: pd/compartidas/<destino>/<origen>/<id>
+    //   El TL del ORIGEN envía y puede retirar lo que mandó. El TL del DESTINO
+    //   recibe y decide (acepta / rechaza). Las reglas de Firebase separan los
+    //   poderes: solo el destino puede cambiar el estado, y el contenido de la
+    //   tarea queda congelado al enviarla.
+    // Por eso el TL de origen NO necesita permiso en el equipo destino: escribe
+    // en la carpeta del destino, pero la regla lo autoriza por ser líder del
+    // propio origen.
+    let compartidasRecibidas = {};
+    let compartidasSalientesPorEquipo = {};   // <equipo> -> {id: share}
+    let compartidasEnviadas = {};
+    let compartidasUnsubs = [];
+
+    function compartidasBase() { return 'mantenimiento/pd/compartidas'; }
+    // La bandeja se lee en la carpeta del equipo destino, pero adentro hay un nivel
+    // más: cada envío vive bajo el nombre del equipo que lo mandó. Se aplana para
+    // que el resto de la app trabaje siempre con { <idEnvio>: envio }.
+    function compartidasAplanar(porEquipo) {
+        const todas = {};
+        Object.keys(porEquipo || {}).forEach(eq => {
+            const carpeta = porEquipo[eq];
+            if (!carpeta || typeof carpeta !== 'object') return;
+            // Un envío mal formado (o de otra versión) puede aparecer aqui como si
+            // fuera una carpeta. Si trae estado, es un envío, no un equipo.
+            if ('estado' in carpeta || 'id' in carpeta) { todas[eq] = carpeta; return; }
+            Object.keys(carpeta).forEach(id => { todas[id] = carpeta[id]; });
+        });
+        return todas;
+    }
+    // Ruta completa de UN envío. Ojo: la de escribir no es la de la bandeja, porque
+    // falta el nivel del equipo de origen.
+    function compartidasEnvioPath(s) {
+        return compartidasBase() + '/' + sanitizeTeamId(s.destino) + '/' +
+               sanitizeTeamId(s.origen) + '/' + s.id;
+    }
+    // Todo lo de compartidas es una función NUEVA pegada a un programa que está en
+    // producción. Si algo de acá falla, la programación y el acceso NO se pueden
+    // enterar: por eso sus entradas en el código viejo van siempre envueltas.
+    function seguroCompartidas(fn) {
+        try { fn(); } catch (e) { console.warn('compartidas (sin efecto):', e); }
+    }
+    // Entrada: todo lo dirigido al equipo que se está viendo
+    function compartidasInboxPath() { return compartidasBase() + '/' + sanitizeTeamId(currentTeam); }
+    // Salida: un listener por equipo, en la carpeta que ese equipo tiene conmigo
+    function compartidasOutboxPath(otro) { return compartidasBase() + '/' + sanitizeTeamId(otro) + '/' + sanitizeTeamId(currentTeam); }
+    // A quién se le puede compartir: cualquier equipo activo, exista o no pertenezca
+    function equiposCompartibles() {
+        return allTeams().filter(t => t !== currentTeam && equipoActivo(t));
+    }
+    function compartidasPendientes() {
+        return Object.keys(compartidasRecibidas)
+            .filter(id => (compartidasRecibidas[id] || {}).estado === 'pendiente');
+    }
+    function compartidasDeTarea(aId, tId) {
+        return Object.keys(compartidasEnviadas)
+            .map(id => compartidasEnviadas[id])
+            .filter(s => s && String(s.origenAvionId) === String(aId) && String(s.origenTareaId) === String(tId));
+    }
+    // Firma del estado: evita repintar cuando el listener trae los mismos datos
+    function compartidasFirma() {
+        const items = (m) => Object.keys(m).sort().map(k => {
+            const s = m[k] || {};
+            return [k, s.estado, s.origen, s.destino].join('|');
+        }).join(',');
+        return 'IN[' + items(compartidasRecibidas) + ']OUT[' + items(compartidasEnviadas) + ']';
+    }
+    function recomputarCompartidasEnviadas() {
+        const todas = {};
+        Object.keys(compartidasSalientesPorEquipo).forEach(eq => {
+            const carpeta = compartidasSalientesPorEquipo[eq] || {};
+            Object.keys(carpeta).forEach(id => { todas[id] = carpeta[id]; });
+        });
+        compartidasEnviadas = todas;
+    }
+    // Las rutas dependen del equipo, que puede cambiar o desaparecer: se desconecta
+    // todo y se vuelve a conectar contra el equipo que haya ahora.
+    function attachCompartidas() {
+        detachCompartidas();
+        if (!dataAttached || !currentTeam) return;
+        compartidasUnsubs.push(onValue(ref(db, compartidasInboxPath()), (snapshot) => {
+            seguroCompartidas(() => {
+                const antes = compartidasFirma();
+                compartidasRecibidas = compartidasAplanar(snapshot.val());
+                if (antes !== compartidasFirma()) renderCompartidas();
+            });
+        }, readErr));
+        equiposCompartibles().forEach(otro => {
+            compartidasUnsubs.push(onValue(ref(db, compartidasOutboxPath(otro)), (snapshot) => {
+                seguroCompartidas(() => {
+                    const antes = compartidasFirma();
+                    compartidasSalientesPorEquipo[otro] = snapshot.val() || {};
+                    recomputarCompartidasEnviadas();
+                    if (antes !== compartidasFirma()) renderCompartidas();
+                });
+            }, readErr));
+        });
+    }
+    function detachCompartidas() {
+        compartidasUnsubs.forEach(u => { try { u(); } catch (e) {} });
+        compartidasUnsubs.length = 0;
+        // El listener del indice tambien se va: si sobrevive, sigue pidiendo el
+        // indice del equipo ANTERIOR y puede marcar "ya la tiene" por error.
+        if (unsubIndice) { try { unsubIndice(); } catch (e) {} unsubIndice = null; }
+        indiceAjeno = null;
+        indicePublicado = '';
+        compartidasRecibidas = {};
+        compartidasSalientesPorEquipo = {};
+        compartidasEnviadas = {};
+        renderBotonCompartidas();
+    }
+
+    // Todo lo que se ve de compartidas se repinta desde acá. El turno se pinta
+    // primero y sin envolver: es la pantalla principal y nunca se negocia.
+    function renderCompartidas() {
+        if (isTeamLeader) render();   // el distintivo de la tarea vive dentro del turno
+        seguroCompartidas(renderBotonCompartidas);
+        seguroCompartidas(renderModalCompartidas);
+        seguroCompartidas(renderShareListTarea);
+    }
+
+    // El botón sirve para las dos cosas: lo que me mandaron y lo que mandé.
+    // El número y el pulso son solo de lo que cae en el turno que se está viendo:
+    // lo de otros turnos no puede reclamar la atención de hoy. Cuando solo hay
+    // envíos propios sin resolver, el botón aparece igual pero tranquilo.
+    function pendientesEnviados() {
+        return Object.keys(compartidasEnviadas)
+            .map(id => compartidasEnviadas[id])
+            .filter(s => s && s.estado === 'pendiente');
+    }
+    function renderBotonCompartidas() {
+        const btn = document.getElementById('btn-compartidas');
+        const txt = document.getElementById('btn-compartidas-txt');
+        if (!btn || !txt) return;
+        const aqui = pendientesDeEsteTurno().length;               // lo mío de hoy
+        const recibidos = Object.keys(compartidasRecibidas)
+            .map(id => compartidasRecibidas[id])
+            .filter(s => s && s.estado === 'pendiente').length;   // lo mío de cualquier turno
+        const enviados = pendientesEnviados().length;
+        // Visible si hay algo pendiente en cualquier sentido, para que nada se
+        // pierda. El número y el pulso son solo de este turno: no denotes por
+        // algo que todavía no te toca.
+        btn.style.display = (aqui || recibidos || enviados) ? 'inline-block' : 'none';
+        btn.classList.toggle('compartidas-alerta', aqui > 0);
+        txt.innerText = aqui ? 'TAREAS COMPARTIDAS (' + aqui + ')' : 'TAREAS COMPARTIDAS';
+    }
+
+    // Retirar un envío es una X: cabe en la línea de la ficha sin gritar. Pide
+    // confirmación igual, porque un envío no se puede recuperar (no hay historial).
+    function botonRetirar(s) {
+        return '<button class="sc-x" onclick="retirarCompartida(\'' + escapeAttr(s.destino) + '\', \'' +
+            escapeAttr(s.id) + '\')" title="Retirar el envío" aria-label="Retirar el envío">✕</button>';
+    }
+    // ── La ficha de una tarea por resolver ──
+    // Se dibuja igual para recibidas y enviadas. Tres líneas y nada más: qué
+    // tarea, de dónde viene y a qué turno va. Sin estados ni historial: acá solo
+    // hay pendientes.
+    // El input type=date ya entrega el formato, pero se valida igual: una fecha
+    // imposible (2026-02-31) crearia un indice que nunca se va a consultar.
+    function shareFechaValida(fecha) {
+        const p = String(fecha || '').split('-');
+        if (p.length !== 3 || p[0].length !== 4) return false;
+        const d = new Date(Number(p[0]), Number(p[1]) - 1, Number(p[2]));
+        return d.getFullYear() === Number(p[0]) && d.getMonth() === Number(p[1]) - 1 && d.getDate() === Number(p[2]);
+    }
+    function shareFechaCorta(fecha) {
+        const p = String(fecha || '').split('-');
+        return (p.length === 3 && p[0].length === 4) ? p[2] + '/' + p[1] + '/' + p[0] : String(fecha || '');
+    }
+    function shareEsEsteTurno(s) {
+        return String(s.fecha) === String(viewingDate) && String(s.turno) === String(activeTurno);
+    }
+    function renderFicha(s, opciones) {
+        const o = opciones || {};
+        const tarea = s.tarea || {};
+        const av = s.avion || {};
+        const quien = String(nombreDe(s.enviadoPor, s.origen) || '').trim().toUpperCase() || 'EQUIPO';
+        const de = [
+            quien,
+            escapeHtml(equipoNombre(s.origen).toUpperCase()),
+            escapeHtml(shareFechaCorta(s.fecha)),
+            escapeHtml(String(s.turno || '').toUpperCase()),
+            av.reg ? escapeHtml(av.reg) : '',
+            av.wp ? '<span class="tango-link">[' + escapeHtml(av.wp) + ']</span>' : ''
+        ].filter(Boolean).join(' · ');
+        const esEste = shareEsEsteTurno(s);
+        const para = '<span class="sc-turno' + (esEste ? ' es-este' : '') + '">' +
+            (esEste ? 'ESTE TURNO'
+                    : escapeHtml(String(s.turno || '').toUpperCase() + ' DEL ' + shareFechaCorta(s.fecha))) + '</span>';
+        const destino = o.direccion === 'enviada'
+            ? '<div class="sc-row"><span class="sc-key">A</span><span class="sc-val">' +
+              '<span class="sc-turno">' + escapeHtml(equipoNombre(s.destino).toUpperCase()) + '</span></span></div>'
+            : '';
+        // Tres notas posibles, todas dentro de la ficha y bien separadas: la que
+        // escribió quien envía, la que ya tenía la tarea y la del WP de origen.
+        const nota = s.nota ? '<div class="sc-nota"><b>NOTA</b> ' + escapeHtml(s.nota) + '</div>' : '';
+        const notaTarea = tarea.comment
+            ? '<div class="sc-nota"><b>TAREA</b> ' + escapeHtml(tarea.comment) + '</div>' : '';
+        const notaWp = av.comment
+            ? '<div class="sc-nota"><b>WP</b> ' + escapeHtml(av.comment) + '</div>' : '';
+        const acciones = (o.acciones && o.acciones.length)
+            ? '<div class="sc-acciones">' + [].concat(o.acciones).join('') + '</div>' : '';
+        return '<div class="share-card">' +
+            '<div class="sc-title">' + escapeHtml(tarea.desc || '') +
+                (tarea.tango ? ' <span class="tango-link">[' + escapeHtml(tarea.tango) + ']</span>' : '') + '</div>' +
+            '<div class="sc-grid">' +
+                destino +
+                '<div class="sc-row"><span class="sc-key">De</span><span class="sc-val">' + de + '</span></div>' +
+                '<div class="sc-row"><span class="sc-key">Para</span><span class="sc-val">' + para + '</span></div>' +
+            '</div>' + nota + notaTarea + notaWp + acciones +
+        '</div>';
+    }
+    // Botones de la ficha. `conIr` agrega el salto cuando el envío no es de este turno.
+    function shareAcciones(s, conIr) {
+        const b = [
+            '<button class="btn-leader" onclick="aceptarCompartida(\'' + escapeAttr(s.id) + '\')">ACEPTAR</button>',
+            '<button class="btn-outline" onclick="rechazarCompartida(\'' + escapeAttr(s.id) + '\')">RECHAZAR</button>'
+        ];
+        if (conIr && !shareEsEsteTurno(s)) {
+            b.push('<button class="btn-outline" onclick="irATurnoCompartido(\'' + escapeAttr(s.fecha) + '\', \'' + escapeAttr(s.turno) + '\')">IR A ESE TURNO</button>');
+        }
+        return b;
+    }
+
+    // El botón de la bandeja: siempre visible para el TL si tiene algo, sin importar
+    // el equipo que se esté viendo.
+    function abrirModalCompartidas() {
+        if (checkLock()) return;
+        renderModalCompartidas();
+        document.getElementById('compartidas-modal').style.display = 'block';
+    }
+
+
+    function pendientesDeEsteTurno() {
+        return compartidasPendientes()
+            .map(id => compartidasRecibidas[id])
+            .filter(s => s && String(s.fecha) === String(viewingDate) && String(s.turno) === String(activeTurno));
+    }
+    // Salta a la fecha y turno de un envío. Reutiliza los controles de la cabecera
+    // para no inventar una segunda forma de cambiar de turno.
+    function irATurnoCompartido(fecha, turno) {
+        if (turno) document.getElementById('global-turno-select').value = turno;
+        if (fecha) document.getElementById('global-date-select').value = fecha;
+        activeTurno = document.getElementById('global-turno-select').value;
+        localStorage.setItem('latam_active_turno', activeTurno);
+        viewingDate = document.getElementById('global-date-select').value;
+        updateViewActionsUI();
+        listenToTurno(activeTurno);
+    }
+    // El menú es una lista de PENDIENTES y nada más. En cuanto el otro equipo
+    // acepta o rechaza, el envío desaparece de acá: se limpió solo.
+    function renderModalCompartidas() {
+        const inbox = document.getElementById('compartidas-inbox');
+        const outbox = document.getElementById('compartidas-outbox');
+        if (!inbox || !outbox) return;
+
+        // ── Recibidas: aquí se decide ──
+        const recibidas = Object.keys(compartidasRecibidas)
+            .map(id => compartidasRecibidas[id])
+            .filter(s => s && s.estado === 'pendiente');
+        const nIn = document.getElementById('compartidas-inbox-n');
+        if (nIn) nIn.textContent = recibidas.length ? '(' + recibidas.length + ')' : '';
+        if (!recibidas.length) {
+            inbox.innerHTML = '<div class="share-empty">Nada pendiente de otros equipos.</div>';
+        } else {
+            inbox.innerHTML = recibidas.map(s => renderFicha(s, { acciones: shareAcciones(s, true) })).join('');
+        }
+
+        // ── Enviadas: esperando respuesta ──
+        const enviadas = pendientesEnviados();
+        const nOut = document.getElementById('compartidas-outbox-n');
+        if (nOut) nOut.textContent = enviadas.length ? '(' + enviadas.length + ')' : '';
+        if (!enviadas.length) {
+            outbox.innerHTML = '<div class="share-empty">No hay ninguna tarea compartida esperando respuesta.</div>';
+        } else {
+            outbox.innerHTML = enviadas.map(s => {
+                const acciones = [botonRetirar(s)] +
+                    (shareEsEsteTurno(s) ? [] : ['<button class="btn-outline" onclick="irATurnoCompartido(\'' +
+                        escapeAttr(s.fecha) + '\', \'' + escapeAttr(s.turno) + '\')">IR A ESE TURNO</button>']);
+                return renderFicha(s, { acciones: acciones, direccion: 'enviada' });
+            }).join('');
+        }
+    }
+
+    // ── Índice de tareas por turno ──
+    // Para poder avisar "esa tarea ya la tiene el otro equipo" SIN poder leer su
+    // programación, cada equipo publica qué barcodes tiene cargados. Las claves son
+    // los barcodes REALES, sin hash: en la consola de Firebase se lee de un vistazo
+    //   pd/indice_tareas/<equipo>/<AAAA-MM-DD>__<TURNO>/<barcode del WP>/<barcode de la tarea>: true
+    // y se puede buscar pegando el barcode. Ejemplo:
+    //   indice_tareas/imagen/2026-10-05__TURNO-NOCHE/T00WPK1234/T00TSK5678: true
+    // OJO: eso significa que un TL puede ver los barcodes que cargo otro equipo en
+    // los turnos de hoy y hacia adelante (los pasados se podan). No se ve nada más:
+    // ni tareas, ni avión, ni técnicos, ni notas. Eso es lo que hace falta para el
+    // aviso de duplicado, que es justamente de equipo a equipo.
+    // Firebase no admite . # $ [ ] / en las claves, así que se cambian por guion
+    // bajo. A un barcode no le pasa nunca.
+    function shareClave(v) {
+        return shareCode(v).replace(/[.#$[\]/]/g, '_');
+    }
+    // '2026-10-05__TURNO-NOCHE'  (con guion en la fecha, se lee y se busca mejor)
+    // Se quitan las tildes a propósito: "Turno Día" y "Turno Dia" tienen que dar el
+    // MISMO slug, o un turno aparecería partido en dos carpetas del índice.
+    function shareTurnoSlug(fecha, turno) {
+        const f = String(fecha || '').trim();
+        const t = String(turno || '').trim().normalize('NFD').replace(/[\u0300-\u036f]/g, '').toUpperCase().replace(/\s+/g, '-');
+        return (f && t) ? f + '__' + t : '';
+    }
+    function indiceBase(team) { return 'mantenimiento/pd/indice_tareas/' + sanitizeTeamId(team); }
+    // ── Regla de negocio: una tarea solo se comparte a un turno por HACER ──
+    // El pasado no se trabaja: se mira para control, no para cargar tareas.
+    // Ver un turno viejo está bien (y permitido), pero no es destino válido.
+    // El índice existe solo para responder "¿ya la tienen en ese turno?", así que
+    // los índices del pasado no se consultan nunca más: se podan enteros.
+    function shareHoy() {
+        const d = new Date();
+        return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+    }
+    function shareTurnoOrden(turno) {
+        const t = String(turno || '').toLowerCase();
+        if (t.indexOf('noche') > -1) return 3;
+        if (t.indexOf('tarde') > -1) return 2;
+        if (t.indexOf('d') > -1) return 1;
+        return 9;
+    }
+    // Vacío = válido. Devuelve el motivo si no se puede compartir ahí.
+    function shareDestinoInvalido(fecha, turno) {
+        if (!shareFechaValida(fecha)) return 'LA FECHA DEL TURNO DESTINO NO ES VÁLIDA.';
+        if (!String(turno || '').trim()) return 'ELEGÍ EL TURNO QUE LA VA A RECIBIR.';
+        if (String(fecha) < shareHoy()) return 'NO SE PUEDE COMPARTIR A UN TURNO PASADO. ESOS TURNOS YA NO SE TRABAJAN: SON SOLO PARA CONTROL.';
+        if (String(fecha) === shareHoy() && shareTurnoOrden(turno) < shareTurnoOrden(activeTurno)) {
+            return 'NO SE PUEDE COMPARTIR AL ' + String(turno).toUpperCase() + ' DE HOY: YA PASÓ. ELEGÍ ' + String(activeTurno).toUpperCase() + ' O UN TURNO DE HOY MÁS TARDE, O UN DÍA FUTURO.';
+        }
+        return '';
+    }
+    // Arma el índice del turno que se está viendo. Solo WP (no actividades) y solo
+    // barcodes de tarea: es lo justo para no repetir trabajo.
+    function indiceDelTurno() { return indiceDeLista(avionesData); }
+    function indiceDeLista(lista) {
+        const idx = {};
+        (lista || []).forEach(a => {
+            if (a.isActivity) return;
+            const wp = shareClave(a.wp);
+            if (!wp) return;
+            const t = {};
+            // siempre el codigo normalizado: si un equipo guardo el barcode en
+            // minusculas, el indice tiene que seguir encontrandolo
+            (a.tareas || []).forEach(x => { const tg = shareClave(x.tango); if (tg) t[tg] = true; });
+            idx[wp] = Object.keys(t).length ? t : null;
+        });
+        return idx;
+    }
+    // Se publica en un solo set por turno, así las tareas borradas desaparecen
+    // solas del índice. No se escribe si no cambió nada, para no gastar en cada
+    // clic de técnico. La firma incluye el equipo: si no, al cambiar de equipo
+    // un turno idéntico se creería ya publicado y el índice quedaría vacío.
+    let indicePublicado = '';
+    // ── Poda del índice ──
+    // El set() de arriba solo reescribe el turno que se está viendo, así que cada
+    // fecha que el equipo guardó alguna vez se queda ahí para siempre. Y como una
+    // tarea solo se comparte a turnos por hacer, el índice de una fecha que ya pasó
+    // no lo vuelve a consultar nadie: queda congelado y muerto. Por eso la poda es
+    // "todo lo anterior a hoy", no un plazo arbitrario. Corre una vez por día.
+    let indicePodadoEl = '';
+    // El slug es '<AAAA-MM-DD>__<TURNO-NOCHE>'. Solo se usa la parte de la fecha.
+    // También se acepta el formato viejo con guion bajo, para que la poda no
+    // deje nodos huérfanos si quedó alguno de antes de cambiar el formato.
+    function shareFechaDeSlug(slug) {
+        const m = /^(\d{4})[-_](\d{2})[-_](\d{2})__/.exec(String(slug || ''));
+        if (!m) return null;
+        const d = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3]));
+        if (d.getFullYear() !== Number(m[1]) || d.getMonth() !== Number(m[2]) - 1 || d.getDate() !== Number(m[3])) return null;
+        return d;
+    }
+    // 'AAAA-MM-DD' del slug, o '' si no es un slug de fecha. Comparable como texto.
+    function shareFechaTextoDeSlug(slug) {
+        const m = /^(\d{4})[-_](\d{2})[-_](\d{2})__/.exec(String(slug || ''));
+        return (m && shareFechaDeSlug(slug)) ? m[1] + '-' + m[2] + '-' + m[3] : '';
+    }
+    function podarIndice() {
+        const hoy = shareHoy();
+        if (indicePodadoEl === hoy) return;
+        indicePodadoEl = hoy;
+        if (!currentTeam) return;
+        const base = indiceBase(currentTeam);
+        // El turno que se está mirando nunca se poda: si otro TL está revisando un
+        // turno viejo por control, su índice tiene que seguir en pie. Si igual se
+        // perdiera, el próximo guardado de ese turno lo vuelve a publicar.
+        const enPantalla = shareTurnoSlug(viewingDate, activeTurno);
+        get(ref(db, base)).then((snap) => {
+            const hijos = snap.val() || {};
+            const pasados = Object.keys(hijos).filter((slug) => {
+                if (slug === enPantalla) return false;
+                const f = shareFechaTextoDeSlug(slug);
+                return !!f && f < hoy;
+            });
+            if (!pasados.length) return;
+            pasados.forEach((slug) => { remove(ref(db, base + '/' + slug)).catch(() => {}); });
+        }).catch(() => {});
+    }
+    function publicarIndiceTareas() {
+        if (!dataAttached || !currentTeam) return;
+        podarIndice();
+        const partes = String(viewingDate || '').split('-');
+        if (partes.length !== 3) return;
+        const slug = shareTurnoSlug(viewingDate, activeTurno);
+        const nuevo = indiceDelTurno();
+        const firma = currentTeam + '|' + slug + '|' + JSON.stringify(nuevo);
+        if (firma === indicePublicado) return;
+        indicePublicado = firma;
+        // A proposito NO es dbSet: el indice es una comodidad, no un dato critico.
+        // Si las reglas no estan publicadas, esto falla en silencio y el resto sigue.
+        escribirIndice(currentTeam, slug, nuevo);
+    }
+    // Publica el índice de UN turno concreto, sea el que se está viendo o no.
+    // Hace falta suelto porque aceptar una tarea en otro turno también deja esa
+    // fecha/turno con una tarea nueva: si el índice no se actualiza ahí, el que
+    // la mandó podría mandarla otra vez y el receptor la duplicaría.
+    // El set() reemplaza el turno ENTERO: por diseño nada se acumula adentro.
+    function escribirIndice(team, slug, indice) {
+        if (!team || !slug) return;
+        set(ref(db, indiceBase(team) + '/' + slug), indice)
+            .catch((e) => console.warn('indice de tareas:', e.code || e.message));
+    }
+    function publicarIndiceTurno(team, fecha, turno, lista) {
+        const partes = String(fecha || '').split('-');
+        if (!team || partes.length !== 3 || !turno) return;
+        escribirIndice(team, shareTurnoSlug(fecha, turno), indiceDeLista(lista));
+    }
+    // ── Consulta del índice del otro equipo (en vivo) ──
+    // Un solo listener, el de la combinación que el TL está mirando ahora.
+    let unsubIndice = null;
+    let indiceAjeno = null;          // { ruta, existe }
+    // 'listo' = ya sabemos si la tiene | 'cargando' = todavia no | 'error' = no se pudo leer
+    let indiceEstado = 'listo';
+    function indiceAjenoRuta() {
+        const destino = document.getElementById('share-team-sel');
+        const fecha = document.getElementById('share-fecha');
+        const turno = document.getElementById('share-turno');
+        if (!destino || !fecha || !turno) return null;
+        const eq = destino.value;
+        if (!eq || !fecha.value || !turno.value) return null;
+        const avion = (avionesData || []).find(a => a.id == editCurrentAvionId);
+        const wp = shareClave(avion && avion.wp);
+        if (!wp) return null;
+        const slug = shareTurnoSlug(fecha.value, turno.value);
+        if (!slug) return null;
+        return indiceBase(eq) + '/' + slug + '/' + wp;
+    }
+    function attachIndiceLectura() {
+        if (unsubIndice) { try { unsubIndice(); } catch (e) {} unsubIndice = null; }
+        indiceAjeno = null;
+        const ruta = indiceAjenoRuta();
+        // Sin ruta no hay nada que consultar (falta el barcode del WP): se puede enviar.
+        indiceEstado = (!ruta || !dataAttached) ? 'listo' : 'cargando';
+        if (!ruta || !dataAttached) return;
+        unsubIndice = onValue(ref(db, ruta), (snap) => {
+            const datos = snap.val() || {};
+            const tarea = (avionesData || []).find(a => a.id == editCurrentAvionId);
+            const t = (tarea && tarea.tareas || []).find(x => x.id == editCurrentTaskId);
+            const clave = shareClave(t && t.tango);
+            indiceAjeno = { ruta: ruta, existe: !!(clave && datos[clave]) };
+            indiceEstado = 'listo';
+            renderEstadoCompartida();
+        }, (err) => {
+            // No se pudo LEER el indice del otro equipo. Decir "no la tiene" seria
+            // mentira: se cerraria la puerta al duplicado justo cuando no sabemos.
+            // Mejor no dejar enviar y decirlo claro (suele ser reglas sin publicar).
+            console.warn('indice de tareas: no se pudo leer', err && (err.code || err.message));
+            indiceAjeno = null;
+            indiceEstado = 'error';
+            renderEstadoCompartida();
+        });
+    }
+    // El equipo destino YA tiene esta tarea en ese turno -> no se puede compartir.
+    function yaLaTieneElDestino() {
+        return !!(indiceAjeno && indiceAjeno.existe);
+    }
+
+    // ── ¿Ya la compartí? ──
+    // Avisa en vivo mientras se elige equipo, día y turno, para no mandar dos veces
+    // lo mismo.
+    function compartirEstadoActual() {
+        const destino = document.getElementById('share-team-sel').value;
+        const fecha = document.getElementById('share-fecha').value;
+        const turno = document.getElementById('share-turno').value;
+        if (!destino || !fecha || !turno) return null;
+        return Object.keys(compartidasEnviadas)
+            .map(id => compartidasEnviadas[id])
+            .filter(s => s && s.destino === destino &&
+                         String(s.origenAvionId) === String(editCurrentAvionId) &&
+                         String(s.origenTareaId) === String(editCurrentTaskId) &&
+                         String(s.fecha) === fecha && String(s.turno) === turno)[0] || null;
+    }
+    // Al cambiar equipo, dia o turno se vuelve a consultar el indice del otro.
+    function cambioDestinoCompartida() {
+        seguroCompartidas(attachIndiceLectura);
+        renderEstadoCompartida();
+    }
+    // ¿Se puede mandar? Solo si el otro equipo no la tiene y no hay un envío
+    // pendiente de esta misma tarea a ese mismo turno.
+    function puedeEnviarCompartida() {
+        const destino = document.getElementById('share-team-sel').value;
+        if (!destino) return false;
+        // Con el indice cargando o caido no se manda: antes que un duplicado, un
+        // "espera un segundo" o un aviso de que faltan las reglas.
+        if (indiceEstado !== 'listo') return false;
+        if (yaLaTieneElDestino()) return false;
+        const previo = compartirEstadoActual();
+        return !(previo && previo.estado === 'pendiente');
+    }
+    function renderEstadoCompartida() {
+        const el = document.getElementById('share-estado');
+        const wrap = document.getElementById('edit-task-share');
+        const btn = document.getElementById('btn-share-enviar');
+        if (!el || !wrap || wrap.style.display === 'none') return;
+        const destino = document.getElementById('share-team-sel').value;
+        el.className = 'share-estado';
+        // El botón de enviar se esconde cuando no hay nada que enviar: es la
+        // respuesta más clara que un aviso larguísimo.
+        if (btn) btn.style.display = 'none';
+        if (!destino) { el.textContent = ''; return; }
+        const quien = escapeHtml(String(equipoNombre(destino)).toUpperCase());
+        const previo = compartirEstadoActual();
+        const fSel = document.getElementById('share-fecha');
+        const tSel = document.getElementById('share-turno');
+        const noValido = shareDestinoInvalido(fSel ? fSel.value : '', tSel ? tSel.value : '');
+        if (noValido) {
+            el.classList.add('fuera');
+            el.textContent = noValido;
+        } else if (indiceEstado === 'cargando') {
+            el.textContent = 'COMPROBANDO SI ' + quien + ' YA LA TIENE EN ESE TURNO...';
+        } else if (indiceEstado === 'error') {
+            el.classList.add('fuera');
+            el.textContent = 'NO SE PUDO VER SI ' + quien + ' LA TIENE: FALTAN LAS REGLAS DE pd/indice_tareas EN FIREBASE. NO SE PUEDE ENVIAR HASTA PUBLICARLAS.';
+        } else if (yaLaTieneElDestino()) {
+            el.classList.add('fuera');
+            el.textContent = quien + ' ya tiene esta tarea en ese turno.';
+        } else if (previo && previo.estado === 'pendiente') {
+            el.classList.add('avisa');
+            el.textContent = 'Envío pendiente en ' + quien + ' para ese turno.';
+        } else {
+            el.classList.add('ok');
+            el.textContent = quien + ' no la tiene en ese turno.';
+        }
+        if (btn) btn.style.display = puedeEnviarCompartida() ? 'inline-block' : 'none';
+    }
+
+    // ── Enviar ──
+    // Se manda una COPIA de la tarea tal como está ahora, junto con los datos del
+    // WP donde vive (barcode, avión, posición, horas, nota) para que el equipo
+    // receptor pueda reusar ese WP o crearlo tal cual si no lo tiene.
+    // Los técnicos NO viajan: el equipo que recibe asigna los suyos al aceptarla.
+    function compartirTareaActual() {
+        if (checkLock()) return;
+        const destino = document.getElementById('share-team-sel').value;
+        if (!destino) return showConfirm('ELIGE PRIMERO UN EQUIPO DE DESTINO.', null);
+        if (!isTeamLeader) return showConfirm('SOLO EL TL PUEDE COMPARTIR TAREAS.', null);
+
+        const avion = avionesData.find(a => a.id == editCurrentAvionId);
+        if (!avion) return;
+        if (avion.isActivity) return showConfirm('LAS ACTIVIDADES EXTRA NO SE COMPARTEN.', null);
+        const tarea = avion.tareas.find(t => t.id == editCurrentTaskId);
+        if (!tarea) return;
+
+        const nota = document.getElementById('share-nota').value.trim().toUpperCase();
+        // El WP puede seguir en tierra varios turnos: elige en cuál lo va a recibir
+        // el otro equipo. Por defecto, el mismo que se está viendo.
+        const fecha = document.getElementById('share-fecha').value;
+        const turno = document.getElementById('share-turno').value || activeTurno;
+        if (!shareFechaValida(fecha)) return showConfirm('ELIGE LA FECHA DEL TURNO QUE LA VA A RECIBIR.', null);
+        if (!turno) return showConfirm('ELIGE EL TURNO QUE LA VA A RECIBIR.', null);
+        // Guarda de verdad: el `min` del input solo es una ayuda, esto corta el envío
+        // aunque alguien lo fuerce por consola.
+        const noValido = shareDestinoInvalido(fecha, turno);
+        if (noValido) return showConfirm(noValido, null);
+        if (!puedeEnviarCompartida()) {
+            return showConfirm('NO SE PUEDE ENVIAR: ' + String(equipoNombre(destino)).toUpperCase() +
+                               (yaLaTieneElDestino() ? ' YA TIENE ESTA TAREA EN ESE TURNO.'
+                                                     : ' YA HAY UN ENVÍO PENDIENTE PARA ESE TURNO.'), null);
+        }
+
+        const id = 'sh_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
+        const share = {
+            id: id,
+            origen: currentTeam,
+            destino: destino,
+            estado: 'pendiente',
+            fecha: fecha,
+            turno: turno,
+            origenAvionId: avion.id,
+            origenTareaId: tarea.id,
+            avion: {
+                wp: avion.wp || '',
+                reg: avion.reg || '',
+                pos: avion.pos || '',
+                start: avion.start || '',
+                end: avion.end || '',
+                comment: avion.comment || ''
+            },
+            tarea: {
+                desc: tarea.desc || '',
+                tango: tarea.tango || '',
+                comment: tarea.comment || ''
+            },
+            nota: nota,
+            enviadoPor: myEmail || (sessionUser() || {}).email || '',
+            enviadoTs: Date.now()
+        };
+        // Se anota de inmediato, antes de escribir: si no, un segundo clic rápido
+        // crearía un envío duplicado mientras el listener todavía no ha vuelto.
+        // Si la escritura falla, el listener deja la carpeta como realmente está.
+        compartidasSalientesPorEquipo[destino] = Object.assign({}, compartidasSalientesPorEquipo[destino]);
+        compartidasSalientesPorEquipo[destino][id] = share;
+        recomputarCompartidasEnviadas();
+        renderCompartidas();
+
+        dbSet(ref(db, compartidasBase() + '/' + sanitizeTeamId(destino) + '/' + sanitizeTeamId(currentTeam) + '/' + id),
+            share, 'COMPARTIR TAREA').then(() => {
+                showToast('📤 ENVIADA A ' + String(equipoNombre(destino)).toUpperCase() +
+                          ' · ' + String(turno).toUpperCase() + ' DEL ' + String(fecha).toUpperCase());
+                document.getElementById('share-nota').value = '';
+                attachIndiceLectura();
+                renderEstadoCompartida();
+            });
+    }
+    // Lo que ya se respondió no se manda otra vez al mismo sitio
+    function retirarCompartida(destino, id) {
+        showConfirm('¿CONFIRMAS RETIRAR EL ENVÍO A ' + String(equipoNombre(destino)).toUpperCase() + '?', () => {
+            dbSet(ref(db, compartidasBase() + '/' + sanitizeTeamId(destino) + '/' + sanitizeTeamId(currentTeam) + '/' + id),
+                null, 'RETIRAR COMPARTIDA');
+        });
+    }
+
+    // ── Recibir ──
+    // Aceptar mete la tarea en el turno de la FECHA EN QUE SE COMPARTIÓ, no en el
+    // que se esté mirando: si se comparte de un turno viejo, la carga va a su sitio.
+    // Se reutiliza el avión de esa matrícula si ya existe; si no, se crea.
+    // ── Recibir ──
+    // Regla de resolución, siempre en este orden:
+    //   1) Si la tarea YA está en ese turno, se reabre si estaba cerrada. El
+    //      barcode es único, así que nunca se duplica.
+    //   2) Si el WP de la tarea YA está cargado, la tarea entra en ese mismo WP.
+    //      Se busca por barcode de WP y no por matrícula, porque un mismo avión
+    //      puede tener dos WP abiertos y la tarea va en el que le toca.
+    //   3) Si no, se crea el WP con los datos que tenía en el origen.
+    // La programación se toca SIEMPRE por transacción, como en saveData(): si otro
+    // TL guardó entre nuestra lectura y la escritura, la transacción reaplica el
+    // cambio arriba de la versión nueva en vez de pisarla.
+    function shareCode(v) { return String(v || '').trim().toUpperCase(); }
+    function nuevoWpCompartido(s) {
+        return {
+            id: Date.now(),
+            wp: (s.avion && s.avion.wp) || '',
+            reg: (s.avion && s.avion.reg) || '',
+            pos: (s.avion && s.avion.pos) || '',
+            start: (s.avion && s.avion.start) || '',
+            end: (s.avion && s.avion.end) || '',
+            isActivity: false,
+            // Sin nota pegada: el avión queda igual que los demás. La procedencia
+            // vive en el envío, no en la programación.
+            comment: (s.avion && s.avion.comment) || '',
+            tareas: []
+        };
+    }
+    function tareaCompartida(s) {
+        return {
+            id: Date.now() + 1,
+            desc: (s.tarea && s.tarea.desc) || '',
+            tango: (s.tarea && s.tarea.tango) || '',
+            techs: '',
+            done: false,
+            atencion: false,
+            comment: ''
+        };
+    }
+    // Qué hay que hacer con la lista de aviones. Muta la lista SOLO si hay que
+    // escribir. Devuelve { tipo, avion }:
+    //   reabrir  -> estaba cerrada, se abre        (escribe)
+    //   ya-esta  -> ya estaba abierta, no se toca   (no escribe)
+    //   panel    -> el turno es el de pantalla: la crea el TL al guardar (no escribe)
+    //   agregar  -> entra ya, con técnicos vacíos   (escribe)
+    function aplicarCompartida(lista, s, wp, tango, enPantalla) {
+        if (tango) {
+            for (const a of lista) {
+                const hit = (a.tareas || []).find(x => shareCode(x.tango) === tango);
+                if (hit) { if (hit.done) { hit.done = false; return { tipo: 'reabrir' }; } return { tipo: 'ya-esta' }; }
+            }
+        }
+        let avion = wp ? lista.find(a => !a.isActivity && shareCode(a.wp) === wp) : null;
+        const reuso = !!avion;
+        if (!avion) avion = nuevoWpCompartido(s);
+        if (enPantalla) return { tipo: 'panel', avion: avion, nuevoWp: reuso ? null : avion };
+        if (!Array.isArray(avion.tareas)) avion.tareas = [];
+        avion.tareas.push(tareaCompartida(s));
+        if (!reuso) lista.push(avion);
+        return { tipo: 'agregar' };
+    }
+
+    async function aceptarCompartida(id) {
+        if (checkLock()) return;
+        const s = compartidasRecibidas[id];
+        if (!s || s.estado !== 'pendiente') return;
+
+        if (!shareFechaValida(s.fecha)) return showConfirm('EL ENVÍO NO TIENE FECHA VÁLIDA.', null);
+        const partes = String(s.fecha).split('-');
+        const safeTurno = String(s.turno || '').replace(/\s+/g, '_');
+        if (!safeTurno) return showConfirm('EL ENVÍO NO TIENE TURNO VÁLIDO.', null);
+
+        const wp = shareCode(s.avion && s.avion.wp);
+        const tango = shareCode(s.tarea && s.tarea.tango);
+        const destino = currentTeam;
+        const ruta = 'mantenimiento/pd/datos/' + sanitizeTeamId(destino) + '/historial/' +
+            partes[0] + '/' + partes[1] + '/' + partes[2] + '/' + safeTurno + '/aviones';
+        const turnoTxt = String(s.turno).toUpperCase() + ' DEL ' + shareFechaCorta(s.fecha);
+        // El turno que se está mirando puede no ser el de la tarea: el cierre se
+        // consulta del turno donde realmente va a caer.
+        const cab = await get(ref(db, ruta.replace('/aviones', '/header')));
+        const cabData = cab.val() || {};
+        if (cabData.estado === 'cerrado' && cabData.cerradoPor !== myEmail) {
+            return showConfirm('🔒 EL TURNO ' + turnoTxt + ' ESTÁ CERRADO POR ' +
+                String(cabData.cerradoPor).toUpperCase() + '.', null);
+        }
+        const enPantalla = String(s.fecha) === String(viewingDate) && String(s.turno) === String(activeTurno);
+        let plan = null;
+        try {
+            if (!enPantalla) {
+                let listaFinal = null;
+                const rTxn = await runTransaction(ref(db, ruta), (current) => {
+                    const l = JSON.parse(JSON.stringify(current || []));
+                    listaFinal = l;
+                    plan = aplicarCompartida(l, s, wp, tango, false);
+                    // 'reabrir' y 'agregar' cambian el turno -> se escribe.
+                    // 'ya-esta' no cambia nada -> la transacción se cancela sola.
+                    return (plan.tipo === 'agregar' || plan.tipo === 'reabrir') ? l : undefined;
+                });
+                const escribio = !!(rTxn && rTxn.committed);
+                if (plan.tipo === 'reabrir' && !escribio) {
+                    return showConfirm('OTRO TL TOCÓ ESTE TURNO EN EL MISMO MOMENTO. REVISA Y VUELVE A INTENTAR.', null);
+                }
+                // El índice de ESTE turno (que no es el de pantalla) queda con la
+                // tarea nueva, para que el que la mandó no pueda mandarla de nuevo.
+                // También en 'ya-esta': si el índice se había quedado sin publicar,
+                // esto lo deja al día igual.
+                publicarIndiceTurno(destino, s.fecha, s.turno, listaFinal);
+            } else {
+                // En el turno de pantalla la tarea la crea el TL al guardar en el
+                // panel, así que acá solo se lee para saber si el WP ya existe.
+                const snap = await get(ref(db, ruta));
+                plan = aplicarCompartida(JSON.parse(JSON.stringify(snap.val() || [])), s, wp, tango, true);
+            }
+        } catch (e) {
+            console.error('ACEPTAR COMPARTIDA', e);
+            return showConfirm('⚠️ NO SE PUDO ACEPTAR (' + (e.code || e.message) + ').', null);
+        }
+        // El envío se borra SOLO cuando la tarea ya existe. En el camino del panel
+        // no se toca nada todavía: si el TL cancela, el envío sigue pendiente y no
+        // queda nada a medias. Lo borra saveAddTask() al guardar.
+        if (plan.tipo === 'panel') {
+            // El panel de técnicos tiene que quedar ADELANTE, no detrás de la
+            // bandeja de compartidas: si no, el TL no ve a quién asigna.
+            const modalCompartidas = document.getElementById('compartidas-modal');
+            if (modalCompartidas) modalCompartidas.style.display = 'none';
+            editCurrentAvionId = plan.avion.id;
+            abrirPanelTareaCompartida(s, plan.avion.id, plan.nuevoWp);
+            return;
+        }
+        await borrarCompartida(s).catch((e) => console.warn('borrar envio:', e.code || e.message));
+        resolverCompartidaLocal(s);
+        if (plan.tipo === 'reabrir') {
+            showToast('♻️ YA LA TENÍAS CERRADA: REABIERTA EN ' + turnoTxt + '.');
+        } else if (plan.tipo === 'ya-esta') {
+            showToast('ℹ️ YA LA TENÍAS: NO SE DUPLICA. ASIGNAR TÉCNICOS EN ' + turnoTxt + '.');
+        } else {
+            showToast('✅ ACEPTADA EN ' + turnoTxt + '. ASIGNA LOS TÉCNICOS EN ESE TURNO.');
+        }
+    }
+    // Resolver un envío lo BORRA. Se resolvió, no hay nada más que mirar y la base
+    // no se llena de histórico. Los dos lados lo ven desaparecer al mismo tiempo.
+    async function borrarCompartida(s) {
+        await set(ref(db, compartidasEnvioPath(s)), null);
+    }
+    // El envío ya salió de Firebase: se saca también de la pantalla al instante,
+    // sin esperar a que vuelva el listener.
+    function resolverCompartidaLocal(s) {
+        delete compartidasRecibidas[s.id];
+        renderCompartidas();
+    }
+
+    function rechazarCompartida(id) {
+        if (checkLock()) return;
+        const s = compartidasRecibidas[id];
+        if (!s || s.estado !== 'pendiente') return;
+        showPromptModal('MOTIVO DEL RECHAZO (OPCIONAL)', '', (motivo) => {
+            const nota = String(motivo || '').trim().toUpperCase();
+            borrarCompartida(s)
+                .then(() => resolverCompartidaLocal(s))
+                .catch((e) => { console.error('RECHAZAR COMPARTIDA', e); });
+        }, 'RECHAZAR', 'MOTIVO');
+    }
+
+    // ── Dentro del modal de editar tarea ──
+    function renderShareListTarea() {
+        const wrap = document.getElementById('edit-task-share');
+        const lista = document.getElementById('share-list');
+        const sel = document.getElementById('share-team-sel');
+        if (!wrap || !lista || !sel) return;
+        // Las actividades extra no se comparten
+        const avion = avionesData.find(a => a.id == editCurrentAvionId);
+        if (!isTeamLeader || (avion && avion.isActivity)) { wrap.style.display = 'none'; return; }
+        wrap.style.display = 'block';
+
+        const opciones = equiposCompartibles();
+        // se repinta al cambiar el estado, pero sin perder el equipo que se estaba eligiendo
+        const elegido = sel.value;
+        sel.innerHTML = opciones.length
+            ? opciones.map(t => '<option value="' + escapeAttr(t) + '">' + escapeHtml(equipoNombre(t).toUpperCase()) + '</option>').join('')
+            : '<option value="">SIN OTROS EQUIPOS ACTIVOS</option>';
+        if (opciones.indexOf(elegido) > -1) sel.value = elegido;
+        sel.disabled = !opciones.length;
+        attachIndiceLectura();
+        renderEstadoCompartida();
+
+        // El WP puede seguir en tierra varios turnos: la fecha y el turno de destino
+        // se eligen antes de enviar, no se fuerzan al turno que se está viendo.
+        const fSel = document.getElementById('share-fecha');
+        const tSel = document.getElementById('share-turno');
+        if (fSel) {
+            // El pasado se puede mirar, pero no es destino: el `min` evita que se
+            // ofrezca y el default manda a hoy si estabas revisando un turno viejo.
+            fSel.min = shareHoy();
+            if (!fSel.value) fSel.value = viewingDate < shareHoy() ? shareHoy() : viewingDate;
+        }
+        if (tSel) {
+            const valsTurno = Array.prototype.map.call(tSel.options || [], o => o.value);
+            if (valsTurno.indexOf(tSel.value) === -1) tSel.value = activeTurno;
+            // Hoy no se comparte hacia atrás de turno.
+            Array.prototype.forEach.call(tSel.options || [], (o) => {
+                o.disabled = !!(fSel && fSel.value === shareHoy() && shareTurnoOrden(o.value) < shareTurnoOrden(activeTurno));
+            });
+        }
+
+        // Como el envío se borra al resolverse, acá solo hay pendientes: no hace
+        // falta un estado, solo el equipo y la forma de retirarlo.
+        const mias = compartidasDeTarea(editCurrentAvionId, editCurrentTaskId)
+            .filter(s => s.estado === 'pendiente');
+        lista.innerHTML = mias.map(s =>
+            '<div class="share-row">' +
+                '<span class="share-to">' + escapeHtml(equipoNombre(s.destino).toUpperCase()) + '</span>' +
+                '<span class="share-turno">' + escapeHtml(String(s.turno || '').toUpperCase() + ' DEL ' + shareFechaCorta(s.fecha)) + '</span>' +
+                botonRetirar(s) +
+            '</div>'
+        ).join('');
     }
 
     function updateLockUI() {
@@ -4483,7 +5542,10 @@
     function saveData() { 
         if(checkLock()) return;
         // Transacción = Firebase revisa que nadie cambió el turno mientras guardabas
-        runTransaction(dbRefs.aviones, (current) => avionesData).catch((e) => dbSet(dbRefs.aviones, avionesData, 'GUARDAR PROGRAMACIÓN'));
+        runTransaction(dbRefs.aviones, (current) => avionesData)
+            .then(() => seguroCompartidas(publicarIndiceTareas))
+            .catch((e) => dbSet(dbRefs.aviones, avionesData, 'GUARDAR PROGRAMACIÓN')
+                         .then(() => seguroCompartidas(publicarIndiceTareas)));
     }
     function saveTechs() { if(!checkLock()) dbSet(dbRefs.techs, shiftTechs, 'GUARDAR TÉCNICOS'); }
     
@@ -4844,6 +5906,9 @@
     // cuando hay un filtro puesto. Se recalcula al cambiar la fecha, el turno o
     // cualquier filtro, porque el "hoy" del turno noche/tarde es el día anterior.
     function updateViewActionsUI() {
+        // El boton de compartidas depende del turno que se esta viendo: se repinta
+        // en vivo en cada cambio de dia o turno, sin recargar.
+        seguroCompartidas(renderBotonCompartidas);
         const btnHoy = document.getElementById('btn-hoy');
         if (btnHoy) btnHoy.style.display = (viewingDate !== getLogicalTodayDate()) ? '' : 'none';
         const btnReset = document.getElementById('btn-restablecer');
@@ -4938,7 +6003,11 @@
         catch (err) { console.error('ERROR AL COPIAR:', err); }
     }
 
-    function closeModal(modalId) { document.getElementById(modalId).style.display = 'none'; }
+    function closeModal(modalId) {
+        document.getElementById(modalId).style.display = 'none';
+        // Si se cierra el panel de tarea compartida sin guardar, el share sigue pendiente.
+        if (modalId === 'add-task-modal') seguroCompartidas(limpiarAddTaskLock);
+    }
 
     // C3 FIX: Todo texto de usuario escapado - antes un <script> en la descripción se ejecutaba en todos
     function generateTaskHTML(avion, t, showPlaneReg = false, showHandle = false) {
@@ -4979,12 +6048,22 @@
             ? `<span class="drag-handle leader-only no-print" onpointerdown="startOrderDrag(event, 'tarea', ${avion.id}, ${t.id})" oncontextmenu="event.preventDefault(); return false;" title="Sostener y arrastrar para ordenar">⋮⋮</span>`
             : '';
 
+        // Distintivo de tarea compartida: solo tiene sentido para quien la mandó.
+        let shareBadgeHtml = '';
+        if (isTeamLeader) {
+            const mias = compartidasDeTarea(avion.id, t.id);
+            if (mias.length) {
+                const pend = mias.filter(s => s.estado === 'pendiente').length;
+                shareBadgeHtml = `<span class="share-badge no-print" onclick="abrirModalCompartidas()" style="cursor:pointer;" title="${pend ? pend + ' pendiente(s)' : 'ya respondida'}">📤 COMPARTIDA</span>`;
+            }
+        }
+
         return `
             <div class="task-item ${t.done ? 'completed' : ''} ${t.atencion ? (t.alertaByTL ? 'alerta-tl' : 'alerta-tech') : ''}" data-avion-id="${avion.id}" data-task-id="${t.id}">
                 ${toggleHtml}
                 <div class="task-main">
                     <div class="task-info">
-                        <div class="task-desc">${planePrefix}${activityTime}${cleanDesc}${tangoDisplay} ${atencionLabel}</div>
+                        <div class="task-desc">${planePrefix}${activityTime}${cleanDesc}${tangoDisplay} ${atencionLabel}${shareBadgeHtml}</div>
                         ${t.techs ? `<div class="task-techs">${escapeHtml(t.techs)}</div>` : ''}
                         ${t.comment ? `<div class="task-comment"><strong>NOTA:</strong> ${escapeHtml(t.comment)}</div>` : ''}
                     </div>
@@ -5565,8 +6644,48 @@
         }
     }
 
+    // Cuando se acepta una tarea compartida, el panel de agregar tarea se abre en
+    // modo BLOQUEADO: título y tango vienen de la tarea compartida y no se pueden
+    // tocar, para que el equipo receptor no invente un barcode distinto. Lo único
+    // que decide el receptor es a qué técnicos se asigna. El share sigue PENDIENTE
+    // hasta que se guarda: si se cancela, no queda nada a medias.
+    let addTaskLock = null;
+    function abrirPanelTareaCompartida(share, avionId, nuevoWp) {
+        const tarea = share.tarea || {};
+        addTaskLock = {
+            share: share, nuevoWp: nuevoWp || null, avionId: avionId,
+            // se guardan aparte del input: aunque alguien los toque, el barcode
+            // que se escribe es SIEMPRE el de la tarea compartida
+            desc: tarea.desc || '',
+            tango: tarea.tango || ''
+        };
+        const desc = document.getElementById('add-task-desc');
+        const tango = document.getElementById('add-task-tango');
+        const comment = document.getElementById('add-task-comment');
+        desc.value = addTaskLock.desc;
+        tango.value = addTaskLock.tango;
+        comment.value = '';   // sin nota pegada: el TL escribe lo que corresponda
+        // bloqueados: solo técnicos y nota
+        [desc, tango].forEach(el => { el.readOnly = true; el.classList.add('campo-bloqueado'); el.oninput = null; });
+        desc.title = 'VIENE DE LA TAREA COMPARTIDA: NO SE PUEDE EDITAR';
+        tango.title = 'VIENE DE LA TAREA COMPARTIDA: NO SE PUEDE EDITAR';
+        buildTechGrid('add-task-techs', "");
+        const header = document.querySelector('#add-task-modal .modal-header');
+        if (header) header.textContent = '📥 TAREA COMPARTIDA DE ' + equipoNombre(share.origen).toUpperCase() + ' — ASIGNA LOS TÉCNICOS';
+        document.getElementById('add-task-modal').style.display = 'block';
+    }
+    // Al cerrar el panel sin guardar, la tarea compartida sigue pendiente.
+    function limpiarAddTaskLock() {
+        addTaskLock = null;
+        const desc = document.getElementById('add-task-desc');
+        const tango = document.getElementById('add-task-tango');
+        [desc, tango].forEach(el => { el.readOnly = false; el.classList.remove('campo-bloqueado'); el.title = ''; });
+        const header = document.querySelector('#add-task-modal .modal-header');
+        if (header) header.textContent = '📝 AGREGAR TAREA';
+    }
     function openAddTaskModal(avionId) {
         if(checkLock()) return;
+        seguroCompartidas(limpiarAddTaskLock);
         editCurrentAvionId = avionId;
         const avion = avionesData.find(a => a.id == avionId);
         document.getElementById('add-task-desc').value = ''; document.getElementById('add-task-tango').value = '';
@@ -5577,10 +6696,16 @@
 
     function saveAddTask() {
         if(checkLock()) return;
-        const avion = avionesData.find(a => a.id == editCurrentAvionId);
+        // En modo bloqueado no se toca nada del share hasta que la tarea existe.
+        const lock = addTaskLock;
+        const avion = (lock && lock.nuevoWp && !avionesData.find(a => a.id === lock.nuevoWp.id))
+            ? (avionesData.push(lock.nuevoWp), lock.nuevoWp)
+            : avionesData.find(a => a.id == editCurrentAvionId);
+        if (!avion) { seguroCompartidas(limpiarAddTaskLock); return showConfirm('YA NO ESTÁ EL AVIÓN EN ESTE TURNO. CIERRA Y ABRE DE NUEVO.', null); }
         if(!avion.tareas) avion.tareas = [];
-        const desc = document.getElementById('add-task-desc').value.trim().toUpperCase();
-        let tango = document.getElementById('add-task-tango').value.trim().toUpperCase();
+        // Bloqueado: se usan los valores de la tarea compartida, no lo que haya en el input.
+        const desc = lock ? lock.desc : document.getElementById('add-task-desc').value.trim().toUpperCase();
+        let tango = lock ? lock.tango : document.getElementById('add-task-tango').value.trim().toUpperCase();
         const comment = document.getElementById('add-task-comment').value.trim().toUpperCase();
         
         if (!desc) return showConfirm("INGRESE EL TÍTULO DE LA TAREA.", null);
@@ -5589,8 +6714,30 @@
         const checkboxes = document.querySelectorAll('.add-task-techs-cb:checked');
         const techs = Array.from(checkboxes).map(cb => cb.value).join(' - ');
 
+        // Barra final contra la carrera de dos TL del mismo equipo: mientras este
+        // panel estaba abierto, el otro TL pudo aceptar la misma tarea. El barcode
+        // es único, así que si ya existe se reabre en vez de duplicarla.
+        if (lock && lock.tango) {
+            for (const a of avionesData) {
+                const hit = (a.tareas || []).find(x => shareCode(x.tango) === lock.tango);
+                if (hit) {
+                    hit.done = false;
+                    saveData(); closeModal('add-task-modal');
+                    seguroCompartidas(limpiarAddTaskLock);
+                    showToast('♻️ EL OTRO TL YA LA AGREGÓ: NO SE DUPLICA.');
+                    return;
+                }
+            }
+        }
+
         avion.tareas.push({ id: Date.now(), desc, tango, techs, done: false, atencion: false, comment: comment });
         saveData(); closeModal('add-task-modal');
+        if (lock) {
+            // Recién ahora la tarea existe: recién ahora se da por aceptada.
+            seguroCompartidas(limpiarAddTaskLock);
+            borrarCompartida(lock.share)
+                .catch((e) => { console.error('ACEPTAR COMPARTIDA', e); });
+        }
     }
 
     function openPredefModal(avionId) {
@@ -5683,6 +6830,9 @@
         buildTechGrid('edit-task-techs', tarea.techs || ""); 
         
         document.getElementById('edit-task-comment').value = tarea.comment || "";
+        const shareNota = document.getElementById('share-nota');
+        if (shareNota) shareNota.value = "";
+        seguroCompartidas(renderShareListTarea);
         
         document.getElementById('edit-task-modal').style.display = 'block';
     }
@@ -6226,6 +7376,8 @@
         openAddMessageModal, openEditMessage, saveMessageFromModal, deleteMessageFromModal,
         openEditAvionModal, saveEditAvion, confirmDeleteAvion,
         openAddTaskModal, saveAddTask, openEditTaskModal, saveEditTask, confirmDeleteTask,
+        abrirModalCompartidas, compartirTareaActual, retirarCompartida, aceptarCompartida, rechazarCompartida,
+        abrirPanelTareaCompartida, limpiarAddTaskLock, irATurnoCompartido, cambioDestinoCompartida,
         editAvionComment, editTaskComment, closeConfirmModal, closePromptModal,
         changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput,
         formatTime, changeTurno, changeDate, goToToday, toggleLockShift,
