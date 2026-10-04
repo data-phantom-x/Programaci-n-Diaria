@@ -2105,6 +2105,12 @@
                 <div class="team-note" id="user-modal-email-nota"></div>
             </div>
 
+            <div class="admin-card">
+                <div class="admin-card-title">EQUIPOS DE ESTA PERSONA</div>
+                <div class="admin-team-grid" id="user-modal-equipos"></div>
+                <div class="team-note">Toca un equipo para agregarlo o quitarlo. Solo salen los que administras tú. Al agregarlo entra como USUARIO (solo lectura): arriba le cambias el rol.</div>
+            </div>
+
             <div class="user-modal-team-bar">
                 <label for="user-modal-team">EQUIPO:</label>
                 <select id="user-modal-team" class="admin-team-select" onchange="userModalCambiaEquipo(this.value)"></select>
@@ -2116,12 +2122,6 @@
                 <button type="button" class="admin-rol-btn admin-rol-admin" id="user-modal-admin"
                     onclick="userModalAlternarAdmin()">ADMIN</button>
                 <div class="team-note user-modal-note" id="user-modal-nota"></div>
-            </div>
-
-            <div class="admin-card">
-                <div class="admin-card-title">EQUIPOS DE ESTA PERSONA</div>
-                <div class="admin-team-grid" id="user-modal-equipos"></div>
-                <div class="team-note">Toca un equipo para agregarlo o quitarlo. Solo salen los que administras tú. Al agregarlo entra como USUARIO (solo lectura): arriba le cambias el rol.</div>
             </div>
         </div>
 
@@ -2614,7 +2614,10 @@
             return ordenarEquipos(allTeams().filter(t => equipoActivo(t)));
         }
         const rec = (user && usuariosDB[userKeyFor(user)]) || {};
-        let ids = Object.keys(rec.roles || {}).filter(t => rolesDe(user, t) && (rolesDe(user, t).usuario || rolesDe(user, t).tech || rolesDe(user, t).planner || rolesDe(user, t).tl || rolesDe(user, t).super || rolesDe(user, t).admin));
+        let ids = Object.keys(rec.roles || {}).filter(t => {
+            const r = rec.roles[t];
+            return r && (r.usuario || r.tech || r.planner || r.tl || r.super || r.admin === true);
+        });
         if (!ids.length) ids = [EQUIPO_DEFECTO];
         const existentes = allTeams();
         const filtrados = existentes.length ? ids.filter(t => existentes.indexOf(t) !== -1) : ids;
@@ -4442,11 +4445,26 @@
             const meta = rol ? (ROLES.find(r => r.id === rol) || { txt: rol.toUpperCase() }) : null;
             const enEquipo = rol !== null;
             const sinAcceso = !enEquipo;
+            // Resumen de TODOS los roles del usuario en TODOS sus equipos
+            const recU = usuariosDB[user] || {};
+            const todosRoles = Object.keys(recU.roles || {}).map(t => {
+                const r = recU.roles[t];
+                if (!r) return null;
+                const rolFunc = rolUnico(r);
+                const esAdm = r.admin === true;
+                if (!rolFunc && !esAdm) return null;
+                const txt = rolFunc ? (ROLES.find(x => x.id === rolFunc) || { txt: rolFunc.toUpperCase() }).txt : 'USUARIO';
+                return `${txt}${esAdm ? '+ADMIN' : ''} · ${equipoNombre(t).toUpperCase()}`;
+            }).filter(Boolean);
+            const rolesEnOtrosEquipos = todosRoles.length - (enEquipo ? 1 : 0);
             // Se ven de un vistazo; para cambiarlos está el lápiz (modal propio)
             const userBadge = esAdmin ? '<span class="admin-role-badge admin">ADMIN</span>' : '';
             const fuera = (enEquipo || !superAdmin) ? '' : '<span class="admin-role-badge" title="NO ESTÁ EN ESTE EQUIPO" style="opacity:.6">FUERA</span>';
+            const extraRolesBadge = rolesEnOtrosEquipos > 0
+                ? `<span class="admin-role-badge" style="background:var(--comment);opacity:.85" title="${escapeAttr(todosRoles.join('  |  '))}">+${rolesEnOtrosEquipos}</span>`
+                : '';
             const rolesTexto = meta ? meta.txt : 'SIN ROL EN ESTE EQUIPO';
-            const glance = `<span class="admin-roles-glance" title="${escapeAttr(rolesTexto + (esAdmin ? ' · además administra este equipo' : ''))}">${escapeHtml(rolesTexto)}</span>`;
+            const glance = `<span class="admin-roles-glance" title="${escapeAttr(todosRoles.join('  |  ') || rolesTexto + (esAdmin ? ' · además administra este equipo' : ''))}">${escapeHtml(rolesTexto)}</span>`;
             html += `<div class="admin-user-row ${sinAcceso ? 'no-access' : ''}">
                 <div class="admin-user-main">
                     <div class="admin-user-copy">
@@ -4455,6 +4473,7 @@
                     </div>
                     ${userBadge}
                     ${fuera}
+                    ${extraRolesBadge}
                     ${glance}
                 </div>
                 <div class="admin-user-actions">
@@ -4773,7 +4792,6 @@
         const key = userModalUser;
         const modal = document.getElementById('user-modal');
         if (!key || !modal || modal.style.display !== 'block') return;
-        const team = userModalTeam;
 
         // ── Datos de la cuenta (independientes del equipo abierto) ──
         // Se pintan antes de todo porque se ven igual con cualquier equipo elegido.
@@ -4840,11 +4858,15 @@
             notaBorrar.style.display = notaBorrar.textContent ? '' : 'none';
         }
 
-        // selector de equipo (solo los que administras)
+        // selector de equipo: los equipos donde ESTA la persona
         const sel = document.getElementById('user-modal-team');
-        const mios = equiposDondeSoyAdmin();
+        const susEquipos = equiposDeUsuario(key);
+        if (susEquipos.indexOf(userModalTeam) === -1) {
+            userModalTeam = susEquipos.indexOf(equipoDelPanel()) > -1 ? equipoDelPanel() : (susEquipos[0] || null);
+        }
+        const team = userModalTeam;
         if (sel) {
-            sel.innerHTML = mios.map(t => `<option value="${escapeAttr(t)}"${t === team ? ' selected' : ''}>${escapeHtml(equipoNombre(t))}${equipoActivo(t) ? '' : ' (DESACTIVADO)'}</option>`).join('')
+            sel.innerHTML = susEquipos.map(t => `<option value="${escapeAttr(t)}"${t === team ? ' selected' : ''}>${escapeHtml(equipoNombre(t))}${equipoActivo(t) ? '' : ' (DESACTIVADO)'}</option>`).join('')
                         || '<option value="">SIN EQUIPOS</option>';
         }
         if (!team) return;
@@ -4898,6 +4920,7 @@
         // equipos que administras (agregar / quitar). Este listado ES la forma de
         // meter y sacar a la persona de un equipo: por eso alcanza con tocar el equipo.
         const box = document.getElementById('user-modal-equipos');
+        const mios = equiposDondeSoyAdmin();
         if (box) {
             box.innerHTML = mios.map(t => {
                 const dentroT = esMiembroDe(key, t);
@@ -5504,6 +5527,10 @@
     function attachCompartidas() {
         detachCompartidas();
         if (!dataAttached || !currentTeam) return;
+        // Las reglas de Firebase solo dejan leer compartidas a TL/planner/super
+        // del equipo (origen o destino). Un tecnico no tiene permiso: si intenta
+        // suscribirse, Firebase devuelve permission_denied y la consola se llena.
+        if (!esSuper() && !puede(sessionUser(), POD_PLANIFICAR, currentTeam) && !puede(sessionUser(), POD_LIDER, currentTeam)) return;
         compartidasUnsubs.push(onValue(ref(db, compartidasInboxPath()), (snapshot) => {
             seguroCompartidas(() => {
                 const antes = compartidasFirma();
@@ -8137,6 +8164,12 @@
     function wpIrAsignar() {
         const sel = wpArchivo ? wpArchivo.tareas.filter(t => t.sel) : [];
         if (!sel.length) return showConfirm('NO MARCASTE NINGUNA TAREA.', null);
+        // En modo nuevo el avión se crea con estas tareas: antes de asignar nada
+        // tiene que estar la matrícula, si no el avión quedaría sin identidad.
+        if (wpModo === 'nuevo') {
+            const reg = (document.getElementById('wp-ac-reg').value || '').toUpperCase().trim();
+            if (!reg || reg.length !== 6) return showConfirm('ANTES DE SEGUIR INGRESA LA MATRÍCULA DEL AVIÓN (6 CARACTERES).', null);
+        }
         // Lo que ya estuviera asignado se conserva: se puede volver atrás a
         // cambiar la selección sin perder el trabajo hecho.
         const previos = {};
@@ -8182,8 +8215,11 @@
         const tw = document.getElementById('wp-asig-techs-wrap');
         const nw = document.getElementById('wp-asig-nota-wrap');
         if (activa) {
+            const datos = wpAvionParaGuardar();
+            const matricula = datos && datos.reg ? escapeHtml(datos.reg) : '';
             activa.innerHTML = x
                 ? '<b>' + escapeHtml(x.desc) + '</b><br><span style="font-size:8.5px;color:var(--text-muted);">'
+                  + (matricula ? '✈️ ' + matricula + ' · ' : '')
                   + escapeHtml(x.tango || 'SIN CÓDIGO') + (x.linea ? ' · TAREA #' + x.linea : '') + '</span>'
                 : '<b>TODAS TIENEN DESTINO</b><br><span style="font-size:8.5px;color:var(--text-muted);'
                   + '">SE PUEDE REVISAR TOCANDO CUALQUIER TAREA DE LA LISTA.</span>';
@@ -8249,10 +8285,10 @@
         const i = x.techs.indexOf(nombre);
         if (marcado && i === -1) x.techs.push(nombre);
         if (!marcado && i > -1) x.techs.splice(i, 1);
-        // Al agregar un técnico la tarea está completa y se pasa sola a la
-        // siguiente. Para poner un segundo hay que volver a esta fila (ahí se
-        // ve que el primero ya quedó marcado), o usar el botón de abajo.
-        wpRenderAsig(marcado && i === -1);
+        // Al marcar un técnico se queda en la misma tarea: así se pueden
+        // asignar varios técnicos seguidos sin tener que volver a la fila.
+        // El avance se hace solo con el botón "TAREA LISTA → SIGUIENTE".
+        wpRenderAsig(false);
     }
     function wpAnotarNota(valor) {
         const x = wpAsig[wpAsigIdx];
