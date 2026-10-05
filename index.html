@@ -512,6 +512,19 @@
             display: flex; flex-wrap: wrap; gap: 6px; width: auto; padding: 6px;
             background: color-mix(in srgb, var(--surface) 60%, transparent);
             border-radius: var(--button-radius);
+            align-items: center;
+        }
+        #tech-pills-container .tech-pill,
+        #tech-pills-container .code-filter-pill {
+            flex-shrink: 0;
+        }
+        .tech-pills-separator {
+            width: 1px;
+            height: 18px;
+            margin: 0 6px;
+            background: linear-gradient(to bottom, transparent, var(--border-alt) 30%, var(--border-alt) 70%, transparent);
+            flex-shrink: 0;
+            align-self: center;
         }
 
         .tech-pill {
@@ -534,6 +547,37 @@
             border-color: var(--border-idle);
             color: var(--text-idle);
         }
+        .tech-pill.selected-tech-pill {
+            background-color: var(--primary);
+            border-color: var(--primary);
+            color: var(--text-on-primary, #fff);
+            box-shadow: 0 0 0 2px var(--accent-soft, rgba(59,130,246,0.35));
+        }
+        .code-filter-pill {
+            background-color: var(--bg);
+            color: var(--primary);
+            border: 1px solid var(--border);
+            padding: 2px 8px;
+            border-radius: 14px;
+            font-size: 10px;
+            cursor: pointer;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .code-filter-pill:hover { background-color: var(--light-gray); }
+        .code-filter-pill.active {
+            background-color: var(--accent);
+            border-color: var(--accent);
+            color: #fff;
+        }
+        .edit-pencil {
+            cursor: pointer;
+            font-size: 12px;
+            opacity: 0.6;
+            transition: 0.2s;
+            user-select: none;
+        }
+        .edit-pencil:hover { opacity: 1; }
         .tech-checkbox-label.tech-idle span {
             background: var(--surface-idle);
             border-color: var(--border-idle-soft);
@@ -707,9 +751,10 @@
         #confirm-modal, #prompt-modal { z-index: 1400; }
         
         .modal-content {
-            background-color: var(--surface); margin: 6% auto; padding: 20px;
+            background-color: var(--surface); padding: 20px;
             border: none; width: 90%; max-width: 450px; border-radius: 8px;
             box-shadow: 0 10px 30px color-mix(in srgb, var(--black) 30%, transparent); max-height: 85vh; overflow-y: auto;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0;
         }
         
         .modal-header { font-weight: 800; font-size: 1.1em; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
@@ -812,8 +857,9 @@
            solo se desplaza el cuerpo. Así los botones del pie (incluido
            ELIMINAR USUARIO) quedan siempre a la vista. */
         #user-modal .modal-content {
-            max-width: 520px; width: 96%; box-sizing: border-box; max-height: 88vh; margin: 4vh auto;
+            max-width: 520px; width: 96%; box-sizing: border-box; max-height: 88vh;
             display: flex; flex-direction: column; overflow: hidden; padding: 16px;
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0;
         }
         /* La caja se ajusta a lo que se ve y solo se desplaza si no cabe: antes medía
            88vh fijos, así que sobraba un bloque vacío aunque todo el contenido fuera corto. */
@@ -1024,7 +1070,7 @@
             .action-bar { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); width: 100%; gap: 6px; }
             .action-bar .action-btn { width: 100%; box-sizing: border-box; }
             
-            .modal-content { width: 92%; padding: 16px; margin: 10% auto; }
+            .modal-content { width: 92%; padding: 16px; }
             .modal-row { flex-direction: row; gap: 10px; } 
         }
 
@@ -1364,6 +1410,46 @@
             display: flex; flex-direction: column; overflow: hidden; padding: 16px;
         }
         #wp-asignar-modal .modal-content { max-width: 760px; }
+        #manage-techs-modal .modal-content {
+            max-width: 800px;
+            width: 92%;
+        }
+        #manage-techs-modal .tech-grid {
+            max-height: 280px;
+        }
+        #rol-import-modal .modal-content {
+            max-width: 900px;
+            width: 92%;
+            max-height: 90vh;
+            padding: 16px;
+        }
+        #rol-import-modal .modal-header {
+            margin-bottom: 10px;
+            padding-bottom: 6px;
+            font-size: 1em;
+        }
+        #rol-import-modal .modal-content input[type="text"],
+        #rol-import-modal .modal-content select {
+            margin-bottom: 8px;
+        }
+        #rol-import-modal .rol-tech-table-wrap {
+            max-height: 42vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+        }
+        #rol-import-modal .rol-tech-table-wrap table {
+            font-size: 9px;
+        }
+        #rol-import-modal .rol-tech-table-wrap th,
+        #rol-import-modal .rol-tech-table-wrap td {
+            padding: 3px 5px;
+        }
+        #rol-import-modal .rol-groups-wrap {
+            max-height: 22vh;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
         #wp-import-modal .modal-header,
         #wp-asignar-modal .modal-header { flex: none; }
         .wp-body { flex: 1 1 auto; min-height: 0; overflow-y: auto; overscroll-behavior: contain; }
@@ -1374,7 +1460,7 @@
             .wp-asig-side { width: 100%; }
             .wp-asig-lista { max-height: 30vh; width: 100%; }
             #wp-import-modal .modal-content,
-            #wp-asignar-modal .modal-content { width: 97% !important; max-height: 94vh; margin: 3vh auto; }
+            #wp-asignar-modal .modal-content { width: 97% !important; max-height: 94vh; }
         }
 
         /* Ultra-Comprimido para Imprimir en una sola hoja carta 216x279mm */
@@ -1595,6 +1681,7 @@
                 <input type="text" id="in-new-tech" placeholder="ESCRIBE PARA BUSCAR..." list="global-techs-list" onkeypress="if(event.key === 'Enter') addTech()" onchange="addTech()">
                 <button class="btn-leader btn-agregar" onclick="addTech()" style="padding: 0 10px; display:inline-flex; align-items:center; gap:2px;"><span class="btn-ico">+</span><span class="btn-lbl">AGREGAR <span style="white-space:nowrap">AL TURNO</span></span></button>
                 <button class="btn-outline btn-listado" onclick="openManageTechsModal()" style="padding: 0 10px; font-size: 9px; display:inline-flex; align-items:center; gap:2px;" title="Editar Base Global de Técnicos"><span class="btn-ico">👥</span><span class="btn-lbl">LISTADO DE TÉCNICOS</span></button>
+                <button class="btn-outline btn-listado" id="btn-sync-rol" onclick="syncShiftWithRol()" style="padding: 0 10px; font-size: 9px; display:none; align-items:center; gap:2px;" title="Sincronizar técnicos con el rol mensual"><span class="btn-ico">🔄</span><span class="btn-lbl">ROL</span></button>
             </div>
 
             <div id="tech-pills-container"></div>
@@ -1753,7 +1840,7 @@
 
             <div class="wp-sec">TAREAS DEL ARCHIVO <span class="wp-n" id="wp-import-n"></span></div>
             <div class="wp-bar">
-                <input type="text" id="wp-buscar" placeholder="🔍 BUSCAR EN LA LISTA..." autocomplete="off" oninput="wpBusqueda = this.value; wpRenderLista();">
+                <input type="text" id="wp-buscar" placeholder="🔍 BUSCAR EN LA LISTA..." autocomplete="off">
                 <button type="button" onclick="wpMarcarTodas(true)">TODAS</button>
                 <button type="button" onclick="wpMarcarTodas(false)">NINGUNA</button>
                 <button type="button" onclick="wpMarcarTodas('inv')">INVERTIR</button>
@@ -2165,17 +2252,72 @@
             Agrega o elimina nombres del listado de tecnicos.
         </div>
         <div style="display:flex; gap:10px; margin-bottom:15px;">
-            <input type="text" id="new-global-tech" placeholder="NOMBRE DEL TÉCNICO" onkeypress="if(event.key === 'Enter') addGlobalTech()">
-            <button class="btn-leader" onclick="addGlobalTech()" style="width:90px;">AGREGAR</button>
+            <select id="global-techs-group-filter" style="flex:1; font-size:12px; margin:0;">
+                <option value="">TODOS LOS GRUPOS</option>
+            </select>
+            <input type="text" id="global-techs-search" placeholder="🔍 BUSCAR TÉCNICO" style="flex:1; font-size:12px; margin:0;">
+            <button id="btn-open-add-global-tech" class="btn-leader" style="width:130px; font-size:11px;">➕ AGREGAR</button>
         </div>
-        <div id="global-techs-container" class="tech-grid" style="border: 1px dashed var(--border); padding: 8px; border-radius: 6px; background: var(--bg);">
+        <div style="display:flex; gap:12px; align-items:flex-start;">
+            <div id="global-techs-container" class="tech-grid" style="flex:1; border: 1px dashed var(--border); padding: 8px; border-radius: 6px; background: var(--bg);">
+            </div>
+            <div id="global-tech-details" style="flex:1; min-width:220px; max-width:320px; border:1px solid var(--border); border-radius:6px; background:var(--bg); padding:10px;">
+                <div style="font-size:11px; font-weight:700; margin-bottom:8px; border-bottom:1px solid var(--border); padding-bottom:4px;">📋 DETALLES DEL TÉCNICO</div>
+                <div id="global-tech-details-content" style="font-size:10px; color:var(--comment);">
+                    SELECCIONA UN TÉCNICO DE LA LISTA PARA VER SUS DATOS.
+                </div>
+            </div>
         </div>
         <div class="modal-footer">
+            <button class="btn-outline btn-modal-action" onclick="openRolImportModal()">📥 CARGAR ROL MENSUAL</button>
             <button class="btn-outline btn-modal-action" onclick="closeModal('manage-techs-modal')">CERRAR</button>
         </div>
     </div>
 </div>
 
+<div id="add-global-tech-modal" class="modal">
+    <div class="modal-content" style="max-width: 400px;">
+        <div class="modal-header">➕ AGREGAR TÉCNICO MANUAL</div>
+        <div style="font-size:10px; color:var(--comment); margin-bottom:12px;">
+            Escribe el nombre completo del técnico. Se guardará en mayúsculas.
+        </div>
+        <input type="text" id="manual-global-tech-name" placeholder="NOMBRE DEL TÉCNICO" style="font-size:12px; text-transform: uppercase;">
+        <div class="modal-footer">
+            <button class="btn-outline btn-modal-action" onclick="closeModal('add-global-tech-modal')">CANCELAR</button>
+            <button class="btn-leader btn-modal-action" onclick="saveManualGlobalTech()">GUARDAR</button>
+        </div>
+    </div>
+</div>
+
+<div id="rol-import-modal" class="modal">
+    <div class="modal-content" style="max-width: 900px; max-height: 90vh; display: flex; flex-direction: column;">
+        <div class="modal-header" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+            <span>📥 CARGAR ROL MENSUAL</span>
+            <span style="cursor:pointer; font-size:18px; line-height:1; color:var(--text-soft);" onclick="closeModal('rol-import-modal')" title="Cerrar">×</span>
+        </div>
+        <div id="rol-import-body" style="overflow-y: auto; padding-right: 4px;">
+            <div id="rol-import-step1" style="margin-bottom: 12px;">
+                <div style="font-size: 10px; color: var(--comment); margin-bottom: 8px;">
+                    Sube el archivo CSV o Excel del rol. El sistema detectará el mes, los grupos y los turnos automáticamente.
+                </div>
+                <input type="file" id="rol-import-file" accept=".csv,.xlsx,.xls,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel" onchange="handleRolFileSelect(event)" style="font-size: 11px;">
+                <div id="rol-import-last-update" style="font-size: 10px; color: var(--comment); margin-top: 8px;"></div>
+            </div>
+            <div id="rol-import-step2" style="display: none;">
+                <div id="rol-import-info" style="font-size: 11px; color: var(--primary); font-weight: 700; margin-bottom: 12px;"></div>
+                <div id="rol-import-groups" style="margin-bottom: 12px;"></div>
+                <div style="font-size: 10px; color: var(--comment); margin-bottom: 6px;">Nombres detectados (puedes editarlos):</div>
+                <div id="rol-import-techs" style="margin-bottom: 12px;"></div>
+            </div>
+        </div>
+        <div class="modal-footer" id="rol-import-footer" style="display: none;">
+            <button class="btn-outline btn-modal-action" onclick="closeModal('rol-import-modal')">CANCELAR</button>
+            <button class="btn-leader btn-modal-action" onclick="saveRolImport()">GUARDAR ROL</button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js'"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
     import { getDatabase, ref, set, get, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
@@ -2439,6 +2581,19 @@
         const d = turnoDatos[team];
         if (d && (avionesData !== d.aviones || dbRefs !== turnosRefs[team])) ligarEquipo(team);
     }
+    function resubscribirGlobalTechsYPredef() {
+        if (unsubGlobalTechs) { try { unsubGlobalTechs(); } catch (e) {} }
+        if (unsubPredefTasks) { try { unsubPredefTasks(); } catch (e) {} }
+        unsubGlobalTechs = onValue(globalTechsRef(), (snapshot) => {
+            globalTechs = snapshot.val() || [];
+            updateGlobalTechsUI();
+        }, readErr);
+        unsubPredefTasks = onValue(predefTasksRef(), (snapshot) => {
+            predefTasks = snapshot.val() || [];
+            updatePredefTasksUI();
+        }, readErr);
+    }
+
     function ligarEquipo(team) {
         if (!team) return;
         currentTeam = team;                                     // permisos y rutas siguen al elegido
@@ -2452,6 +2607,9 @@
         actividadGrupoTitulo = d.header.actividadTitulo || '⭐ ACTIVIDADES EXTRA';
         render(); renderTechPills(); renderGroupMessages(); updateTechFilterDropdown();
         updateLockUI(); aplicarPoderesUI();
+        // En vista de todos el equipo gestionado puede cambiar; hay que re-suscribir
+        // la base global y las tareas predefinidas para que apunten al equipo correcto.
+        if (vistaTodos) resubscribirGlobalTechsYPredef();
     }
     function pintarSelectorGestion() {
         const row = document.getElementById('panel-team-row');
@@ -2465,6 +2623,8 @@
     function cambiarEquipoGestionado(team) {
         ligarEquipo(team);
         renderHeaderTodos();
+        updateRolSyncButton();
+        loadShiftRolCodes();
     }
     // ¿Está ese turno cerrado para mí? En la vista de todos se pregunta por el
     // equipo de la tarjeta, no por el que se está gestionando.
@@ -2764,13 +2924,15 @@
             showToast('📚 VIENDO TODOS LOS EQUIPOS · PARA GESTIONAR, ELIGE EL EQUIPO EN EL PANEL');
             return;
         }
+        const veniaDeTodos = vistaTodos;
         if (vistaTodos) {
             vistaTodos = false;
             try { localStorage.removeItem(LS_TODOS); } catch (e) {}
         }
-        if (id === currentTeam) { pintarVistaDeTodos(); updateTeamSwitcher(); return; }
+        if (id === currentTeam && !veniaDeTodos) { pintarVistaDeTodos(); updateTeamSwitcher(); return; }
         if (!equipoActivo(id)) return showToast('⚠️ EQUIPO DESACTIVADO');
         currentTeam = id;
+        activeCodeFilter = '';
         localStorage.setItem(LS_EQUIPO, id);
         avisarCambioSesion();                       // CFR recarga y se queda en su propio equipo
         searchCache = null;
@@ -2808,15 +2970,18 @@
         }
         actualizarTiraEquipos();
         if (panelAbierto) aplicarPoderesUI();
-        updateTechFilterDropdown();
         render();
         if (!vistaTodos) {
             // al volver a un equipo, la cabecera vuelve a ser la de ese turno
             const h = (turnoDatos[currentTeam] || {}).header;
             if (h) aplicarHeaderEquipo(currentTeam, h);
+            // también hay que repintar las pastillas de técnicos, porque en la vista
+            // de todos no se actualizan (no tienen un solo equipo propio)
+            renderTechPills();
         } else {
             renderHeaderTodos();
         }
+        updateTechFilterDropdown();
     }
     // Una línea por equipo con su TL, su estado y cuántos aviones tiene. Sirve
     // para saber de un vistazo qué hay en cada uno y para entrar con un clic.
@@ -3227,8 +3392,12 @@
     let unsubAviones = [], unsubTechs = [], unsubHeader = [];
 
     let avionesData = [];
-    let shiftTechs = []; 
+    let shiftTechs = [];
+    let currentRolCodes = null; // { nombreTecnico: codigoOriginal } para viewingDate
+    let activeCodeFilter = ''; 
     let globalTechs = [];
+    let globalTechDetails = {}; // nombre -> datos del rol mensual
+    let selectedGlobalTech = null;
     let predefTasks = []; 
     let actividadGrupoTitulo = '⭐ ACTIVIDADES EXTRA';
     let groupMessages = [];
@@ -3373,6 +3542,7 @@
                 : '';
         }
         updateLockUI();
+        updateRolSyncButton();
     }
 
     function deactivateLeaderUI() {
@@ -3420,6 +3590,8 @@
     let gateRolesTimer = null;
     let sesionVigente = '';
     const staticUnsubs = [];
+    let unsubGlobalTechs = null;
+    let unsubPredefTasks = null;
 
     onAuthStateChanged(auth, (user) => {
         sesionVigente = (user && user.email) || '';
@@ -3491,16 +3663,16 @@
                 // el catalogo decide a quien se le puede compartir: si aparece o
                 // desaparece un equipo, las carpetas de salida cambian
                 seguroCompartidas(attachCompartidas);
-            }, readErr),
-            onValue(globalTechsRef(), (snapshot) => {
-                globalTechs = snapshot.val() || [];
-                updateGlobalTechsUI();
-            }, readErr),
-            onValue(predefTasksRef(), (snapshot) => {
-                predefTasks = snapshot.val() || [];
-                updatePredefTasksUI();
             }, readErr)
         );
+        unsubGlobalTechs = onValue(globalTechsRef(), (snapshot) => {
+            globalTechs = snapshot.val() || [];
+            updateGlobalTechsUI();
+        }, readErr);
+        unsubPredefTasks = onValue(predefTasksRef(), (snapshot) => {
+            predefTasks = snapshot.val() || [];
+            updatePredefTasksUI();
+        }, readErr);
         listenToTurno(activeTurno);
         seguroCompartidas(attachCompartidas);
     }
@@ -3510,6 +3682,8 @@
         dataAttached = false;
         staticUnsubs.forEach(u => { try { u(); } catch (e) {} });
         staticUnsubs.length = 0;
+        if (unsubGlobalTechs) { try { unsubGlobalTechs(); } catch (e) {} unsubGlobalTechs = null; }
+        if (unsubPredefTasks) { try { unsubPredefTasks(); } catch (e) {} unsubPredefTasks = null; }
         cancelarListenersTurno();
         turnosRefs = {};
         turnoDatos = {};
@@ -5196,6 +5370,7 @@
     function changeTurno() {
         activeTurno = document.getElementById('global-turno-select').value;
         localStorage.setItem('latam_active_turno', activeTurno);
+        activeCodeFilter = '';
         // el turno decide cuál es el "hoy" (de noche todavía es el día anterior)
         updateViewActionsUI();
         listenToTurno(activeTurno);
@@ -5203,6 +5378,7 @@
 
     function changeDate() {
         viewingDate = document.getElementById('global-date-select').value;
+        activeCodeFilter = '';
         updateViewActionsUI();
         listenToTurno(activeTurno);
     }
@@ -5210,6 +5386,7 @@
     function goToToday() {
         viewingDate = getLogicalTodayDate();
         document.getElementById('global-date-select').value = viewingDate;
+        activeCodeFilter = '';
         updateViewActionsUI();
         listenToTurno(activeTurno);
     }
@@ -5274,6 +5451,17 @@
         turnosRefs = {};
         turnoDatos = {};
 
+        // Resetear las variables de pantalla ANTES de suscribir los listeners:
+        // si Firebase dispara el callback síncrono con el valor cacheado, no queremos
+        // que el reset posterior lo sobrescriba y deje la lista vacía.
+        if (!vistaTodos) {
+            avionesData = [];
+            shiftTechs = [];
+            groupMessages = [];
+            const headerDisplay = document.getElementById('display-header');
+            if (headerDisplay) headerDisplay.innerHTML = '';
+        }
+
         equiposAVisitar().forEach(team => {
             const path = getBasePathDe(team);
             const refs = {
@@ -5306,16 +5494,14 @@
             ligarEquipo(currentTeam);
         } else {
             dbRefs = turnosRefs[currentTeam] || {};
-            avionesData = [];
-            shiftTechs = [];
-            groupMessages = [];
-            document.getElementById('display-header').innerHTML = '';
         }
         render();
         renderTechPills();
         renderGroupMessages();
         updateTechFilterDropdown();
         actualizarTiraEquipos();
+        updateRolSyncButton();
+        loadShiftRolCodes();
     }
     // Llega un dato de uno de los turnos. En la vista de un equipo, el de pantalla
     // se copia tal cual a las variables de siempre (ahí viven todas las escrituras);
@@ -5324,7 +5510,8 @@
         if (!turnoDatos[team]) turnoDatos[team] = { aviones: [], techs: [], header: {} };
         turnoDatos[team][campo] = valor;
         const enPantalla = (team === currentTeam && !vistaTodos);
-        if (enPantalla) {
+        const enPantallaTodos = (team === currentTeam && vistaTodos);
+        if (enPantalla || enPantallaTodos) {
             if (campo === 'aviones') {
                 avionesData = valor || [];
             } else if (campo === 'techs') {
@@ -6553,19 +6740,189 @@
                 return;
             }
             globalTechs.forEach((tech, index) => {
-                container.innerHTML += `
-                    <div class="tech-pill">
-                        <span class="tech-name">${escapeHtml(tech)}</span>
-                        <span class="tech-remove" onclick="removeGlobalTech(${index})" title="Eliminar de la Base">✖</span>
-                    </div>
+                const isSelected = selectedGlobalTech === tech;
+                const pill = document.createElement('div');
+                pill.className = 'tech-pill' + (isSelected ? ' selected-tech-pill' : '');
+                pill.dataset.tech = tech;
+                pill.dataset.index = index;
+                pill.innerHTML = `
+                    <span class="tech-name" title="Ver detalles">${escapeHtml(tech)}</span>
+                    <span class="tech-remove" title="Eliminar de la Base">✖</span>
                 `;
+                pill.querySelector('.tech-name').addEventListener('click', () => showGlobalTechDetails(tech));
+                pill.querySelector('.tech-remove').addEventListener('click', () => removeGlobalTech(index));
+                container.appendChild(pill);
             });
+            populateGlobalTechGroupFilter();
+            filterGlobalTechs();
         }
     }
 
-    function addGlobalTech() {
+    function showGlobalTechDetails(techName) {
+        selectedGlobalTech = techName;
+        updateGlobalTechsUI();
+        const content = document.getElementById('global-tech-details-content');
+        if (!content) return;
+        const data = globalTechDetails[techName];
+        if (!data) {
+            content.innerHTML = `<div style="color:var(--comment);">NO HAY DATOS ADICIONALES PARA <b>${escapeHtml(techName)}</b>.</div>`;
+            return;
+        }
+        const vencimientos = data.vencimientos || {};
+        let vencHtml = '';
+        const vencKeys = Object.keys(vencimientos);
+        if (vencKeys.length) {
+            vencHtml = '<div style="margin-top:6px;"><b>VENCIMIENTOS:</b><ul style="margin:4px 0 0 0; padding-left:14px;">' +
+                vencKeys.map(k => `<li>${escapeHtml(k)}: ${escapeHtml(vencimientos[k])}</li>`).join('') +
+                '</ul></div>';
+        }
+        content.innerHTML = `
+            <div style="margin-bottom:8px;">
+                <b>NOMBRE:</b>
+                <div style="display:flex; gap:6px; align-items:center; margin-top:4px;">
+                    <span id="global-tech-name-display" style="flex:1; font-weight:600;">${escapeHtml(data.nombre || techName)}</span>
+                    <span class="edit-pencil" onclick="startEditGlobalTechName()" title="Editar nombre">✏️</span>
+                </div>
+                <div id="global-tech-name-edit" style="display:none; margin-top:4px;">
+                    <div style="display:flex; gap:6px;">
+                        <input type="text" id="edit-global-tech-name" value="${escapeAttr(data.nombre || techName)}" style="flex:1; font-size:10px; text-transform:uppercase; margin:0;">
+                        <button class="btn-leader" onclick="saveGlobalTechNameEdit()" style="width:70px; font-size:10px;">GUARDAR</button>
+                    </div>
+                </div>
+            </div>
+            <div style="margin-bottom:6px;"><b>BP:</b> ${escapeHtml(data.bp || '—')}</div>
+            <div style="margin-bottom:6px;"><b>GRUPO:</b> ${escapeHtml(data.grupo || '—')}</div>
+            <div style="margin-bottom:6px;"><b>SKILL:</b> ${escapeHtml(data.skill || '—')}</div>
+            <div style="margin-bottom:6px;"><b>NIVEL:</b> ${escapeHtml(data.nivel || '—')}</div>
+            <div style="margin-bottom:6px;"><b>ÁREA:</b> ${escapeHtml(data.area || '—')}</div>
+            <div style="margin-bottom:6px;"><b>LICENCIA:</b> ${escapeHtml(data.licencia || '—')}</div>
+            ${vencHtml}
+        `;
+        const input = document.getElementById('edit-global-tech-name');
+        if (input) input.addEventListener('keypress', e => { if (e.key === 'Enter') saveGlobalTechNameEdit(); });
+    }
+
+    function startEditGlobalTechName() {
+        const display = document.getElementById('global-tech-name-display');
+        const pencil = document.querySelector('.edit-pencil');
+        const editWrap = document.getElementById('global-tech-name-edit');
+        const input = document.getElementById('edit-global-tech-name');
+        if (display) display.style.display = 'none';
+        if (pencil) pencil.style.display = 'none';
+        if (editWrap) editWrap.style.display = '';
+        if (input) setTimeout(() => input.focus(), 50);
+    }
+
+    async function saveGlobalTechNameEdit() {
         if (!puedeCargarTecnicos()) return showConfirm('NO PUEDES MODIFICAR LA BASE DE TÉCNICOS EN ESTE EQUIPO.', null);
-        const input = document.getElementById('new-global-tech');
+        const input = document.getElementById('edit-global-tech-name');
+        if (!input) return;
+        const oldName = selectedGlobalTech;
+        const newName = input.value.trim().toUpperCase();
+        if (!newName || newName === oldName) return;
+        if (globalTechs.includes(newName)) return showConfirm('YA EXISTE UN TÉCNICO CON ESE NOMBRE.', null);
+
+        try {
+            const teamPath = datosPath();
+            const tareas = [];
+
+            // 1. Reemplazar en global_techs
+            const idx = globalTechs.indexOf(oldName);
+            if (idx !== -1) {
+                globalTechs[idx] = newName;
+                globalTechs.sort();
+                tareas.push(dbSet(ref(db, teamPath + '/global_techs'), globalTechs, 'RENOMBRAR TÉCNICO EN BASE GLOBAL'));
+            }
+
+            // 2. Renombrar en rol_mensual.tecnicos y en asignaciones
+            const snap = await get(ref(db, teamPath + '/rol_mensual'));
+            if (snap.exists()) {
+                const rol = snap.val();
+                const tecnicos = rol.tecnicos || {};
+                if (tecnicos[oldName]) {
+                    const info = Object.assign({}, tecnicos[oldName], { nombre: newName });
+                    delete tecnicos[oldName];
+                    tecnicos[newName] = info;
+                }
+                const asignaciones = rol.asignaciones || {};
+                Object.keys(asignaciones).forEach(fecha => {
+                    const dia = asignaciones[fecha];
+                    ['Turno Día', 'Turno Tarde', 'Turno Noche'].forEach(turno => {
+                        const arr = dia[turno];
+                        if (Array.isArray(arr)) {
+                            const pos = arr.indexOf(oldName);
+                            if (pos !== -1) arr[pos] = newName;
+                        }
+                    });
+                    if (dia.codigos && dia.codigos[oldName] !== undefined) {
+                        dia.codigos[newName] = dia.codigos[oldName];
+                        delete dia.codigos[oldName];
+                    }
+                });
+                tareas.push(dbSet(ref(db, teamPath + '/rol_mensual'), Object.assign({}, rol, { tecnicos, asignaciones }), 'RENOMBRAR TÉCNICO EN ROL'));
+            }
+
+            // 3. También renombrar en el turno que se está viendo actualmente
+            const idxTurno = shiftTechs.indexOf(oldName);
+            if (idxTurno !== -1) {
+                shiftTechs[idxTurno] = newName;
+                shiftTechs.sort();
+                if (dbRefs && dbRefs.techs) tareas.push(dbSet(dbRefs.techs, shiftTechs, 'ACTUALIZAR TÉCNICOS DEL TURNO'));
+            }
+            let avionesChanged = false;
+            (avionesData || []).forEach(avion => {
+                (avion.tareas || []).forEach(t => {
+                    if (!t.techs) return;
+                    const lista = t.techs.split(' - ').map(n => {
+                        const name = n.trim().toUpperCase();
+                        return name === oldName ? newName : n;
+                    });
+                    const nueva = lista.join(' - ');
+                    if (nueva !== t.techs) { t.techs = nueva; avionesChanged = true; }
+                });
+            });
+            if (avionesChanged && dbRefs && dbRefs.aviones) {
+                tareas.push(dbSet(dbRefs.aviones, avionesData, 'ACTUALIZAR TAREAS DEL TURNO'));
+            }
+
+            await Promise.all(tareas);
+            selectedGlobalTech = newName;
+            await loadGlobalTechDetails();
+            showGlobalTechDetails(newName);
+            showToast('✅ NOMBRE ACTUALIZADO');
+        } catch (e) {
+            console.error('ERROR RENOMBRANDO TÉCNICO:', e);
+            showConfirm('ERROR AL RENOMBRAR EL TÉCNICO.\n' + (e.message || e), null);
+        }
+    }
+
+    async function loadGlobalTechDetails() {
+        try {
+            const snap = await get(ref(db, datosPath() + '/rol_mensual'));
+            if (!snap.exists()) { globalTechDetails = {}; return; }
+            const rol = snap.val();
+            globalTechDetails = {};
+            if (rol && rol.tecnicos) {
+                Object.values(rol.tecnicos).forEach(t => {
+                    if (t && t.nombre) globalTechDetails[t.nombre] = t;
+                });
+            }
+        } catch (e) {
+            console.error('ERROR CARGANDO DETALLES DEL ROL:', e);
+            globalTechDetails = {};
+        }
+    }
+
+    function openAddGlobalTechModal() {
+        const input = document.getElementById('manual-global-tech-name');
+        if (input) input.value = '';
+        document.getElementById('add-global-tech-modal').style.display = 'block';
+        setTimeout(() => { if (input) input.focus(); }, 50);
+    }
+
+    function saveManualGlobalTech() {
+        if (!puedeCargarTecnicos()) return showConfirm('NO PUEDES MODIFICAR LA BASE DE TÉCNICOS EN ESTE EQUIPO.', null);
+        const input = document.getElementById('manual-global-tech-name');
         const name = input.value.trim().toUpperCase();
         if (!name) return;
         if (globalTechs.includes(name)) return showConfirm("EL TÉCNICO YA EXISTE EN LA BASE GLOBAL.", null);
@@ -6573,19 +6930,640 @@
         globalTechs.sort();
         dbSet(globalTechsRef(), globalTechs, 'GUARDAR BASE GLOBAL');
         input.value = '';
+        closeModal('add-global-tech-modal');
+    }
+
+    function populateGlobalTechGroupFilter() {
+        const sel = document.getElementById('global-techs-group-filter');
+        if (!sel) return;
+        const current = sel.value;
+        const groups = Array.from(new Set(Object.values(globalTechDetails).map(t => t.grupo).filter(Boolean))).sort();
+        sel.innerHTML = '<option value="">TODOS LOS GRUPOS</option>' +
+            groups.map(g => `<option value="${escapeAttr(g)}">${escapeHtml(g)}</option>`).join('');
+        sel.value = current;
+        sel.style.display = groups.length ? '' : 'none';
+    }
+
+    function filterGlobalTechs() {
+        const container = document.getElementById('global-techs-container');
+        if (!container) return;
+        const q = (document.getElementById('global-techs-search')?.value || '').trim().toUpperCase();
+        const groupFilter = document.getElementById('global-techs-group-filter')?.value || '';
+        container.querySelectorAll('.tech-pill').forEach(pill => {
+            const name = pill.dataset.tech || '';
+            const data = globalTechDetails[name];
+            const matchesSearch = !q || name.toUpperCase().includes(q);
+            const matchesGroup = !groupFilter || (data && data.grupo === groupFilter);
+            pill.style.display = (matchesSearch && matchesGroup) ? '' : 'none';
+        });
     }
 
     function removeGlobalTech(index) {
         if (!puedeCargarTecnicos()) return showConfirm('NO PUEDES MODIFICAR LA BASE DE TÉCNICOS EN ESTE EQUIPO.', null);
         showConfirm(`¿CONFIRMAS ELIMINAR A ${globalTechs[index]} DE LA BASE DE DATOS GLOBAL?`, () => {
+            if (selectedGlobalTech === globalTechs[index]) {
+                selectedGlobalTech = null;
+                const content = document.getElementById('global-tech-details-content');
+                if (content) content.innerHTML = '<div style="font-size:10px; color:var(--comment);">SELECCIONA UN TÉCNICO DE LA LISTA PARA VER SUS DATOS.</div>';
+            }
             globalTechs.splice(index, 1);
             dbSet(globalTechsRef(), globalTechs, 'GUARDAR BASE GLOBAL');
         });
     }
 
-    function openManageTechsModal() {
+    async function openManageTechsModal() {
         document.getElementById('manage-techs-modal').style.display = 'block';
+        await loadGlobalTechDetails();
         updateGlobalTechsUI();
+        if (selectedGlobalTech) showGlobalTechDetails(selectedGlobalTech);
+    }
+
+    // ─── CARGA DE ROL MENSUAL ───────────────────────────────────────────────
+    const MESES_ES = {
+        ene: 1, feb: 2, mar: 3, abr: 4, may: 5, jun: 6,
+        jul: 7, ago: 8, sep: 9, oct: 10, nov: 11, dic: 12,
+        jan: 1, apr: 4, aug: 8, dec: 12
+    };
+    const MESES_ABBR = ['', 'ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+
+    function formatRolCell(val) {
+        if (val == null || val === '') return '';
+        if (val instanceof Date) {
+            const d = val.getDate();
+            const m = MESES_ABBR[val.getMonth() + 1] || '';
+            const y = val.getFullYear();
+            if (m) return `${d}-${m}-${y}`;
+            return String(val);
+        }
+        if (typeof val === 'number' && val > 30000 && val < 100000 && typeof XLSX !== 'undefined' && XLSX.SSF) {
+            try {
+                const p = XLSX.SSF.parse_date_code(val);
+                if (p && p.y && p.m && p.d) {
+                    const m = MESES_ABBR[p.m] || '';
+                    return `${p.d}-${m}-${p.y}`;
+                }
+            } catch (e) {}
+        }
+        return String(val).trim();
+    }
+    let rolImportState = null;
+    let rolImportLastByTeam = {};
+
+    function parseMonthYearFromHeader(str) {
+        const m = String(str || '').toLowerCase().match(/(\d{1,2})[-/]([a-záéíóúñ]{3,})(?:[-/](\d{2,4}))?/);
+        if (!m) return null;
+        const month = MESES_ES[m[2]];
+        if (!month) return null;
+        let year = m[3] ? parseInt(m[3], 10) : null;
+        if (year !== null && year < 100) year += 2000;
+        return { day: parseInt(m[1], 10), month, year };
+    }
+
+    function isNextDay(prev, curr) {
+        if (curr.col !== prev.col + 1) return false;
+        const prevYear = prev.year || new Date().getFullYear();
+        const prevDate = new Date(prevYear, prev.month - 1, prev.day);
+        const nextDate = new Date(prevDate.getFullYear(), prevDate.getMonth(), prevDate.getDate() + 1);
+        const currYear = curr.year || nextDate.getFullYear();
+        return curr.day === nextDate.getDate() && curr.month === nextDate.getMonth() + 1 && currYear === nextDate.getFullYear();
+    }
+
+    function findDayColumns(row) {
+        // Buscar una secuencia larga de fechas consecutivas (día siguiente al anterior)
+        // para distinguir el encabezado del rol de fechas sueltas de vencimientos.
+        const candidates = [];
+        for (let i = 0; i < row.length; i++) {
+            const info = parseMonthYearFromHeader(row[i]);
+            if (info) candidates.push(Object.assign({ col: i }, info));
+        }
+        if (candidates.length < 3) return null;
+
+        let best = null;
+        let current = [candidates[0]];
+        for (let i = 1; i < candidates.length; i++) {
+            const prev = candidates[i - 1];
+            const curr = candidates[i];
+            if (isNextDay(prev, curr)) {
+                current.push(curr);
+            } else {
+                if (!best || current.length > best.length) best = current;
+                current = [curr];
+            }
+        }
+        if (!best || current.length > best.length) best = current;
+        if (!best || best.length < 5) return null;
+
+        return {
+            start: best[0].col,
+            end: best[best.length - 1].col,
+            days: best
+        };
+    }
+
+    function esFilaNombresColumna(row) {
+        const vals = row.map(c => String(c || '').trim().toUpperCase());
+        return vals.indexOf('NOMBRE GRUPO') !== -1 && vals.indexOf('NOMBRE') !== -1 && vals.indexOf('BP') !== -1;
+    }
+
+    function buildRolIndexes(headerRow, dayCols) {
+        const idx = {};
+        for (let i = 0; i < headerRow.length; i++) {
+            const val = String(headerRow[i] || '').trim().toUpperCase();
+            if (val === 'NOMBRE GRUPO') idx.grupo = i;
+            if (val === 'BP') idx.bp = i;
+            if (val === 'NOMBRE') idx.nombre = i;
+            if (val === 'SKILL') idx.skill = i;
+            if (val === 'NIVEL') idx.nivel = i;
+            if (val === 'AREA') idx.area = i;
+            if (val === 'MEC') idx.mec = i;
+            if (val === 'SUP') idx.sup = i;
+        }
+        if (idx.nombre === undefined || idx.grupo === undefined) return null;
+
+        const certs = [];
+        const fijas = new Set(['DOTACION', 'DOTACIÓN', 'RUT', 'MEC', 'SUP', 'AREA', 'NOMBRE GRUPO', 'BP', 'NOMBRE', 'SKILL', 'NIVEL', 'OBSERVACIÓN', 'OBSERVACION']);
+        for (let i = 0; i < dayCols.start; i++) {
+            const raw = String(headerRow[i] || '').trim();
+            const up = raw.toUpperCase();
+            // Saltar columnas fijas conocidas y vacías
+            if (!raw || fijas.has(up) ||
+                i === idx.grupo || i === idx.bp || i === idx.nombre ||
+                i === idx.skill || i === idx.nivel || i === idx.area ||
+                i === idx.mec || i === idx.sup) continue;
+            certs.push({ col: i, name: raw.replace(/\s+/g, ' ') });
+        }
+        idx.certs = certs;
+        return idx;
+    }
+
+    function detectYearFromFile(rows) {
+        for (const row of rows) {
+            for (let i = 0; i < row.length - 1; i++) {
+                if (String(row[i] || '').toLowerCase().includes('fecha:')) {
+                    const txt = String(row[i + 1] || '');
+                    const m = txt.match(/(\d{1,2})[-/]([a-záéíóúñ]{3,})[-/](\d{2,4})/i);
+                    if (m) {
+                        let y = parseInt(m[3], 10);
+                        if (y < 100) y += 2000;
+                        return y;
+                    }
+                }
+            }
+        }
+        return new Date().getFullYear();
+    }
+
+    function cleanGroupName(name) {
+        return String(name || '')
+            .trim()
+            .toUpperCase()
+            .replace(/\s*\d+\s*$/, '')
+            .trim();
+    }
+
+    function cleanCode(code) {
+        return String(code || '').trim().toUpperCase().replace(/[.,;]$/, '');
+    }
+
+    function codeToTurno(code) {
+        const c = cleanCode(code);
+        if (!c) return null;
+        const m = c.match(/^(\d+)H(\d{2})$/);
+        if (!m) return null;
+        const hour = parseInt(m[2], 10);
+        if (hour >= 5 && hour <= 8) return 'Turno Día';
+        if (hour >= 13 && hour <= 14) return 'Turno Tarde';
+        if (hour >= 20 && hour <= 24) return 'Turno Noche';
+        return null;
+    }
+
+    function parseRolFile(arrayBuffer, fileName) {
+        if (typeof XLSX === 'undefined') {
+            throw new Error('LA LIBRERÍA PARA LEER EXCEL/CSV NO SE CARGÓ. REVISA TU CONEXIÓN.');
+        }
+        let workbook;
+        try {
+            workbook = XLSX.read(arrayBuffer, { type: 'array', cellDates: true });
+        } catch (e) {
+            throw new Error('NO SE PUDO LEER EL ARCHIVO: ' + (e.message || e));
+        }
+
+        // Buscar la primera hoja que tenga encabezados de días
+        let json = null;
+        for (const sheetName of workbook.SheetNames) {
+            const sheet = workbook.Sheets[sheetName];
+            const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: '', raw: true });
+            const formatted = rows.map(row => row.map(formatRolCell));
+            if (formatted.some(r => findDayColumns(r))) {
+                json = formatted;
+                break;
+            }
+        }
+        if (!json) {
+            throw new Error('NO SE DETECTÓ EL MES DEL ROL. REVISA QUE EL ARCHIVO TENGA LOS ENCABEZADOS DE DÍAS (1-oct, 2-oct, ...).');
+        }
+
+        let baseYear = detectYearFromFile(json);
+
+        const techs = [];
+        let dayCols = null;
+        let indexes = null;
+        let month = null, monthKey = null;
+
+        for (const row of json) {
+            const d = findDayColumns(row);
+            if (d) {
+                dayCols = d;
+                indexes = null;
+                const first = d.days[0];
+                month = first.month;
+                baseYear = first.year || baseYear;
+                monthKey = `${baseYear}-${String(month).padStart(2, '0')}`;
+                continue;
+            }
+            if (!dayCols) continue;
+
+            if (!indexes && esFilaNombresColumna(row)) {
+                indexes = buildRolIndexes(row, dayCols);
+                continue;
+            }
+            if (!indexes) continue;
+
+            const nombre = String(row[indexes.nombre] || '').trim().toUpperCase();
+            const grupoRaw = String(row[indexes.grupo] || '').trim().toUpperCase();
+            const grupo = cleanGroupName(grupoRaw);
+            if (!nombre || !grupoRaw || !grupo) continue;
+
+            const bp = String(row[indexes.bp] || '').trim();
+            const skill = String(row[indexes.skill] || '').trim().toUpperCase();
+            const nivel = String(row[indexes.nivel] || '').trim().toUpperCase();
+            const area = indexes.area !== undefined ? String(row[indexes.area] || '').trim().toUpperCase() : '';
+            const licencia = String(row[indexes.mec] || row[indexes.sup] || '').trim();
+            const vencimientos = {};
+            if (indexes.certs) {
+                indexes.certs.forEach(c => {
+                    const v = String(row[c.col] || '').trim();
+                    if (v) vencimientos[c.name] = v;
+                });
+            }
+
+            const asignaciones = {};
+            dayCols.days.forEach(d => {
+                const code = cleanCode(row[d.col]);
+                const turno = codeToTurno(code);
+                if (turno) {
+                    const year = d.year || baseYear;
+                    const key = `${year}-${String(d.month).padStart(2, '0')}-${String(d.day).padStart(2, '0')}`;
+                    if (!asignaciones[key]) asignaciones[key] = [];
+                    asignaciones[key].push({ turno, code });
+                }
+            });
+
+            techs.push({
+                id: techs.length,
+                nombre,
+                grupoRaw,
+                grupo,
+                bp,
+                skill,
+                nivel,
+                area,
+                licencia,
+                vencimientos,
+                asignaciones
+            });
+        }
+
+        if (!monthKey) throw new Error('NO SE DETECTÓ EL MES DEL ROL. REVISA QUE EL ARCHIVO TENGA LOS ENCABEZADOS DE DÍAS.');
+        if (!techs.length) throw new Error('NO SE ENCONTRARON TÉCNICOS EN EL ARCHIVO.');
+
+        const groups = Array.from(new Set(techs.map(t => t.grupo))).sort();
+        return { monthKey, month, year: baseYear, techs, groups };
+    }
+
+    function equiposDisponiblesParaRol() {
+        return allTeams().filter(t => equipoActivo(t) && puedeCargarTecnicosEn(t));
+    }
+
+    async function openRolImportModal() {
+        if (!puedeCargarTecnicos()) {
+            return showConfirm('NO PUEDES CARGAR EL ROL EN ESTE EQUIPO.', null);
+        }
+        document.getElementById('rol-import-file').value = '';
+        document.getElementById('rol-import-step1').style.display = 'block';
+        document.getElementById('rol-import-step2').style.display = 'none';
+        document.getElementById('rol-import-footer').style.display = 'none';
+        document.getElementById('rol-import-info').innerHTML = '';
+        document.getElementById('rol-import-groups').innerHTML = '';
+        document.getElementById('rol-import-techs').innerHTML = '';
+        rolImportState = null;
+
+        const teams = equiposDisponiblesParaRol();
+        const target = equipoEnEdicion() || currentTeam;
+        const lastWrap = document.getElementById('rol-import-last-update');
+        lastWrap.innerHTML = '';
+
+        // Cargar última actualización del equipo objetivo
+        if (teams.includes(target)) {
+            try {
+                const snap = await get(ref(db, 'mantenimiento/pd/datos/' + sanitizeTeamId(target) + '/rol_mensual'));
+                const data = snap.val();
+                rolImportLastByTeam[target] = data || null;
+                if (data && data.actualizadoTs) {
+                    const d = new Date(data.actualizadoTs);
+                    lastWrap.innerHTML = `Última actualización de rol en <b>${escapeHtml(equipoNombre(target))}</b>: ${d.toLocaleString('es-CL')} por ${escapeHtml(data.actualizadoPor || '-')}`;
+                } else {
+                    lastWrap.innerHTML = `No hay rol cargado aún para <b>${escapeHtml(equipoNombre(target))}</b>.`;
+                }
+            } catch (e) {
+                lastWrap.innerHTML = 'No se pudo consultar la última actualización.';
+            }
+        }
+
+        document.getElementById('rol-import-modal').style.display = 'block';
+    }
+
+    function handleRolFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            try {
+                const parsed = parseRolFile(e.target.result, file.name);
+                rolImportState = { parsed, editedNames: {} };
+                buildRolImportPreview();
+            } catch (err) {
+                showConfirm('ERROR AL PROCESAR EL ARCHIVO:\n' + err.message, null);
+            }
+        };
+        reader.onerror = () => showConfirm('ERROR AL LEER EL ARCHIVO.', null);
+        reader.readAsArrayBuffer(file);
+    }
+
+    function buildRolImportPreview() {
+        const { parsed } = rolImportState;
+        const teams = equiposDisponiblesParaRol();
+        const defaultTeam = equipoEnEdicion() || currentTeam;
+
+        document.getElementById('rol-import-step1').style.display = 'none';
+        document.getElementById('rol-import-step2').style.display = 'block';
+        document.getElementById('rol-import-footer').style.display = 'flex';
+
+        document.getElementById('rol-import-info').innerHTML =
+            `MES DETECTADO: <b>${parsed.monthKey}</b> · ${parsed.techs.length} TÉCNICOS · ${parsed.groups.length} GRUPOS`;
+
+        // Grupos
+        const groupsWrap = document.getElementById('rol-import-groups');
+        const teamOptions = teams.map(t => `<option value="${escapeAttr(t)}"${t === defaultTeam ? ' selected' : ''}>${escapeHtml(equipoNombre(t))}</option>`).join('');
+        const showTeamSelect = teams.length > 1;
+        let groupsHtml = '<div class="rol-groups-wrap" style="display:flex; flex-direction:column; gap:6px;">';
+        parsed.groups.forEach((g, i) => {
+            const count = parsed.techs.filter(t => t.grupo === g).length;
+            groupsHtml += `
+                <div style="display:flex; align-items:center; gap:6px; padding:4px 6px; background:var(--bg); border-radius:6px; border:1px solid var(--border);">
+                    <input type="checkbox" id="rol-grp-${i}" value="${escapeAttr(g)}" style="margin:0;">
+                    <label for="rol-grp-${i}" style="flex:1; font-size:11px; font-weight:700; margin:0;">${escapeHtml(g)}</label>
+                    <span style="font-size:10px; color:var(--comment); white-space:nowrap;">${count} técnicos</span>
+                    ${showTeamSelect ? `<select id="rol-grp-team-${i}" style="font-size:10px; min-width:0; width:auto; max-width:100px; height:20px; padding:1px 4px; margin:0;">${teamOptions}</select>` : `<input type="hidden" id="rol-grp-team-${i}" value="${escapeAttr(defaultTeam)}"><span style="font-size:10px; color:var(--comment); white-space:nowrap;">${escapeHtml(equipoNombre(defaultTeam))}</span>`}
+                </div>`;
+        });
+        groupsHtml += '</div>';
+        groupsWrap.innerHTML = groupsHtml;
+
+        // Técnicos
+        const techsWrap = document.getElementById('rol-import-techs');
+        const existingByBp = {};
+        const targetTeam = defaultTeam;
+        const last = rolImportLastByTeam[targetTeam];
+        if (last && last.tecnicos) {
+            Object.values(last.tecnicos).forEach(t => { if (t.bp) existingByBp[t.bp] = t.nombre; });
+        }
+
+        let techsHtml = `<div style="display:flex; gap:8px; margin-bottom:8px; align-items:center;">
+                <input type="text" id="rol-global-search" placeholder="🔍 BUSCAR EN TODOS LOS CAMPOS" style="flex:1; font-size:10px; margin:0;">
+            </div>
+            <div id="rol-import-techs-hint" style="font-size:10px; color:var(--comment); margin-bottom:6px;"></div>
+            <div class="rol-tech-table-wrap">
+            <table style="width:100%; border-collapse: collapse;">
+                <thead style="position:sticky; top:0; background:var(--surface); z-index:1;">
+                    <tr>
+                        <th style="text-align:left; padding:6px; border-bottom:1px solid var(--border);">GRUPO</th>
+                        <th style="text-align:left; padding:6px; border-bottom:1px solid var(--border);">NOMBRE (EDITABLE)</th>
+                        <th style="text-align:left; padding:6px; border-bottom:1px solid var(--border);">BP</th>
+                        <th style="text-align:left; padding:6px; border-bottom:1px solid var(--border);">SKILL</th>
+                        <th style="text-align:left; padding:6px; border-bottom:1px solid var(--border);">NIVEL</th>
+                    </tr>
+                </thead><tbody>`;
+        parsed.techs.forEach(t => {
+            const suggested = existingByBp[t.bp] || t.nombre;
+            rolImportState.editedNames[t.id] = suggested;
+            techsHtml += `
+                <tr class="rol-tech-row" data-grupo="${escapeAttr(t.grupo)}">
+                    <td style="padding:5px; border-bottom:1px solid var(--border); white-space:nowrap;">${escapeHtml(t.grupo)}</td>
+                    <td style="padding:5px; border-bottom:1px solid var(--border);">
+                        <input type="text" class="rol-name-input" data-rol-id="${t.id}" id="rol-name-${t.id}" value="${escapeAttr(suggested)}" style="width:100%; font-size:10px;">
+                    </td>
+                    <td style="padding:5px; border-bottom:1px solid var(--border);">${escapeHtml(t.bp)}</td>
+                    <td style="padding:5px; border-bottom:1px solid var(--border);">${escapeHtml(t.skill)}</td>
+                    <td style="padding:5px; border-bottom:1px solid var(--border);">${escapeHtml(t.nivel)}</td>
+                </tr>`;
+        });
+        techsHtml += '</tbody></table></div></div>';
+        techsWrap.innerHTML = techsHtml;
+        parsed.techs.forEach(t => {
+            const input = document.getElementById(`rol-name-${t.id}`);
+            if (input) {
+                input.addEventListener('change', function() {
+                    if (rolImportState) rolImportState.editedNames[t.id] = this.value.trim().toUpperCase();
+                });
+            }
+        });
+
+        // Filtrar la tabla de técnicos según grupos seleccionados y búsqueda global
+        function updateRolTechRowsVisibility() {
+            const selectedGroups = new Set();
+            parsed.groups.forEach((g, i) => {
+                const chk = document.getElementById(`rol-grp-${i}`);
+                if (chk && chk.checked) selectedGroups.add(g);
+            });
+            const globalSearch = (document.getElementById('rol-global-search')?.value || '').trim().toUpperCase();
+            let visibleCount = 0;
+            techsWrap.querySelectorAll('.rol-tech-row').forEach(row => {
+                const inSelectedGroup = selectedGroups.has(row.dataset.grupo);
+                const rowText = Array.from(row.querySelectorAll('td')).map(cell => {
+                    const input = cell.querySelector('input');
+                    return (input ? input.value : cell.textContent).toUpperCase();
+                }).join(' ');
+                const matchesSearch = globalSearch && rowText.includes(globalSearch);
+                // Si se escribe en el buscador, busca en todos los técnicos sin importar el grupo;
+                // si no, solo muestra los grupos seleccionados.
+                const show = globalSearch ? matchesSearch : inSelectedGroup;
+                row.style.display = show ? '' : 'none';
+                if (show) visibleCount++;
+            });
+            const hint = document.getElementById('rol-import-techs-hint');
+            if (hint) {
+                if (globalSearch) {
+                    hint.innerHTML = `Mostrando <b>${visibleCount}</b> técnicos que coinciden con "<b>${escapeHtml(globalSearch)}</b>".`;
+                } else {
+                    hint.innerHTML = `Mostrando <b>${visibleCount}</b> de ${parsed.techs.length} técnicos (solo los grupos seleccionados).`;
+                }
+            }
+        }
+
+        parsed.groups.forEach((g, i) => {
+            const chk = document.getElementById(`rol-grp-${i}`);
+            if (chk) chk.addEventListener('change', updateRolTechRowsVisibility);
+        });
+        const searchInput = document.getElementById('rol-global-search');
+        if (searchInput) searchInput.addEventListener('input', updateRolTechRowsVisibility);
+        updateRolTechRowsVisibility();
+    }
+
+    async function saveRolImport() {
+        if (!rolImportState) return;
+        const { parsed } = rolImportState;
+        const teams = equiposDisponiblesParaRol();
+        const groups = parsed.groups;
+        const selected = [];
+        groups.forEach((g, i) => {
+            const chk = document.getElementById(`rol-grp-${i}`);
+            if (chk && chk.checked) {
+                const teamSel = document.getElementById(`rol-grp-team-${i}`);
+                selected.push({ grupo: g, team: teamSel ? teamSel.value : (equipoEnEdicion() || currentTeam) });
+            }
+        });
+        if (!selected.length) return showConfirm('DEBES SELECCIONAR AL MENOS UN GRUPO PARA IMPORTAR.', null);
+
+        const invalid = selected.filter(s => !teams.includes(s.team));
+        if (invalid.length) return showConfirm('NO TIENES PERMISO PARA CARGAR EN ALGUNO DE LOS EQUIPOS SELECCIONADOS.', null);
+
+        // Agrupar por equipo destino
+        const porEquipo = {};
+        selected.forEach(s => {
+            if (!porEquipo[s.team]) porEquipo[s.team] = { grupos: [], techs: [] };
+            porEquipo[s.team].grupos.push(s.grupo);
+        });
+
+        parsed.techs.forEach(t => {
+            const sel = selected.find(s => s.grupo === t.grupo);
+            if (!sel) return;
+            const nombreFinal = String(rolImportState.editedNames[t.id] || t.nombre).trim().toUpperCase();
+            if (!nombreFinal) return;
+            porEquipo[sel.team].techs.push(Object.assign({}, t, { nombreFinal }));
+        });
+
+        const now = Date.now();
+        const email = sessionUser() || '';
+        const updates = [];
+
+        for (const [team, data] of Object.entries(porEquipo)) {
+            const tecnicos = {};
+            const asignaciones = {};
+            const nombres = [];
+
+            data.techs.forEach(t => {
+                tecnicos[t.nombreFinal] = {
+                    nombre: t.nombreFinal,
+                    bp: t.bp,
+                    skill: t.skill,
+                    nivel: t.nivel,
+                    area: t.area,
+                    licencia: t.licencia,
+                    grupo: t.grupo,
+                    grupoRaw: t.grupoRaw,
+                    vencimientos: t.vencimientos
+                };
+                nombres.push(t.nombreFinal);
+                Object.entries(t.asignaciones).forEach(([fecha, items]) => {
+                    if (!asignaciones[fecha]) asignaciones[fecha] = { 'Turno Día': [], 'Turno Tarde': [], 'Turno Noche': [], codigos: {} };
+                    items.forEach(item => {
+                        const turno = item.turno;
+                        if (!asignaciones[fecha][turno].includes(t.nombreFinal)) {
+                            asignaciones[fecha][turno].push(t.nombreFinal);
+                        }
+                        if (item.code) {
+                            asignaciones[fecha].codigos[t.nombreFinal] = item.code;
+                        }
+                    });
+                });
+            });
+
+            const payload = {
+                mes: parsed.monthKey,
+                actualizadoPor: email,
+                actualizadoTs: now,
+                gruposImportados: Array.from(new Set(data.grupos)),
+                tecnicos,
+                asignaciones
+            };
+
+            const teamPath = 'mantenimiento/pd/datos/' + sanitizeTeamId(team);
+            updates.push(dbSet(ref(db, teamPath + '/rol_mensual'), payload, 'GUARDAR ROL MENSUAL'));
+
+            // Reemplazar global_techs del equipo con los técnicos del rol importado
+            const reemplazo = Array.from(new Set(nombres)).sort();
+            updates.push(dbSet(ref(db, teamPath + '/global_techs'), reemplazo, 'REEMPLAZAR BASE GLOBAL'));
+        }
+
+        try {
+            await Promise.all(updates);
+            closeModal('rol-import-modal');
+            showToast('✅ ROL MENSUAL GUARDADO CORRECTAMENTE');
+        } catch (e) {
+            console.error('SAVE ROL ERROR', e);
+            const code = e && e.code ? e.code : '';
+            const msg = e && e.message ? e.message : String(e);
+            showConfirm('ERROR AL GUARDAR EL ROL.\n' + (code ? code + ': ' : '') + msg, null);
+        }
+    }
+
+    async function syncShiftWithRol() {
+        if (checkLock()) return;
+        const team = equipoEnEdicion() || currentTeam;
+        if (!team) return;
+        if (!puedeCargarTecnicosEn(team)) return showConfirm('NO PUEDES MODIFICAR LOS TÉCNICOS DE ESTE EQUIPO (' + equipoNombre(team) + ').', null);
+        if (String(viewingDate) < String(getLogicalTodayDate())) {
+            return showConfirm('NO SE PUEDE SINCRONIZAR UN TURNO PASADO.', null);
+        }
+        try {
+            const snap = await get(ref(db, 'mantenimiento/pd/datos/' + sanitizeTeamId(team) + '/rol_mensual'));
+            const rol = snap.val();
+            if (!rol) return showConfirm('NO HAY ROL MENSUAL CARGADO PARA ESTE EQUIPO.', null);
+            if (rol.mes !== viewingDate.slice(0, 7)) return showConfirm('EL ROL CARGADO ES DE OTRO MES (' + rol.mes + '). NO COINCIDE CON EL DÍA QUE ESTÁS VIENDO.', null);
+            const asig = (rol.asignaciones || {})[viewingDate];
+            if (!asig) return showConfirm('NO HAY ASIGNACIONES EN EL ROL PARA ESTE DÍA.', null);
+            const delRol = asig[activeTurno] || [];
+            if (!delRol.length) return showConfirm('EL ROL NO TIENE TÉCNICOS ASIGNADOS A ESTE TURNO.', null);
+
+            const added = [];
+            delRol.forEach(nombre => {
+                if (!shiftTechs.includes(nombre)) {
+                    shiftTechs.push(nombre);
+                    added.push(nombre);
+                }
+            });
+            if (!added.length) return showToast('ℹ️ TODOS LOS TÉCNICOS DEL ROL YA ESTÁN EN EL TURNO');
+            shiftTechs.sort();
+            const techsPath = getBasePath() + '/techs';
+            await dbSet(ref(db, techsPath), shiftTechs, 'SINCRONIZAR TÉCNICOS CON ROL');
+            showToast(`✅ SE AGREGARON ${added.length} TÉCNICO(S) DEL ROL`);
+        } catch (e) {
+            console.error('SYNC ROL ERROR', e);
+            const code = e && e.code ? e.code : '';
+            const msg = e && e.message ? e.message : String(e);
+            const team = equipoEnEdicion() || currentTeam;
+            const path = 'mantenimiento/pd/datos/' + sanitizeTeamId(team) + '/rol_mensual';
+            showConfirm('ERROR AL SINCRONIZAR CON EL ROL.\n' + (code ? code + ': ' : '') + msg + '\n\nEquipo: ' + equipoNombre(team) + '\nRuta: ' + path, null);
+        }
+    }
+
+    function updateRolSyncButton() {
+        const btn = document.getElementById('btn-sync-rol');
+        if (!btn) return;
+        const team = equipoEnEdicion() || currentTeam;
+        const visible = puedeCargarTecnicosEn(team) && String(viewingDate) >= String(getLogicalTodayDate());
+        btn.style.display = visible ? 'inline-flex' : 'none';
     }
 
     function addTech() {
@@ -6686,8 +7664,32 @@
         return !getAssignedTechsSet().has(tech);
     }
 
+    async function loadShiftRolCodes() {
+        currentRolCodes = null;
+        const team = equipoEnEdicion() || currentTeam;
+        if (!team) return;
+        try {
+            const snap = await get(ref(db, 'mantenimiento/pd/datos/' + sanitizeTeamId(team) + '/rol_mensual'));
+            if (snap.exists()) {
+                const rol = snap.val();
+                const asig = (rol.asignaciones || {})[viewingDate];
+                if (asig && asig.codigos) currentRolCodes = asig.codigos;
+            }
+        } catch (e) {
+            console.error('ERROR CARGANDO CÓDIGOS DEL ROL:', e);
+        }
+        renderTechPills();
+    }
+
+    function setCodeFilter(code) {
+        activeCodeFilter = (activeCodeFilter === code) ? '' : code;
+        renderTechPills();
+    }
+
     function renderTechPills() {
-        const container = document.getElementById('tech-pills-container'); container.innerHTML = '';
+        const container = document.getElementById('tech-pills-container');
+        if (!container) return;
+        container.innerHTML = '';
         if(shiftTechs.length === 0) {
             container.innerHTML = '<span style="font-size:10px; color:var(--comment); font-style:italic;">No hay técnicos registrados.</span>';
             return;
@@ -6698,13 +7700,61 @@
         countPill.title = `Total de técnicos en el turno: ${shiftTechs.length}`;
         countPill.innerHTML = `<span class="tech-name">👥 ${shiftTechs.length}</span>`;
         container.appendChild(countPill);
-        shiftTechs.forEach((tech, index) => {
+
+        // Pastillas de filtro por código de turno (si hay rol cargado)
+        const codeMap = currentRolCodes || {};
+        const techCodes = shiftTechs.map(tech => codeMap[tech] || 'SIN CÓDIGO');
+        const codeCounts = {};
+        techCodes.forEach(c => { codeCounts[c] = (codeCounts[c] || 0) + 1; });
+        const distinctCodes = Object.keys(codeCounts).sort();
+        if (distinctCodes.length > 0 && !(distinctCodes.length === 1 && distinctCodes[0] === 'SIN CÓDIGO')) {
+            if (activeCodeFilter && !distinctCodes.includes(activeCodeFilter)) activeCodeFilter = '';
+            distinctCodes.forEach(code => {
+                const btn = document.createElement('span');
+                btn.className = 'code-filter-pill' + (activeCodeFilter === code ? ' active' : '');
+                const label = code === 'SIN CÓDIGO' ? String(codeCounts[code]) : `${code} (${codeCounts[code]})`;
+                btn.textContent = label;
+                btn.title = code === 'SIN CÓDIGO' ? 'SIN CÓDIGO' : `CÓDIGO ${code}`;
+                btn.onclick = () => setCodeFilter(code);
+                container.appendChild(btn);
+            });
+            const sep = document.createElement('div');
+            sep.className = 'tech-pills-separator';
+            container.appendChild(sep);
+        }
+
+        const filtered = shiftTechs.map((tech, i) => ({ tech, i, code: techCodes[i] }))
+            .filter(item => !activeCodeFilter || item.code === activeCodeFilter);
+
+        filtered.forEach(({ tech, i }) => {
             const idle = !assigned.has(tech);
             const pill = document.createElement('div'); pill.className = 'tech-pill' + (idle ? ' tech-idle' : '');
             if (idle) pill.title = `${tech} · SIN TAREAS ASIGNADAS EN ESTE TURNO`;
-            pill.innerHTML = `<span class="tech-name">${escapeHtml(tech)}</span> <span class="tech-remove" onclick="removeTech(${index})" title="Eliminar">✖</span>`;
+            const code = codeMap[tech];
+            if (code) pill.title = (pill.title ? pill.title + ' · ' : '') + `CÓDIGO ROL: ${code}`;
+
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'tech-name';
+            nameSpan.textContent = tech;
+            nameSpan.style.cursor = 'pointer';
+            nameSpan.title = 'Ver detalles del técnico';
+            nameSpan.addEventListener('click', () => showTechDetailsFromPanel(tech));
+
+            const removeSpan = document.createElement('span');
+            removeSpan.className = 'tech-remove';
+            removeSpan.textContent = '✖';
+            removeSpan.title = 'Eliminar';
+            removeSpan.addEventListener('click', () => removeTech(i));
+
+            pill.appendChild(nameSpan);
+            pill.appendChild(removeSpan);
             container.appendChild(pill);
         });
+    }
+
+    async function showTechDetailsFromPanel(techName) {
+        await openManageTechsModal();
+        showGlobalTechDetails(techName);
     }
 
     function updateTechFilterDropdown() {
@@ -8510,6 +9560,7 @@
             .then(() => {
                 renderCompartidas();
                 closeModal('wp-asignar-modal');
+                closeModal('add-avion-modal');
                 wpCerrarImport();
                 if (errores.length) {
                     return showConfirm('⚠️ HUBO ALGUNAS COSAS QUE NO SE GUARDARON:\n\n· ' + errores.join('\n· ')
@@ -9541,7 +10592,9 @@
         changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput,
         formatTime, changeTurno, changeDate, goToToday, toggleLockShift,
         finalizeTime, onTimeKeyEnter,
-        openManageTechsModal, addGlobalTech, removeGlobalTech,
+        openManageTechsModal, showGlobalTechDetails, startEditGlobalTechName, saveGlobalTechNameEdit, removeGlobalTech,
+        openAddGlobalTechModal, saveManualGlobalTech, showTechDetailsFromPanel,
+        openRolImportModal, handleRolFileSelect, saveRolImport, syncShiftWithRol,
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
         // carga rápida de work package (.xlsx / .csv)
         wpArchivoElegido, wpMarcarTodas, wpAvisoImport, wpCerrarImport, wpVolverAImport,
@@ -9570,6 +10623,29 @@
         estadoActual, equiposDelPanel, puedoGestionarEquipo, usuariosDeEquipo, avisosEquipoBar,
         doGoogleLogin, logoutFull
     });
+
+    // Listeners estáticos de la Base Global de Técnicos
+    (function initGlobalTechsStaticListeners() {
+        const btnAdd = document.getElementById('btn-open-add-global-tech');
+        if (btnAdd) btnAdd.addEventListener('click', openAddGlobalTechModal);
+        const search = document.getElementById('global-techs-search');
+        if (search) search.addEventListener('input', filterGlobalTechs);
+        const manualInput = document.getElementById('manual-global-tech-name');
+        if (manualInput) {
+            manualInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') saveManualGlobalTech();
+            });
+        }
+        const wpSearch = document.getElementById('wp-buscar');
+        if (wpSearch) {
+            wpSearch.addEventListener('input', function(e) {
+                wpBusqueda = e.target.value;
+                wpRenderLista();
+            });
+        }
+        const groupFilter = document.getElementById('global-techs-group-filter');
+        if (groupFilter) groupFilter.addEventListener('change', filterGlobalTechs);
+    })();
 
 </script>
 </body>
