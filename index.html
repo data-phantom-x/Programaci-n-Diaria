@@ -801,13 +801,15 @@
         .admin-modal-layout { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 10px; padding: 10px; align-items: stretch; flex: 1 1 auto; min-height: 0; overflow-y: auto; }
         .admin-side { display: flex; flex-direction: column; gap: 8px; }
         .admin-card { border: 1px solid var(--border-soft); border-radius: 7px; padding: 7px; background: var(--light-gray); }
-        .admin-card-title { color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: 0.3px; }
+        .admin-card-title { color: var(--primary); font-size: 10px; font-weight: 800; letter-spacing: 0.3px; }
         .modal-content .admin-field { width: 100%; height: 28px; margin: 4px 0 0; background: var(--surface); }
-        /* 5 roles funcionales (usuario, técnico, planner, TL, SUPER) + el ADMIN aparte */
-        .admin-role-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 3px; margin-top: 5px; }
-        .admin-role-option { display: flex; align-items: center; justify-content: center; gap: 3px; min-height: 24px; padding: 2px; border: 1px solid var(--border-soft); border-radius: 4px; background: var(--surface); color: var(--primary); font-size: 8.5px; font-weight: 800; cursor: pointer; }
+        /* 5 roles funcionales (usuario, técnico, TL, planner, SUPER) + el ADMIN aparte */
+        .admin-role-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; margin-top: 5px; }
+        .admin-role-option { display: flex; align-items: center; justify-content: center; gap: 5px; min-height: 34px; padding: 4px 6px; border: 1px solid var(--border-soft); border-radius: 5px; background: var(--surface); color: var(--primary); font-size: 10px; font-weight: 800; cursor: pointer; text-align: center; line-height: 1.15; white-space: normal; }
         .admin-role-option:has(input:checked) { border-color: var(--primary); background: var(--surface-violet); color: var(--primary); }
         .admin-role-option input { margin: 0; accent-color: var(--primary); }
+        .admin-equipos-global { padding: 6px; border: 1px dashed var(--border); border-radius: 5px; background: var(--surface-soft); text-align: center; }
+        .admin-equipos-todos { color: var(--primary); font-size: 9px; font-weight: 800; letter-spacing: 0.5px; }
         .admin-add-button { width: 100%; height: var(--button-height); border-radius: var(--button-radius); font-size: 9px; box-shadow: none; }
         /* ── MODO MANTENIMIENTO (solo super admin) ── */
         /* Tarjeta apartada del resto: apaga TODO el sistema, no es una cosa de un equipo. */
@@ -831,7 +833,7 @@
         .admin-username { color: var(--primary); font-size: 10px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .admin-user-row.no-access .admin-username { color: var(--comment); }
         .admin-realname { color: var(--comment); font-size: 9px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .admin-role-badge { flex: none; padding: 1px 4px; border-radius: 8px; color: var(--surface); font-size: 7px; font-weight: 800; letter-spacing: 0.2px; }
+        .admin-role-badge { flex: none; padding: 2px 5px; border-radius: 8px; color: var(--surface); font-size: 8px; font-weight: 800; letter-spacing: 0.2px; }
         .admin-role-badge.admin { background: var(--danger); }
     .admin-role-badge.tech { background: var(--success); }
         /* El planner va en turquesa: es el único rol que no es ni verde (técnico)
@@ -903,9 +905,10 @@
         .admin-rol-admin.on { border-style: solid; }
         .admin-team-grid { display: flex; gap: 3px; margin-top: 5px; flex-wrap: wrap; }
         .admin-team-btn {
-            width: 22px; min-width: 22px; height: var(--button-height-admin) !important; padding: 0;
+            width: auto; min-width: 60px; height: var(--button-height-admin) !important; padding: 0 10px;
             border-radius: var(--button-radius); font-size: 9px; background: var(--surface);
             border: 1px solid var(--border); color: var(--comment);
+            white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
         .admin-team-btn.active { background: var(--success); border-color: var(--success); color: var(--surface); }
         .admin-modal-footer { flex: none; justify-content: flex-end; margin: 0; padding: 8px 10px; background: var(--surface-soft); border-top: 1px solid var(--border-soft); }
@@ -983,7 +986,7 @@
         .team-member button { border: 0; background: transparent; color: var(--danger); font-size: 10px; cursor: pointer; padding: 0; line-height: 1; }
         .team-member.locked { opacity: .8; }
         .team-add-row { display: flex; gap: 5px; margin-top: 7px; }
-        .team-note { font-size: 8px; color: var(--comment); margin-top: 6px; line-height: 1.4; }
+        .team-note { font-size: 9px; color: var(--comment); margin-top: 6px; line-height: 1.4; }
 
         /* AJUSTES PARA CELULARES */
         /* ── FORMATO DE PANTALLA PEQUEÑA ─────────────────────────────────────
@@ -1094,7 +1097,7 @@
             .clock-time { font-size: 10px; }
             .leader-title { font-size: 0.7em; letter-spacing: 0.6px; }
             .admin-modal-layout { padding: 10px; gap: 10px; }
-            .admin-role-option { padding: 2px; font-size: 8px; }
+            .admin-role-option { padding: 4px 5px; font-size: 9px; min-height: 30px; }
             /* El lapiz de editar se queda en la MISMA fila que el nombre: antes se le
                ponia width 100% a cada bloque y el boton caia a una segunda fila sin
                necesidad. El nombre se acorta con puntos suspensivos si no cabe. */
@@ -2132,25 +2135,37 @@
         <div class="admin-modal-layout">
             <div class="admin-side">
                 <div class="admin-card">
-                    <div class="admin-card-title">AGREGAR USUARIO AL EQUIPO</div>
+                    <div class="admin-card-title">AGREGAR / EDITAR USUARIO</div>
                     <input type="text" id="admin-realname" class="admin-field" list="admin-sugerencias-nombre" placeholder="NOMBRE · EJ: JUAN PEREZ" autocomplete="off" oninput="adminSugerir('nombre')" onchange="adminCompletar('nombre')" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <input type="text" id="admin-name" class="admin-field" list="admin-sugerencias" placeholder="EMAIL · EJ: juan.perez@latam.cl" autocomplete="off" oninput="adminSugerir('email')" onchange="adminCompletar('email')" onkeypress="if(event.key === 'Enter') adminAddUser()">
                     <datalist id="admin-sugerencias"></datalist>
                     <datalist id="admin-sugerencias-nombre"></datalist>
                     <div class="team-note" id="admin-sugerencia-nota"></div>
-                    <div class="admin-card-title">ROL EN ESTE EQUIPO</div>
+
+                    <div class="admin-card-title">ROL FUNCIONAL</div>
                     <div class="admin-role-grid">
-                        <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-user" value="usuario" checked> USUARIO</label>
-                        <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-tech" value="tech"> TÉCNICO</label>
-                        <label class="admin-role-option" title="Programa para todos sus equipos: crea y edita la programación, carga técnicos y los asigna. NO completa tareas ni cierra turnos."><input type="radio" name="admin-rol" id="admin-is-planner" value="planner"> PLANNER</label>
-                        <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-tl" value="tl"> TL</label>
+                        <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-usuario" value="usuario" checked onchange="adminCambiaTipoRol()"> USUARIO</label>
+                        <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-tech" value="tech" onchange="adminCambiaTipoRol()"> TÉCNICO</label>
+                        <label class="admin-role-option"><input type="radio" name="admin-rol" id="admin-is-tl" value="tl" onchange="adminCambiaTipoRol()"> TL</label>
+                        <label class="admin-role-option" title="Programa en todos los equipos: crea y edita la programación, carga técnicos y los asigna. NO completa tareas ni cierra turnos."><input type="radio" name="admin-rol" id="admin-is-planner" value="planner" onchange="adminCambiaTipoRol()"> PLANNER</label>
+                        <label class="admin-role-option" title="Control total en todos los equipos. Solo puede otorgarlo un super admin o admin global."><input type="radio" name="admin-rol" id="admin-is-super" value="super" onchange="adminCambiaTipoRol()"> SUPER</label>
                     </div>
-                    <div class="team-note">PLANNER: programa para todos sus equipos y carga técnicos, pero no completa tareas ni cierra turnos. SUPER: gestiona sus equipos asignados como un TL y puede ver todos los equipos.</div>
-                    <label class="admin-role-option" style="margin-top:4px" id="admin-opt-admin">
-                        <input type="checkbox" id="admin-is-admin"> ADMIN
+                    <div class="team-note">SUPER / PLANNER tienen alcance global (todos los equipos). TL / TÉCNICO / USUARIO requieren seleccionar equipos.</div>
+
+                    <label class="admin-role-option" style="margin-top:8px" id="admin-opt-admin" title="Puede administrar usuarios y equipos. Con SUPER/PLANNER es admin global; con otros roles es admin solo de los equipos seleccionados.">
+                        <input type="checkbox" id="admin-is-admin" onchange="adminCambiaTipoRol()"> ADMIN
                     </label>
+
+                    <div class="admin-card-title" style="margin-top:12px">EQUIPOS</div>
+                    <div id="admin-equipos-global" class="admin-equipos-global" style="display:none;">
+                        <span class="admin-equipos-todos">📚 TODOS LOS EQUIPOS</span>
+                    </div>
+                    <div id="admin-equipos-selector">
+                        <div class="admin-team-grid" id="admin-equipos-grid"></div>
+                        <div class="team-note">Selecciona uno o más equipos. El usuario tendrá el rol elegido en cada uno.</div>
+                    </div>
                 </div>
-                <button class="btn-leader admin-add-button" onclick="adminAddUser()">AGREGAR AL EQUIPO</button>
+                <button class="btn-leader admin-add-button" onclick="adminAddUser()">GUARDAR USUARIO</button>
                 <div class="admin-card admin-manto-card" id="admin-mantenimiento-card" style="display:none;">
                     <div class="admin-card-title">MODO MANTENIMIENTO <span style="font-weight:400;opacity:.7">· SOLO SUPER ADMIN</span></div>
                     <div class="team-note admin-manto-note" id="admin-mantenimiento-nota">DESACTIVADO. TODO EL PERSONAL ACCEDE CON NORMALIDAD.</div>
@@ -2193,22 +2208,23 @@
             </div>
 
             <div class="admin-card">
-                <div class="admin-card-title">EQUIPOS DE ESTA PERSONA</div>
-                <div class="admin-team-grid" id="user-modal-equipos"></div>
-                <div class="team-note">Toca un equipo para agregarlo o quitarlo. Solo salen los que administras tú. Al agregarlo entra como USUARIO (solo lectura): arriba le cambias el rol.</div>
-            </div>
-
-            <div class="user-modal-team-bar">
-                <label for="user-modal-team">EQUIPO:</label>
-                <select id="user-modal-team" class="admin-team-select" onchange="userModalCambiaEquipo(this.value)"></select>
+                <div class="admin-card-title">ROL FUNCIONAL</div>
+                <div class="admin-role-grid" id="user-modal-roles"></div>
+                <div class="team-note">SUPER / PLANNER tienen alcance global. TL / TÉCNICO / USUARIO requieren seleccionar equipos.</div>
+                    <label class="admin-role-option" style="margin-top:8px; justify-content:flex-start; padding:4px 8px;" id="user-modal-admin-wrap" title="Puede administrar usuarios y equipos. Con SUPER/PLANNER es admin global; con otros roles es admin solo de los equipos seleccionados.">
+                    <input type="checkbox" id="user-modal-admin" onchange="userModalAlternarAdmin()"> ADMIN
+                </label>
             </div>
 
             <div class="admin-card">
-                <div class="admin-card-title">ROL EN ESTE EQUIPO <span style="font-weight:400;opacity:.7">· UNO SOLO</span></div>
-                <div class="admin-rol-grid2" id="user-modal-roles"></div>
-                <button type="button" class="admin-rol-btn admin-rol-admin" id="user-modal-admin"
-                    onclick="userModalAlternarAdmin()">ADMIN</button>
-                <div class="team-note user-modal-note" id="user-modal-nota"></div>
+                <div class="admin-card-title">EQUIPOS</div>
+                <div id="user-modal-equipos-global" class="admin-equipos-global" style="display:none;">
+                    <span class="admin-equipos-todos">📚 TODOS LOS EQUIPOS</span>
+                </div>
+                <div id="user-modal-equipos-selector">
+                    <div class="admin-team-grid" id="user-modal-equipos"></div>
+                    <div class="team-note">Toca un equipo para agregarlo o quitarlo. Solo salen los que administras tú.</div>
+                </div>
             </div>
         </div>
 
@@ -2388,9 +2404,10 @@
         });
     }
 
-    // REGISTRO ÚNICO DE USUARIOS. Los roles son POR EQUIPO:
-    //   pd/usuarios/<correo>/{ email, roles: { <equipo>: { nombre, usuario, tech, tl, admin } } }
-    // Un admin solo puede escribir roles/<equipo> de los equipos que administra.
+    // REGISTRO ÚNICO DE USUARIOS.
+    //   pd/usuarios/<correo>/{ email, nombre, rolGlobal, adminGlobal, roles: { <equipo>: { usuario, tech, tl, admin } } }
+    // rolGlobal puede ser 'super' o 'planner' (alcance global). adminGlobal otorga permisos de administración globales.
+    // Un admin solo puede escribir roles/<equipo> de los equipos que administra; los campos globales solo los tocan super admin o admin global.
     let techUsers = [];
     let uidLinked = false;   // el indice de uids solo se escribe una vez por carga
     let usuariosDB = {};
@@ -2476,37 +2493,34 @@
         return usuariosDB[key];
     }
     // ─── ROLES ─────────────────────────────────────────────────────────────
-    // Hay DOS cosas distintas y no se mezclan:
-    //   1) el ROL FUNCIONAL: uno solo por equipo (usuario | tecnico | tl). No se suman.
-    //   2) el ADMIN: un flag aparte que SE SUMA a cualquier rol funcional y unicamente
-    //      da acceso al panel de administracion. Admin no es "superior" a TL: un admin
-    //      que además es solo usuario sigue sin poder trabajar ni liderar el turno.
-    // Para agregar un rol funcional nuevo: una línea en ROLES y otra en ROLES_PODERES.
-    //   3) los PODERES: lo que el rol permite hacer. La interfaz NO pregunta "¿eres
-    //      TL?" sino "¿puedes hacer esto?": así el planner entra al panel y ve lo
-    //      que puede hacer, sin poder tocar lo que no le corresponde.
+    // Jerarquía invertida: primero se define el ROL FUNCIONAL y el flag ADMIN,
+    // y según el rol elegido se determina el alcance de los EQUIPOS:
+    //   · SUPER / PLANNER  → alcance global (todos los equipos activos).
+    //   · TL / TÉCNICO / USUARIO → alcance por equipos seleccionados.
+    //   · ADMIN sigue la misma filosofía: global si va con SUPER/PLANNER,
+    //     o sobre los equipos seleccionados si va con TL/TÉCNICO/USUARIO.
+    // Los PODERES no cambian: la interfaz pregunta "¿puedes hacer esto?".
     const ROLES = [
-        { id: 'usuario', txt: 'USUARIO', cls: 'active-user' },
-        { id: 'tech',    txt: 'TÉCNICO', cls: 'active-tech' },
-        { id: 'planner', txt: 'PLANNER', cls: 'active-planner' },
-        { id: 'tl',      txt: 'TL',      cls: 'active-tl' },
-        { id: 'super',   txt: 'SUPER',   cls: 'active-super' }
+        { id: 'usuario', txt: 'USUARIO', cls: 'active-user', global: false },
+        { id: 'tech',    txt: 'TÉCNICO', cls: 'active-tech', global: false },
+        { id: 'tl',      txt: 'TL',      cls: 'active-tl',   global: false },
+        { id: 'planner', txt: 'PLANNER', cls: 'active-planner', global: true },
+        { id: 'super',   txt: 'SUPER',   cls: 'active-super', global: true }
     ];
     const ROLES_ORDEN = ROLES.map(r => r.id);      // de menor a mayor, solo para ordenar
+    const ROLES_GLOBALES = ROLES.filter(r => r.global).map(r => r.id); // ['planner','super']
+    const ROLES_POR_EQUIPO = ROLES.filter(r => !r.global).map(r => r.id); // ['usuario','tech','tl']
     const ROLES_ADMIN = { id: 'admin', txt: 'ADMIN', cls: 'active-admin' };
     // Poderes del rol funcional. 'administrar' NO esta aqui: lo da el flag admin.
     const ROLES_PODERES = {
         usuario: ['leer'],
         tech:    ['leer', 'trabajar'],
-        // El planner programa para todos los equipos donde es planner: crea y edita
-        // la programación, carga técnicos al turno y los asigna a las tareas.
-        // NO puede completar tareas ni abrir o cerrar turnos: eso es del TL de
-        // cada equipo.
+        // El planner programa en TODOS los equipos: crea y edita la programación,
+        // carga técnicos al turno y los asigna a las tareas. NO completa tareas
+        // ni abre/cierra turnos: eso es del TL de cada equipo.
         planner: ['leer', 'planificar', 'asignar', 'cargar_tecnicos'],
         tl:      ['leer', 'trabajar', 'lider', 'planificar', 'asignar', 'cargar_tecnicos'],
-        // El supervisor tiene los mismos poderes de turno que el TL, pero además
-        // puede ver la programación de TODOS los equipos (aunque solo gestiona
-        // los que tenga asignados como SUPER).
+        // El supervisor tiene control total de turno en todos los equipos.
         super:   ['leer', 'trabajar', 'lider', 'planificar', 'asignar', 'cargar_tecnicos']
     };
     const PODER_ADMIN = 'administrar';
@@ -2667,6 +2681,17 @@
         }
         return null;
     }
+    // Rol funcional global del usuario (super/planner), o null si no tiene.
+    function rolGlobalDe(user) {
+        const rec = usuariosDB[userKeyFor(user)];
+        const rg = rec && rec.rolGlobal;
+        return ROLES_GLOBALES.indexOf(rg) > -1 ? rg : null;
+    }
+    // Flag admin global del usuario.
+    function adminGlobalDe(user) {
+        const rec = usuariosDB[userKeyFor(user)];
+        return !!(rec && rec.adminGlobal);
+    }
     function rolDe(user, rol, team) {
         const r = rolesDe(user, team);
         if (!r) return false;
@@ -2686,9 +2711,19 @@
     }
     // Registro de roles ya normalizado: UN rol funcional en true, mas el flag admin
     // aparte. O null si el usuario no es miembro de ese equipo.
+    // Si el usuario tiene rol global (super/planner), ese rol aplica a cualquier equipo.
     function rolesDe(user, team) {
         const rec = usuariosDB[userKeyFor(user)];
-        const r = rec && rec.roles && rec.roles[team || currentTeam];
+        const t = team || currentTeam;
+        const rg = rolGlobalDe(user);
+        if (rg) {
+            const out = {};
+            out[rg] = true;   // rol funcional global (super/planner)
+            // admin global o admin del equipo concreto
+            out[ROLES_ADMIN.id] = adminGlobalDe(user) || !!(rec && rec.roles && rec.roles[t] && rec.roles[t][ROLES_ADMIN.id]);
+            return out;
+        }
+        const r = rec && rec.roles && rec.roles[t];
         const rol = rolUnico(r);
         if (!rol) return null;
         const out = rolesDeUnRol(rol);
@@ -2703,24 +2738,24 @@
         if (r && r.nombre) return r.nombre;
         return (rec && rec.email) || user;
     }
-    // Crea (si hace falta) el registro de roles de un usuario en un equipo
+    // Crea (si hace falta) el registro de roles de un usuario en un equipo.
+    // Solo guarda roles por equipo (usuario/tech/tl) y el flag admin de ese equipo.
     function rolRec(user, team) {
         const rec = userRec(user);
         if (!rec.roles) rec.roles = {};
-        if (!rec.roles[team]) rec.roles[team] = { usuario: true, tech: false, planner: false, tl: false, super: false, admin: false };
+        if (!rec.roles[team]) rec.roles[team] = { usuario: true, tech: false, tl: false, admin: false };
         return rec.roles[team];
     }
-    // Un usuario cuenta si tiene algún rol en ALGUN equipo ACTIVO (para poder entrar).
-    // Un equipo desactivado NO da acceso: si el usuario solo tuviera roles ahí, la
-    // puerta lo trata igual que a uno sin ningún rol ("NO TIENE ACCESO HABILITADO").
+    // Un usuario cuenta si tiene rol global o algún rol en ALGUN equipo ACTIVO.
     function tieneAlgunRol(user) {
+        if (rolGlobalDe(user)) return true;
         const rec = usuariosDB[userKeyFor(user)];
         if (!rec || !rec.roles) return false;
-            return Object.keys(rec.roles).some(t => {
-                if (!equipoActivo(t)) return false;
-                const r = rec.roles[t];
-                return r && (r.usuario || r.tech || r.planner || r.tl || r.super || r.admin);
-            });
+        return Object.keys(rec.roles).some(t => {
+            if (!equipoActivo(t)) return false;
+            const r = rec.roles[t];
+            return r && (r.usuario || r.tech || r.tl || r.admin);
+        });
     }
 
     // ─── MULTI-EQUIPOS (solo PD) ──────────────────────────────────────────────
@@ -2756,27 +2791,25 @@
     function ordenarEquipos(lista) {
         return lista.slice().sort((a, b) => (equipoOrden(a) - equipoOrden(b)) || String(a).localeCompare(String(b)));
     }
-    // Equipos del usuario = equipos donde tiene registro de roles.
+    // Equipos del usuario: según su rol funcional.
+    //   · super/planner (o super admin) → todos los equipos activos.
+    //   · tl/técnico/usuario → equipos seleccionados donde tenga registro.
     // Sin ninguno = usuario antiguo -> CABINA.
     function esSupervisor(user) {
-        const rec = (user && usuariosDB[userKeyFor(user)]) || {};
-        if (!rec.roles) return false;
-        return Object.keys(rec.roles).some(t => rec.roles[t] && rec.roles[t].super === true);
+        return rolGlobalDe(user) === 'super';
+    }
+    function esPlanner(user) {
+        return rolGlobalDe(user) === 'planner';
     }
     function equiposDeUsuario(user) {
-        if (isSuperAdmin(user)) {
-            const todos = allTeams();
-            return todos.length ? todos : [EQUIPO_DEFECTO];
-        }
-        // El supervisor ve TODOS los equipos activos, aunque solo gestionará los
-        // que tenga asignados con rol SUPER.
-        if (esSupervisor(user)) {
-            return ordenarEquipos(allTeams().filter(t => equipoActivo(t)));
+        if (isSuperAdmin(user) || esSupervisor(user) || esPlanner(user)) {
+            const todos = allTeams().filter(t => equipoActivo(t));
+            return todos.length ? ordenarEquipos(todos) : [EQUIPO_DEFECTO];
         }
         const rec = (user && usuariosDB[userKeyFor(user)]) || {};
         let ids = Object.keys(rec.roles || {}).filter(t => {
             const r = rec.roles[t];
-            return r && (r.usuario || r.tech || r.planner || r.tl || r.super || r.admin === true);
+            return r && (r.usuario || r.tech || r.tl || r.admin === true);
         });
         if (!ids.length) ids = [EQUIPO_DEFECTO];
         const existentes = allTeams();
@@ -2790,10 +2823,11 @@
         return ordenarEquipos(Array.from(s));
     }
     // Equipos donde TENGO el rol de ADMIN (no basta con pertenecer a ellos).
-    // Incluye los desactivados, para poder volver a activarlos. El super admin: todos.
+    // Incluye los desactivados, para poder volver a activarlos. El super admin
+    // y el admin global: todos.
     function equiposDondeSoyAdmin(user) {
         const u = user || sessionUser();
-        if (isSuperAdmin(u)) return allTeams();
+        if (isSuperAdmin(u) || adminGlobalDe(u)) return allTeams();
         const rec = (u && usuariosDB[userKeyFor(u)]) || {};
         const mios = Object.keys(rec.roles || {}).filter(t => puede(u, 'administrar', t));
         return ordenarEquipos(mios);
@@ -2819,11 +2853,11 @@
     function esMiembroDe(user, team) {
         return rolDeUsuario(user, team) !== null;
     }
-    // Usuarios que tienen roles en ese equipo
+    // Usuarios que tienen roles en ese equipo: incluye globales (super/planner).
     function usuariosDeEquipo(team) {
         return Object.keys(usuariosDB).filter(u => {
             const r = rolesDe(u, team);
-            return !!(r && (r.usuario || r.tech || r.planner || r.tl || r.admin));
+            return !!(r && (r.usuario || r.tech || r.tl || r.planner || r.super || r.admin));
         }).sort();
     }
     function hayEquipoActivo(user) { return equiposDeUsuario(user || sessionUser()).some(t => equipoActivo(t)); }
@@ -3041,11 +3075,11 @@
         correosAutorizados = Object.keys(usuariosDB).filter(u => puede(u, 'lider', t));
         adminList = Object.keys(usuariosDB).filter(u => puede(u, 'administrar', t));
     }
-    // ¿El registro de roles tiene algún rol activo? Si no, el equipo debe desaparecer
-    // de los roles del usuario (en vez de quedar un {usuario:false,...} que lo seguiria
-    // haciendo aparecer en las listas como miembro sin acceso).
+    // ¿El registro de roles por equipo tiene algún rol activo? Solo se consideran
+    // los roles por equipo (usuario/tech/tl). El admin queda si el usuario sigue
+    // siendo miembro, pero sin rol funcional se borra el registro entero.
     function rolesVacias(rr) {
-        return !rr || !ROLES_ORDEN.some(r => !!rr[r]);
+        return !rr || !ROLES_POR_EQUIPO.some(r => !!rr[r]);
     }
     // Refleja en memoria el registro de roles de un usuario en un equipo
     function aplicarRolesLocal(user, team, rr) {
@@ -3068,35 +3102,89 @@
     function sincronizarIndiceAdmins(user, team) {
         try {
             const key = claveNodoDe(user);
-            if (!key || !team) return;
-            const esAdmin = puede(user, 'administrar', team);
+            if (!key || !team) return Promise.resolve();
+            // Índice por equipo para admins con alcance limitado.
+            const esAdmin = !adminGlobalDe(user) && puede(user, 'administrar', team);
             const ruta = 'mantenimiento/pd/admins/' + key + '/' + sanitizeTeamId(team);
             const p = esAdmin ? set(ref(db, ruta), true) : remove(ref(db, ruta));
             if (p && typeof p.catch === 'function') {
                 p.catch(e => console.warn('indice de admins no se actualizo:', e && (e.code || e.message)));
             }
+            return p || Promise.resolve();
         } catch (e) {
             console.warn('indice de admins:', e && e.message);
+            return Promise.resolve();
         }
     }
-    // Índice de supervisores: las reglas de Firebase lo usan para permitir que un
-    // supervisor lea la programación de TODOS los equipos sin tener que recorrer
-    // todos los roles (algo que las reglas no pueden hacer).
-    function sincronizarIndiceSupervisors(user, team) {
+    // Índice de administradores globales: aplica a todos los equipos.
+    function sincronizarIndiceGlobalAdmins(user) {
         try {
             const key = claveNodoDe(user);
-            if (!key || !team) return;
-            const rec = usuariosDB[key] || {};
-            const r = (rec.roles || {})[team] || {};
-            const esSupervisor = r.super === true;
-            const ruta = 'mantenimiento/pd/supervisors/' + key + '/' + sanitizeTeamId(team);
-            const p = esSupervisor ? set(ref(db, ruta), true) : remove(ref(db, ruta));
+            if (!key) return Promise.resolve();
+            const ruta = 'mantenimiento/pd/global_admins/' + key;
+            const p = adminGlobalDe(user) ? set(ref(db, ruta), true) : remove(ref(db, ruta));
+            if (p && typeof p.catch === 'function') {
+                p.catch(e => console.warn('indice de global_admins no se actualizo:', e && (e.code || e.message)));
+            }
+            return p || Promise.resolve();
+        } catch (e) {
+            console.warn('indice de global_admins:', e && e.message);
+            return Promise.resolve();
+        }
+    }
+    // Índice de supervisores: bandera global. Las reglas lo usan para dar acceso
+    // total a todos los equipos sin recorrer roles/$team.
+    function sincronizarIndiceSupervisors(user) {
+        try {
+            const key = claveNodoDe(user);
+            if (!key) return Promise.resolve();
+            const ruta = 'mantenimiento/pd/supervisors/' + key;
+            const p = esSupervisor(user) ? set(ref(db, ruta), true) : remove(ref(db, ruta));
             if (p && typeof p.catch === 'function') {
                 p.catch(e => console.warn('indice de supervisors no se actualizo:', e && (e.code || e.message)));
             }
+            return p || Promise.resolve();
         } catch (e) {
             console.warn('indice de supervisors:', e && e.message);
+            return Promise.resolve();
         }
+    }
+    // Índice de planners: bandera global. Las reglas lo usan para dar acceso de
+    // programación a todos los equipos sin recorrer roles/$team.
+    function sincronizarIndicePlanners(user) {
+        try {
+            const key = claveNodoDe(user);
+            if (!key) return Promise.resolve();
+            const ruta = 'mantenimiento/pd/planners/' + key;
+            const p = esPlanner(user) ? set(ref(db, ruta), true) : remove(ref(db, ruta));
+            if (p && typeof p.catch === 'function') {
+                p.catch(e => console.warn('indice de planners no se actualizo:', e && (e.code || e.message)));
+            }
+            return p || Promise.resolve();
+        } catch (e) {
+            console.warn('indice de planners:', e && e.message);
+            return Promise.resolve();
+        }
+    }
+    // Reparación de índices del usuario conectado: si por alguna razón (migración,
+    // sincronización fallida, edición manual en Firebase) falta alguno de los índices
+    // globales que corresponden a sus roles, se vuelven a escribir. Esto evita que un
+    // admin global o un planner/super pierda sus permisos reales pese a tenerlos en
+    // su registro de usuario.
+    let indicesPropiosReparados = false;
+    function repararIndicesPropios() {
+        const u = sessionUser();
+        if (!u || indicesPropiosReparados) return Promise.resolve();
+        indicesPropiosReparados = true;
+        return Promise.all([
+            sincronizarIndiceSupervisors(u),
+            sincronizarIndicePlanners(u),
+            sincronizarIndiceGlobalAdmins(u)
+        ]).then(() => {
+            const rec = usuariosDB[userKeyFor(u)];
+            if (!rec || !rec.roles) return;
+            return Promise.all(Object.keys(rec.roles).map(t => sincronizarIndiceAdmins(u, t)));
+        }).catch(e => console.warn('reparacion de indices propios:', e && e.message));
     }
 
     function guardarRol(user, team, rolRecData, autorizado, previo) {
@@ -3104,31 +3192,37 @@
             showToast('⚠️ NO PUEDES GESTIONAR EL EQUIPO ' + String(equipoNombre(team)).toUpperCase());
             return Promise.resolve(false);
         }
-        // Sin ningún rol true se BORRA el equipo del usuario (set en null). Escribir
-        // {usuario:false,tech:false,tl:false,admin:false} lo dejaria como miembro
-        // vacio, que es justo lo que se quiere evitar.
+        // Sin ningún rol funcional por equipo se BORRA el registro del equipo.
         const vacio = rolesVacias(rolRecData);
         const payload = vacio ? null : rolRecData;
         return set(ref(db, rolesPath(user, team)), payload)
             .then(() => {
                 aplicarRolesLocal(user, team, rolRecData);
-                sincronizarIndiceAdmins(user, team);   // las reglas lo usan para saber
-                sincronizarIndiceSupervisors(user, team); // las reglas lo usan para saber
-                syncRoleArrays();                      // quien administra algo
+                return Promise.all([
+                    sincronizarIndiceAdmins(user, team),
+                    sincronizarIndiceGlobalAdmins(user),
+                    sincronizarIndiceSupervisors(user),
+                    sincronizarIndicePlanners(user)
+                ]);
+            })
+            .then(() => {
+                syncRoleArrays();
                 updateTeamSwitcher();
                 refreshAdminListIfOpen();
-                renderAdminTeamBar();     // si el usuario se quitó el admin, su lista cambia
+                renderAdminTeamBar();
                 renderNewTeamsGrid();
                 updateAdminUI();
                 return true;
             })
             .catch((e) => {
                 console.error('FIREBASE WRITE ERROR', e);
-                // si falló, se restaura lo que había: la pantalla no puede mostrar un
-                // cambio que no se guardó (y el super admin podría dejarlo sin permisos)
                 if (previo) aplicarRolesLocal(user, team, previo);
-                sincronizarIndiceAdmins(user, team);   // re-sincronizar índices tras revertir
-                sincronizarIndiceSupervisors(user, team);
+                Promise.all([
+                    sincronizarIndiceAdmins(user, team),
+                    sincronizarIndiceGlobalAdmins(user),
+                    sincronizarIndiceSupervisors(user),
+                    sincronizarIndicePlanners(user)
+                ]).catch(() => {});
                 syncRoleArrays();
                 updateAdminUI();
                 updateTeamSwitcher();
@@ -3136,6 +3230,56 @@
                 renderAdminTeamBar();
                 showToast('⚠️ NO SE GUARDÓ EL ROL EN ' + String(equipoNombre(team)).toUpperCase() +
                           (e.code ? ' (' + e.code + ')' : '') + '. Tienes que ser admin de ese equipo.');
+                return false;
+            });
+    }
+    // Guarda la configuración global de un usuario (rol global y admin global).
+    // Solo un super admin o admin global puede otorgar/quitar alcance global.
+    function guardarRolGlobal(user, rolGlobal, adminGlobal, autorizado) {
+        const puedeGlobal = isSuperAdmin(sessionUser()) || adminGlobalDe(sessionUser());
+        if (autorizado === undefined ? !puedeGlobal : !autorizado) {
+            showToast('⚠️ NO PUEDES OTORGAR ROLES CON ALCANCE GLOBAL');
+            return Promise.resolve(false);
+        }
+        const key = claveNodoDe(user);
+        const rgValido = ROLES_GLOBALES.indexOf(rolGlobal) > -1 ? rolGlobal : null;
+        const tareas = [];
+        const rec = userRec(user);
+        const previoRg = rec.rolGlobal;
+        const previoAg = rec.adminGlobal;
+        rec.rolGlobal = rgValido || undefined;
+        rec.adminGlobal = adminGlobal ? true : undefined;
+        tareas.push(set(ref(db, 'mantenimiento/pd/usuarios/' + key + '/rolGlobal'), rgValido || null));
+        tareas.push(set(ref(db, 'mantenimiento/pd/usuarios/' + key + '/adminGlobal'), adminGlobal ? true : null));
+        return Promise.all(tareas)
+            .then(() => Promise.all([
+                sincronizarIndiceSupervisors(user),
+                sincronizarIndicePlanners(user),
+                sincronizarIndiceGlobalAdmins(user)
+            ]))
+            .then(() => {
+                syncRoleArrays();
+                updateTeamSwitcher();
+                refreshAdminListIfOpen();
+                renderAdminTeamBar();
+                updateAdminUI();
+                return true;
+            })
+            .catch((e) => {
+                console.error('FIREBASE WRITE ERROR', e);
+                rec.rolGlobal = previoRg;
+                rec.adminGlobal = previoAg;
+                Promise.all([
+                    sincronizarIndiceSupervisors(user),
+                    sincronizarIndicePlanners(user),
+                    sincronizarIndiceGlobalAdmins(user)
+                ]).catch(() => {});
+                syncRoleArrays();
+                updateAdminUI();
+                updateTeamSwitcher();
+                refreshAdminListIfOpen();
+                renderAdminTeamBar();
+                showToast('⚠️ NO SE GUARDÓ LA CONFIGURACIÓN GLOBAL (' + (e.code || e.message) + ')');
                 return false;
             });
     }
@@ -3177,17 +3321,23 @@
             tareas.push(set(ref(db, 'mantenimiento/pd/usuarios/' + viejo + '/email'), valor));
         } else {
             // se copia el registro al nodo nuevo (roles incluidos) y se borra el viejo
-            const roles = (rec.roles && Object.keys(rec.roles).length) ? rec.roles : null;
-            tareas.push(set(ref(db, 'mantenimiento/pd/usuarios/' + nuevo), { email: valor, nombre: rec.nombre || '', roles: roles }));
-            // el indice de admins tambien se mueve: las reglas lo usan para saber quien
-            // administra que, asi que si se queda atras el admin pierde el equipo
+            const payload = { email: valor, nombre: rec.nombre || '' };
+            if (rec.roles && Object.keys(rec.roles).length) payload.roles = rec.roles;
+            if (rec.rolGlobal) payload.rolGlobal = rec.rolGlobal;
+            if (rec.adminGlobal) payload.adminGlobal = true;
+            tareas.push(set(ref(db, 'mantenimiento/pd/usuarios/' + nuevo), payload));
+            // los indices se mueven para no perder permisos
             Object.keys(rec.roles || {}).forEach(t => {
                 if (rec.roles[t] && rec.roles[t].admin === true) tareas.push(set(ref(db, 'mantenimiento/pd/admins/' + nuevo + '/' + sanitizeTeamId(t)), true));
-                if (rec.roles[t] && rec.roles[t].super === true) tareas.push(set(ref(db, 'mantenimiento/pd/supervisors/' + nuevo + '/' + sanitizeTeamId(t)), true));
             });
+            if (rec.rolGlobal === 'super') tareas.push(set(ref(db, 'mantenimiento/pd/supervisors/' + nuevo), true));
+            if (rec.rolGlobal === 'planner') tareas.push(set(ref(db, 'mantenimiento/pd/planners/' + nuevo), true));
+            if (rec.adminGlobal) tareas.push(set(ref(db, 'mantenimiento/pd/global_admins/' + nuevo), true));
             tareas.push(remove(ref(db, 'mantenimiento/pd/usuarios/' + viejo)));
             tareas.push(remove(ref(db, 'mantenimiento/pd/admins/' + viejo)));
             tareas.push(remove(ref(db, 'mantenimiento/pd/supervisors/' + viejo)));
+            tareas.push(remove(ref(db, 'mantenimiento/pd/planners/' + viejo)));
+            tareas.push(remove(ref(db, 'mantenimiento/pd/global_admins/' + viejo)));
         }
         return Promise.all(tareas)
             .then(() => {
@@ -3331,30 +3481,46 @@
             // true. Los registros antiguos pueden venir con varios (el modelo anterior los
             // sumaba): se queda el mas alto, que es lo que mas poder le daba.
             const roles = {};
-            const unRol = (r) => {
-                for (let i = ROLES_ORDEN.length - 1; i >= 0; i--) if (r[ROLES_ORDEN[i]]) return ROLES_ORDEN[i];
+            const unRolPorEquipo = (r) => {
+                for (let i = ROLES_POR_EQUIPO.length - 1; i >= 0; i--) if (r[ROLES_POR_EQUIPO[i]]) return ROLES_POR_EQUIPO[i];
                 return null;
             };
             let nombre = e.nombre || '';
+            let rolGlobal = (ROLES_GLOBALES.indexOf(e.rolGlobal) > -1) ? e.rolGlobal : null;
+            let adminGlobal = e.adminGlobal === true;
             if (e.roles && typeof e.roles === 'object') {
                 Object.keys(e.roles).forEach(t => {
                     const r = e.roles[t] || {};
-                    // el nombre ya no se duplica por equipo: si viene aqui es formato anterior
                     if (!nombre && r.nombre) nombre = r.nombre;
-                    // OJO: el flag admin hay que pasarlo. Sin esto se leia la base
-                    // y se descartaba el admin: nadie era admin en ningun cliente.
-                    roles[t] = rolesDeUnRol(unRol(r), r.admin === true);
+                    // Migración de datos antiguos: super/planner por equipo se convierten
+                    // a rol global. El admin por equipo se conserva para roles por equipo.
+                    if (!rolGlobal) {
+                        if (r.super) rolGlobal = 'super';
+                        else if (r.planner) rolGlobal = 'planner';
+                    }
+                    const rolEq = unRolPorEquipo(r);
+                    if (rolEq || r.admin === true) {
+                        roles[t] = rolesDeUnRol(rolEq, r.admin === true);
+                    }
                 });
             } else {
-                // formato antiguo (roles sueltos, sin equipo): secea como CABINA
+                // formato antiguo (roles sueltos, sin equipo): se trata como CABINA
                 const r = { usuario: !!(e.usuario || e.acceso), tech: !!e.tech, planner: !!e.planner, tl: !!e.tl, super: !!e.super, admin: !!e.admin };
-                roles[EQUIPO_DEFECTO] = Object.assign({ nombre: e.nombre || '' }, rolesDeUnRol(unRol(r), r.admin === true));
+                if (!rolGlobal) {
+                    if (r.super) rolGlobal = 'super';
+                    else if (r.planner) rolGlobal = 'planner';
+                }
+                const rolEq = unRolPorEquipo(r);
+                if (rolEq || r.admin === true) {
+                    roles[EQUIPO_DEFECTO] = Object.assign({ nombre: e.nombre || '' }, rolesDeUnRol(rolEq, r.admin === true));
+                }
             }
-            // Nodo basura: sin correo y sin ningún rol no le sirve de nada a nadie y solo
-            // ensucia las listas (puede haberlos dejado una escritura con una clave mal
-            // resuelta en versiones anteriores). No se carga.
-            if (!email && !Object.keys(roles).length) return;
-            usuariosDB[key] = { email: email, nombre: nombre, roles: roles };
+            const rec = { email: email, nombre: nombre, roles: roles };
+            if (rolGlobal) rec.rolGlobal = rolGlobal;
+            if (adminGlobal) rec.adminGlobal = true;
+            // Nodo basura: sin correo, sin rol global y sin roles por equipo no se carga.
+            if (!email && !rolGlobal && !Object.keys(roles).length) return;
+            usuariosDB[key] = rec;
             // La clave REAL del nodo, sin sanear: es la unica que vale para escribir.
             // Si se calculara con sanitizeKey(), un nodo importado como
             // DECCI.GUZZMAN@LATAM.COMM escribiria en DECCI_GUZZMAN@LATAM_COMM y crearia
@@ -3815,6 +3981,7 @@
             myEmail = u;
             updateTeamSwitcher();
             syncRoleArrays();          // los roles son por equipo: el equipo acaba de resolverse
+            repararIndicesPropios();   // asegura que los índices globales del usuario conectado existan
             if (puedePanel()) {
                 activateLeaderUI();
             } else {
@@ -3907,7 +4074,7 @@
     // ningun admin de equipo era reconocido y solo entraba el super admin.
     function administraAlgunEquipo(user) {
         if (!user) return false;
-        if (isSuperAdmin(user)) return true;
+        if (isSuperAdmin(user) || adminGlobalDe(user)) return true;
         const rec = usuariosDB[userKeyFor(user)] || {};
         return Object.keys(rec.roles || {}).some(t => puede(user, 'administrar', t));
     }
@@ -4112,6 +4279,8 @@
         if (btnFiltro) { btnFiltro.classList.remove('on'); btnFiltro.textContent = 'SOLO ESTE EQUIPO'; }
         renderAdminTeamBar();
         renderNewTeamsGrid();
+        adminCambiaTipoRol();
+        renderAdminEquiposGrid();
         document.getElementById('admin-modal').style.display = 'block';
         refreshAdminList();
         renderAdminTeamBar();   // el desplegable manda: deja el equipo en uno que si se administre
@@ -4232,12 +4401,14 @@
             // pd/datos/<equipo> no tiene permiso de escritura para NADIE (solo sus hojas lo
             // tienen): un remove() del nodo entero se rechazaria y el equipo volveria a
             // aparecer. En pd/equipos el permiso de borrar el equipo SI es del super admin.
+            // Solo se borran roles por equipo. Los roles globales (super/planner) no
+            // dependen de ningún equipo, asi que esos usuarios no se tocan.
             usuariosConRolEn(team).forEach(key => {
                 const rec = usuariosDB[key];
+                if (rec && rec.rolGlobal) return;
                 if (rec && rec.roles) delete rec.roles[team];
                 tareas.push(remove(ref(db, 'mantenimiento/pd/usuarios/' + claveNodoDe(key) + '/roles/' + sanitizeTeamId(team))));
                 tareas.push(remove(ref(db, 'mantenimiento/pd/admins/' + claveNodoDe(key) + '/' + sanitizeTeamId(team))));
-                tareas.push(remove(ref(db, 'mantenimiento/pd/supervisors/' + claveNodoDe(key) + '/' + sanitizeTeamId(team))));
             });
             ['global_techs', 'predefined_task', 'historial'].forEach(hoja =>
                 tareas.push(remove(ref(db, 'mantenimiento/pd/datos/' + team + '/' + hoja))));
@@ -4537,8 +4708,10 @@
             const rec = usuariosDB[key];
             if (rec && rec.roles) delete rec.roles[team];
             set(ref(db, rolesPath(key, team)), null).then(() => {
-                sincronizarIndiceAdmins(key, team);   // ya no administra este equipo
-                sincronizarIndiceSupervisors(key, team); // ya no supervisor de este equipo
+                sincronizarIndiceAdmins(key, team);
+                sincronizarIndiceGlobalAdmins(key);
+                sincronizarIndiceSupervisors(key);
+                sincronizarIndicePlanners(key);
                 syncRoleArrays();
                 updateTeamSwitcher();
                 refreshAdminList();
@@ -4547,7 +4720,9 @@
                 console.error('FIREBASE WRITE ERROR', e);
                 aplicarRolesLocal(key, team, previo);
                 sincronizarIndiceAdmins(key, team);
-                sincronizarIndiceSupervisors(key, team);
+                sincronizarIndiceGlobalAdmins(key);
+                sincronizarIndiceSupervisors(key);
+                sincronizarIndicePlanners(key);
                 syncRoleArrays();
                 updateTeamSwitcher();
                 refreshAdminList();
@@ -4594,9 +4769,10 @@
         const q = (document.getElementById('admin-search')?.value || '').trim().toLowerCase();
         const team = equipoDelPanel();
         const superAdmin = isSuperAdmin(sessionUser());
+        const soyAdminGlobal = adminGlobalDe(sessionUser());
         const todos = Object.keys(usuariosDB).filter(u => !isSuperAdmin(u));
-        // Con el filtro activo (o si no eres super admin) solo se ven los usuarios del equipo
-        const base = (adminSoloEquipo || !superAdmin) ? usuariosDeEquipo(team) : todos;
+        // Con el filtro activo (o si no eres super admin ni admin global) solo se ven los usuarios del equipo
+        const base = (adminSoloEquipo || (!superAdmin && !soyAdminGlobal)) ? usuariosDeEquipo(team) : todos;
         const delEquipo = usuariosDeEquipo(team);
         // union sin repetir: antes se concatenaba 'base' con 'base' otra vez, asi que en un
         // equipo sin miembros cada usuario salia duplicado
@@ -4613,24 +4789,29 @@
             if (!user) continue;
             const nombreReal = String(nombreDe(user, team) || '').trim();
             if (q && !user.toLowerCase().includes(q) && !nombreReal.toLowerCase().includes(q)) continue;
-            // Rol funcional (uno solo) + el flag admin, que se muestra aparte
-            const rol = rolDeUsuario(user, team);
-            const esAdmin = rol !== null && rolDe(user, ROLES_ADMIN.id, team);
-            const meta = rol ? (ROLES.find(r => r.id === rol) || { txt: rol.toUpperCase() }) : null;
-            const enEquipo = rol !== null;
-            const sinAcceso = !enEquipo;
-            // Resumen de TODOS los roles del usuario en TODOS sus equipos
+            // Rol funcional (uno solo, puede ser global) + el flag admin
             const recU = usuariosDB[user] || {};
-            const todosRoles = Object.keys(recU.roles || {}).map(t => {
+            const rg = recU.rolGlobal;
+            const rol = rg ? rg : rolDeUsuario(user, team);
+            const esAdmin = rg ? !!recU.adminGlobal : (rol !== null && rolDe(user, ROLES_ADMIN.id, team));
+            const meta = rol ? (ROLES.find(r => r.id === rol) || { txt: rol.toUpperCase() }) : null;
+            const enEquipo = rg ? true : (rol !== null);
+            const sinAcceso = !enEquipo;
+            // Resumen de TODOS los roles del usuario
+            const todosRoles = [];
+            if (rg) {
+                todosRoles.push((ROLES.find(x => x.id === rg) || { txt: rg.toUpperCase() }).txt + (recU.adminGlobal ? '+ADMIN' : '') + ' · TODOS');
+            }
+            Object.keys(recU.roles || {}).forEach(t => {
                 const r = recU.roles[t];
-                if (!r) return null;
-                const rolFunc = rolUnico(r);
+                if (!r) return;
+                const rolFunc = rg ? null : rolUnico(r);
                 const esAdm = r.admin === true;
-                if (!rolFunc && !esAdm) return null;
-                const txt = rolFunc ? (ROLES.find(x => x.id === rolFunc) || { txt: rolFunc.toUpperCase() }).txt : 'USUARIO';
-                return `${txt}${esAdm ? '+ADMIN' : ''} · ${equipoNombre(t).toUpperCase()}`;
-            }).filter(Boolean);
-            const rolesEnOtrosEquipos = todosRoles.length - (enEquipo ? 1 : 0);
+                if (!rg && !rolFunc && !esAdm) return;
+                const txt = rg ? (ROLES.find(x => x.id === rg) || { txt: rg.toUpperCase() }).txt : (rolFunc ? (ROLES.find(x => x.id === rolFunc) || { txt: rolFunc.toUpperCase() }).txt : 'USUARIO');
+                todosRoles.push(`${txt}${esAdm ? '+ADMIN' : ''} · ${equipoNombre(t).toUpperCase()}`);
+            });
+            const rolesEnOtrosEquipos = Math.max(0, todosRoles.length - (enEquipo ? 1 : 0));
             // Se ven de un vistazo; para cambiarlos está el lápiz (modal propio)
             const userBadge = esAdmin ? '<span class="admin-role-badge admin">ADMIN</span>' : '';
             const fuera = (enEquipo || !superAdmin) ? '' : '<span class="admin-role-badge" title="NO ESTÁ EN ESTE EQUIPO" style="opacity:.6">FUERA</span>';
@@ -4651,7 +4832,7 @@
                     ${glance}
                 </div>
                 <div class="admin-user-actions">
-                    <button class="btn-action-small admin-user-action admin-edit-user" onclick="abrirEditarUsuario('${escapeJsString(user)}')" title="EDITAR ESTE USUARIO" ${(!puedo) ? 'disabled style="opacity:.35"' : ''}>✎</button>
+                    <button class="btn-action-small admin-user-action admin-edit-user" onclick="abrirEditarUsuario('${escapeJsString(user)}')" title="EDITAR ESTE USUARIO" ${(!puedo || (rg && !(isSuperAdmin(sessionUser()) || adminGlobalDe(sessionUser())))) ? 'disabled style="opacity:.35"' : ''}>✎</button>
                 </div>
             </div>`;
         }
@@ -4661,13 +4842,53 @@
     }
 
 
-    // Crea al usuario DENTRO del equipo visible. Si ya existe, solo se le asignan roles en
-    // ese equipo (así no se duplican). Para otro equipo: cambia el desplegable y agrágalo.
+    // Muestra/oculta el selector de equipos según el rol funcional elegido.
+    // SUPER / PLANNER → alcance global (todos los equipos). Los demás → selector.
+    function adminCambiaTipoRol() {
+        const rol = ROLES_ORDEN.find(id => {
+            const el = document.getElementById('admin-is-' + id);
+            return el && el.checked;
+        }) || ROLES_ORDEN[0];
+        const esGlobal = ROLES_GLOBALES.indexOf(rol) > -1;
+        const globalDiv = document.getElementById('admin-equipos-global');
+        const selectorDiv = document.getElementById('admin-equipos-selector');
+        if (globalDiv) globalDiv.style.display = esGlobal ? 'block' : 'none';
+        if (selectorDiv) selectorDiv.style.display = esGlobal ? 'none' : 'block';
+        if (!esGlobal && !document.getElementById('admin-equipos-grid').hasChildNodes()) {
+            renderAdminEquiposGrid();
+        }
+        // Los roles globales solo los puede otorgar un super admin o admin global.
+        const puedeGlobal = isSuperAdmin(sessionUser()) || adminGlobalDe(sessionUser());
+        ROLES_GLOBALES.forEach(id => {
+            const el = document.getElementById('admin-is-' + id);
+            if (el) el.disabled = !puedeGlobal;
+        });
+    }
+    // Renderiza los botones/check de equipos que el admin actual puede gestionar.
+        function renderAdminEquiposGrid(seleccionados) {
+        const grid = document.getElementById('admin-equipos-grid');
+        if (!grid) return;
+        const sel = new Set(seleccionados || []);
+        const equipos = equiposDelPanel(); // incluye todos si es super/global admin
+        grid.innerHTML = equipos.map(t => {
+            const activo = sel.has(t) ? 'active' : '';
+            const titulo = equipoNombre(t) + (equipoActivo(t) ? '' : ' (inactivo)');
+            return `<button type="button" class="admin-team-btn ${activo}" data-team="${escapeAttr(t)}" onclick="adminToggleEquipoNuevo(this)" title="${escapeAttr(titulo)}">${escapeHtml(equipoNombre(t))}</button>`;
+        }).join('') || '<span class="team-note">NO TIENES EQUIPOS PARA GESTIONAR</span>';
+    }
+    function abreviaturaEquipo(team) {
+        const nom = equipoNombre(team) || team;
+        return nom.split(/\s+/).map(p => p[0]).join('').toUpperCase().slice(0, 3) || team.slice(0, 3).toUpperCase();
+    }
+    function adminToggleEquipoNuevo(btn) {
+        btn.classList.toggle('active');
+    }
+    function adminEquiposSeleccionados() {
+        return Array.from(document.querySelectorAll('#admin-equipos-grid .admin-team-btn.active')).map(b => b.dataset.team).filter(Boolean);
+    }
+    // Crea o actualiza un usuario según el rol funcional y los equipos elegidos.
     function adminAddUser() {
         if (!isAdminUser()) return;
-        // Si se escribio solo el nombre y ese nombre identifica a una persona, se completa
-        // el email: asi se agrega a la persona que ya existe en vez de crear un duplicado
-        // (o de salir con el error de "falta el correo").
         if (!normalizeEmail(document.getElementById('admin-name').value)) {
             adminCompletar('nombre');
         }
@@ -4675,12 +4896,7 @@
         if (!name) return showConfirm("INGRESA EL EMAIL DEL USUARIO (EJ: juan.perez@latam.cl).", null);
         if (!name.includes('@')) return showConfirm("INGRESA EL CORREO COMPLETO, INCLUYENDO EL DOMINIO (EJ: juan.perez@latam.cl).", null);
         if (isSuperAdmin(name)) return showToast('⚠️ ESE USUARIO YA TIENE ACCESO A TODO EL SISTEMA');
-        const team = equipoDelPanel();
-        const aviso = avisoEquipoPanel();
-        if (aviso) return showToast(aviso);
-        // Un solo rol: son opciones excluyentes (radio). Si por lo que sea no hay ninguna
-        // marcada, se usa USUARIO, que es el rol mas basico y el que siempre deja entrar.
-        // Rol funcional (uno solo) + el flag admin, que es independiente
+
         const rol = ROLES_ORDEN.find(id => {
             const el = document.getElementById('admin-is-' + id);
             return el && el.checked;
@@ -4688,20 +4904,51 @@
         const chkAdmin = document.getElementById('admin-is-admin');
         const admin = !!(chkAdmin && chkAdmin.checked);
         const key = userKeyFor(name);
-        const yaExistia = esMiembroDe(key, team);
-        const rolPrevio = rolDeUsuario(key, team);
-        const adminPrevio = esMiembroDe(key, team) && rolDe(key, ROLES_ADMIN.id, team);
-        const nombre = (document.getElementById('admin-realname').value || '').trim()
-                    || (yaExistia ? nombreDe(key, team) : name.split('@')[0]);
-        guardarRol(key, team, rolesDeUnRol(rol, admin)).then((ok) => {
-            if (!ok) return;
-            // El correo se guarda en el MISMO nodo (no se mueve): moverlo requiere
-            // permiso de super admin. Así un admin de equipo puede dar de alta y
-            // corregir el email sin romper el registro.
-            if (!yaExistia) guardarEmailEnElMismoNodo(key, name).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL EMAIL (' + (e.code || e.message) + ')'));
-            if (nombre !== nombreDe(key, team)) {
-                guardarNombre(key, nombre).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL NOMBRE (' + (e.code || e.message) + ')'));
+        const esGlobal = ROLES_GLOBALES.indexOf(rol) > -1;
+        const nombre = (document.getElementById('admin-realname').value || '').trim() || name.split('@')[0];
+
+        // Validar permisos para alcance global
+        const puedeGlobal = isSuperAdmin(sessionUser()) || adminGlobalDe(sessionUser());
+        if (esGlobal && !puedeGlobal) {
+            return showToast('⚠️ NO PUEDES OTORGAR ROLES CON ALCANCE GLOBAL');
+        }
+
+        let promesa;
+        if (esGlobal) {
+            promesa = guardarRolGlobal(key, rol, admin).then(ok => {
+                if (!ok) return false;
+                // Al pasar a rol global, limpiar roles por equipo antiguos para evitar
+                // permisos residuales inesperados.
+                const rec = usuariosDB[key];
+                if (rec && rec.roles) {
+                    const tareas = Object.keys(rec.roles).map(t => guardarRol(key, t, null, true, rec.roles[t]));
+                    return Promise.all(tareas).then(() => true);
+                }
+                return true;
+            });
+        } else {
+            const teams = adminEquiposSeleccionados();
+            if (!teams.length) return showToast('⚠️ SELECCIONA AL MENOS UN EQUIPO');
+            const noAutorizados = teams.filter(t => !puedoGestionarEquipo(t));
+            if (noAutorizados.length) return showToast('⚠️ NO PUEDES GESTIONAR ' + noAutorizados.map(equipoNombre).join(', '));
+            const recExistente = usuariosDB[key];
+            if (recExistente && recExistente.rolGlobal && !puedeGlobal) {
+                return showToast('⚠️ ESTE USUARIO TIENE UN ROL GLOBAL. NO PUEDES EDITARLO DESDE ACÁ.');
             }
+            const rolRec = rolesDeUnRol(rol, admin);
+            const tareas = [];
+            // Si el usuario tenía un rol global, hay que quitarlo para pasarlo a por equipo.
+            if (recExistente && recExistente.rolGlobal && puedeGlobal) {
+                tareas.push(guardarRolGlobal(key, null, false, true));
+            }
+            teams.forEach(t => tareas.push(guardarRol(key, t, rolRec, true)));
+            promesa = Promise.all(tareas).then(res => res.every(Boolean));
+        }
+
+        promesa.then(ok => {
+            if (!ok) return;
+            guardarEmailEnElMismoNodo(key, name).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL EMAIL (' + (e.code || e.message) + ')'));
+            guardarNombre(key, nombre).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL NOMBRE (' + (e.code || e.message) + ')'));
             document.getElementById('admin-name').value = '';
             document.getElementById('admin-realname').value = '';
             const nota = document.getElementById('admin-sugerencia-nota');
@@ -4712,18 +4959,23 @@
             });
             adminBloquearNombre(false);
             nombreAutocompletado = null;
+            adminCambiaTipoRol();
+            renderAdminEquiposGrid();
+            refreshAdminList();
+            renderUserModal();
             renderSugerencias();
-            showToast(`✅ ${yaExistia ? 'AGREGADO AL EQUIPO' : 'USUARIO CREADO EN'} ${equipoNombre(team).toUpperCase()}: ${String(nombreDe(key, team)).toUpperCase()}`
-                      + (admin ? ' · ADMIN' : '')
-                      + (rolPrevio && rolPrevio !== rol ? ` · ANTES ERA ${etiquetaRol(rolPrevio)}` : '')
-                      + (admin !== adminPrevio ? (admin ? ' · SE LE DIO ADMIN' : ' · SE LE QUITO EL ADMIN') : ''));
+            showToast(`✅ USUARIO ${name.toUpperCase()} GUARDADO` + (admin ? ' · ADMIN' : '') + (esGlobal ? ' · ALCANCE GLOBAL' : ''));
+        }).catch(e => {
+            console.error('FIREBASE WRITE ERROR (adminAddUser)', e);
+            showToast('⚠️ NO SE PUDO GUARDAR EL USUARIO (' + (e.code || e.message) + ')');
         });
     }
 
     // El rol funcional es UNO: al elegir uno se apagan los demas. El flag admin NO se
     // toca aqui, porque es independiente (se puede ser admin y tecnico, admin y tl, etc).
+    // Solo se guardan roles por equipo (usuario/tech/tl); super/planner van en rolGlobal.
     function fijarRol(rec, rol) {
-        ROLES_ORDEN.forEach(id => { rec[id] = (id === rol); });
+        ROLES_POR_EQUIPO.forEach(id => { rec[id] = (id === rol); });
         return rec;
     }
     // El admin se enciende o apaga sin tocar el rol funcional.
@@ -4731,10 +4983,11 @@
         rec[ROLES_ADMIN.id] = !!sí;
         return rec;
     }
-    // Registro para un rol funcional (+ admin opcional), listo para guardar
+    // Registro para un rol funcional por equipo (+ admin opcional), listo para guardar.
+    // Solo roles por equipo: super/planner se guardan como rolGlobal.
     function rolesDeUnRol(rol, admin) {
         const out = {};
-        ROLES_ORDEN.forEach(id => { out[id] = (id === rol); });
+        ROLES_POR_EQUIPO.forEach(id => { out[id] = (id === rol); });
         out[ROLES_ADMIN.id] = !!admin;
         return out;
     }
@@ -4894,7 +5147,9 @@
             set(ref(db, rolesPath(user, team)), null)
                 .then(() => {
                     sincronizarIndiceAdmins(user, team);   // ya no administra este equipo
-                    sincronizarIndiceSupervisors(user, team); // ya no supervisor de este equipo
+                    sincronizarIndiceGlobalAdmins(user);
+                    sincronizarIndiceSupervisors(user);    // índices globales
+                    sincronizarIndicePlanners(user);
                     syncRoleArrays();
                     updateTeamSwitcher();
                     refreshAdminList();
@@ -4904,6 +5159,10 @@
                     console.error('FIREBASE WRITE ERROR', e);
                     // si la BD lo conservo, la pantalla no puede mostrar al usuario fuera
                     aplicarRolesLocal(userKeyFor(user), team, previo);
+                    sincronizarIndiceAdmins(user, team);
+                    sincronizarIndiceGlobalAdmins(user);
+                    sincronizarIndiceSupervisors(user);
+                    sincronizarIndicePlanners(user);
                     syncRoleArrays();
                     updateTeamSwitcher();
                     refreshAdminList();
@@ -4932,210 +5191,240 @@
     };
 
     // ─── EDITAR UN USUARIO (todo desde una sola ventana) ───────────────────
-    // La lista del panel solo muestra un lápiz por usuario; al pulsarlo se abre este modal,
-    // donde están el nombre real, los roles del equipo elegido y sus equipos.
+    // La lista del panel solo muestra un lápiz por usuario; al pulsarlo se abre este modal.
+    // El flujo es: primero el ROL FUNCIONAL + ADMIN, y después los EQUIPOS según el alcance.
     let userModalUser = null;   // clave del usuario abierto
-    let userModalTeam = null;   // equipo cuyos roles se están editando
     let userModalNombre = null; // nombre tecleado y aún sin guardar (null = nada tecleado)
     let userModalEmail = null;  // email tecleado y aún sin guardar (null = nada tecleado)
-    const USER_ROLES_UI = ROLES;   // una sola fuente: agregar un rol lo agrega al modal
+    const USER_ROLES_UI = ROLES;
     function abrirEditarUsuario(user) {
         if (!isAdminUser()) return;
         const key = userKeyFor(user);
         if (!key) return;
-        // isSuperAdmin() solo reconoce el correo completo, así que se le pasa el
-        // correo del registro (la lista solo tiene la clave corta)
         const rec = usuariosDB[key] || {};
         if (isSuperAdmin(rec.email || user)) return showToast('⚠️ NO SE PUEDE MODIFICAR ESA CUENTA');
         userModalUser = key;
         userModalNombre = null;
         userModalEmail = null;
-        // arranca en el equipo del panel si el usuario está ahí; si no, en el primero
-        // que administres y del que sea miembro
-        const panel = equipoDelPanel();
-        const mios = equiposDondeSoyAdmin();
-        userModalTeam = (esMiembroDe(key, panel)) ? panel
-                      : (mios.filter(t => esMiembroDe(key, t))[0] || panel || mios[0] || null);
-        // primero se muestra y después se pinta: si se pintara antes, el modal saldría vacío
         const modal = document.getElementById('user-modal');
         if (modal) modal.style.display = 'block';
         renderUserModal();
     }
-    function userModalCambiaEquipo(team) { userModalTeam = team || null; renderUserModal(); }
+    function userModalCambiaTipoRol() {
+        const key = userModalUser;
+        if (!key) return;
+        const rg = rolGlobalDe(key);
+        const globalDiv = document.getElementById('user-modal-equipos-global');
+        const selectorDiv = document.getElementById('user-modal-equipos-selector');
+        if (globalDiv) globalDiv.style.display = rg ? 'block' : 'none';
+        if (selectorDiv) selectorDiv.style.display = rg ? 'none' : 'block';
+    }
     function renderUserModal() {
         const key = userModalUser;
         const modal = document.getElementById('user-modal');
         if (!key || !modal || modal.style.display !== 'block') return;
 
-        // ── Datos de la cuenta (independientes del equipo abierto) ──
-        // Se pintan antes de todo porque se ven igual con cualquier equipo elegido.
-        const editable = userModalTeam ? puedoGestionarEquipo(userModalTeam) : puedoGestionarEquipo(equipoDelPanel());
-        // Corregir el email o borrar al usuario ya no es solo del super admin: lo
-        // puede cualquier admin del equipo. Lo unico que se respeta siempre, sin
-        // importar el cargo, es que nadie se cambia a si mismo.
+        const rec = usuariosDB[key] || {};
+        const rg = rolGlobalDe(key);
+        const esGlobal = !!rg;
         const propio = esElPropio(key);
-        const puedeCuenta = editable && !propio;
-        // email: si el admin ya está tecleando algo, no se le pisa al redibujar
-        const recE = usuariosDB[userKeyFor(key)] || {};
-        const emailGuardado = String(recE.email || '').trim();
+        const puedeGlobal = isSuperAdmin(sessionUser()) || adminGlobalDe(sessionUser());
+        // Edición de cuenta: permitida salvo que sea uno mismo. Los cambios globales
+        // requieren permiso global; los por equipo requieren admin de algún equipo.
+        const editableCuenta = !propio && (esGlobal ? puedeGlobal : equiposDondeSoyAdmin().length > 0);
+
+        // email
+        const emailGuardado = String(rec.email || '').trim();
         const inpEmail = document.getElementById('user-modal-email');
         if (inpEmail) {
             if (userModalEmail !== null && document.activeElement !== inpEmail) inpEmail.value = userModalEmail;
             else if (document.activeElement !== inpEmail) inpEmail.value = emailGuardado;
-            inpEmail.disabled = !puedeCuenta;
-            inpEmail.title = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL'
-                : 'EL CORREO CON EL QUE ENTRA A LA PLATAFORMA';
+            inpEmail.disabled = !editableCuenta;
+            inpEmail.title = propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL' : 'EL CORREO CON EL QUE ENTRA A LA PLATAFORMA';
         }
         const btnGuardarEmail = document.getElementById('user-modal-guardar-email');
         if (btnGuardarEmail) {
-            btnGuardarEmail.disabled = !puedeCuenta;
+            btnGuardarEmail.disabled = !editableCuenta;
             btnGuardarEmail.title = inpEmail ? inpEmail.title : '';
         }
-        // Un guion bajo en el dominio delata un correo roto: se guardó la clave del
-        // registro (que lleva "_" porque Firebase no admite puntos) en vez del correo,
-        // y con eso la persona no puede entrar. Solo se avisa: se corrige en el campo.
         const correoRoto = emailGuardado.indexOf('@') > -1 && emailGuardado.split('@')[1].indexOf('_') > -1;
         const notaEmail = document.getElementById('user-modal-email-nota');
         if (notaEmail) {
-            // igual que la nota de eliminar: solo dice algo cuando el campo esta apagado
-            // y hay que explicar por que
-            notaEmail.textContent = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL.'
+            notaEmail.textContent = propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL.'
                 : correoRoto ? '⚠️ ESTE CORREO ESTÁ MAL: TIENE "_" EN VEZ DE ".". ESCRÍBELO DE NUEVO Y GUÁRDALO.'
                 : '';
-            notaEmail.style.color = (!puedeCuenta || correoRoto) ? 'var(--comment)' : '';
-            // vacia no ocupa nada: si no, el margen dejaba un hueco entre tarjetas
+            notaEmail.style.color = correoRoto ? 'var(--danger)' : 'var(--comment)';
             notaEmail.style.display = notaEmail.textContent ? '' : 'none';
         }
 
-        // BORRADO. Lo puede hacer cualquier admin del equipo, no solo quien administra
-        // todos: si con esto el usuario se queda sin equipos, su cuenta se borra entera.
-        // Lo unico que se respeta siempre, sin importar el cargo, es que nadie se
-        // borra a si mismo.
+        // borrado
         const btnBorrar = document.getElementById('user-modal-borrar');
         if (btnBorrar) {
-            btnBorrar.disabled = !puedeCuenta;
-            btnBorrar.title = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : propio ? 'NO TE PUEDES ELIMINAR A TI MISMO'
+            btnBorrar.disabled = !editableCuenta;
+            btnBorrar.title = propio ? 'NO TE PUEDES ELIMINAR A TI MISMO'
                 : 'LO SACA DE LOS EQUIPOS QUE ADMINISTRAS TÚ, Y BORRA SU CUENTA SI SE QUEDA SIN NINGUNO · PIDE CONFIRMAR ESCRIBIENDO EL USUARIO';
         }
-        // La nota solo aparece cuando el botón está apagado y hay que decir por qué.
-        // Si se puede borrar, la explicación ya está en el title del botón y en la
-        // confirmación: repetirla acá abajo solo agrega ruido.
         const notaBorrar = document.getElementById('user-modal-eliminar-nota');
         if (notaBorrar) {
-            notaBorrar.textContent = !editable ? avisoEquipo(userModalTeam || equipoDelPanel())
-                : propio ? '⚠️ NO PUEDES ELIMINARTE A TI MISMO'
-                : '';
-            notaBorrar.style.color = puedeCuenta ? 'var(--comment)' : 'var(--danger)';
+            notaBorrar.textContent = propio ? '⚠️ NO PUEDES ELIMINARTE A TI MISMO' : '';
+            notaBorrar.style.color = 'var(--danger)';
             notaBorrar.style.display = notaBorrar.textContent ? '' : 'none';
         }
 
-        // selector de equipo: los equipos donde ESTA la persona
-        const sel = document.getElementById('user-modal-team');
-        const susEquipos = equiposDeUsuario(key);
-        if (susEquipos.indexOf(userModalTeam) === -1) {
-            userModalTeam = susEquipos.indexOf(equipoDelPanel()) > -1 ? equipoDelPanel() : (susEquipos[0] || null);
-        }
-        const team = userModalTeam;
-        if (sel) {
-            sel.innerHTML = susEquipos.map(t => `<option value="${escapeAttr(t)}"${t === team ? ' selected' : ''}>${escapeHtml(equipoNombre(t))}${equipoActivo(t) ? '' : ' (DESACTIVADO)'}</option>`).join('')
-                        || '<option value="">SIN EQUIPOS</option>';
-        }
-        if (!team) return;
-
-        const dentro = esMiembroDe(key, team);
-        const puedo = puedoGestionarEquipo(team);
-
-        // Rol FUNCIONAL: se elige UNO (usuario | técnico | tl). Pulsar uno apaga el otro.
+        // rol funcional
         const grid = document.getElementById('user-modal-roles');
-        const rolActual = rolDeUsuario(key, team);
+        const rolActual = rg || rolDeUsuario(key, equipoDelPanel()) || 'usuario';
         if (grid) {
             grid.innerHTML = USER_ROLES_UI.map(r => {
                 const on = rolActual === r.id;
-                return `<button type="button" class="admin-rol-btn${on ? ' on ' + r.cls : ''}" aria-pressed="${on}"
-                    onclick="userModalPonerRol('${r.id}')" ${(!puedo || !dentro || esElPropio(key)) ? 'disabled' : ''}
-                    title="${!dentro ? 'PRIMERO AGREGALO AL EQUIPO'
-                        : on ? 'YA TIENE ESTE ROL · PARA SACARLO DEL EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA"'
-                        : 'CAMBIAR A ' + r.txt}">${r.txt}</button>`;
+                const disabled = propio || (ROLES_GLOBALES.indexOf(r.id) > -1 && !puedeGlobal);
+                return `<label class="admin-role-option${on ? ' checked' : ''}" style="${on ? 'border-color:var(--primary);background:var(--surface-violet);' : ''}">
+                    <input type="radio" name="user-modal-rol" value="${r.id}" ${on ? 'checked' : ''} ${disabled ? 'disabled' : ''} onchange="userModalPonerRol('${r.id}')"> ${r.txt}
+                </label>`;
             }).join('');
         }
-        // El ADMIN va aparte: se SUMA al rol que tenga y solo da el panel de administración.
-        // No da poderes de turno (trabajar, liderar): para eso está el rol de TL.
-        const rr = rolesDe(key, team) || {};
-        const btnAdm = document.getElementById('user-modal-admin');
-        if (btnAdm) {
-            const esAdm = !!rr[ROLES_ADMIN.id];
-            btnAdm.className = 'admin-rol-btn admin-rol-admin' + (esAdm ? ' on ' + ROLES_ADMIN.cls : '');
-            btnAdm.setAttribute('aria-pressed', String(esAdm));
-            btnAdm.innerHTML = ROLES_ADMIN.txt + (esAdm ? ' ✓' : '');
-            btnAdm.disabled = !puedo || !dentro || esElPropio(key);
-            btnAdm.title = !dentro ? 'PRIMERO AGREGALO AL EQUIPO'
-                : esAdm ? 'QUITARLE EL ADMIN · NO LE QUITA SUS PODERES DE TURNO'
-                : 'DARLE ADMIN · SE SUMA A SU ROL, NO LO REEMPLAZA';
-        }
-        const nota = document.getElementById('user-modal-nota');
-        if (nota) {
-            nota.textContent = !puedo ? avisoEquipo(team)
-                : !dentro ? '⚠️ NO ESTÁ EN ESTE EQUIPO: AGREGALO EN "EQUIPOS DE ESTA PERSONA"'
-                : propio ? '⚠️ NO PUEDES QUITARTE TUS PROPIOS ROLES NI SALIR DEL EQUIPO: TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO'
-                : '';
-            nota.style.color = (puedo && dentro && !propio) ? 'var(--comment)' : 'var(--danger)';
+
+        // admin
+        const adminChk = document.getElementById('user-modal-admin');
+        const adminGlobal = adminGlobalDe(key);
+        const adminEnEquipos = !rg && Object.keys(rec.roles || {}).some(t => rec.roles[t] && rec.roles[t].admin === true);
+        if (adminChk) {
+            adminChk.checked = adminGlobal || adminEnEquipos;
+            adminChk.disabled = propio;
         }
 
-        // nombre real: si el admin ya está tecleando algo, no se le pisa al redibujar
+        // equipos
+        const globalDiv = document.getElementById('user-modal-equipos-global');
+        const selectorDiv = document.getElementById('user-modal-equipos-selector');
+        const box = document.getElementById('user-modal-equipos');
+        if (esGlobal) {
+            if (globalDiv) globalDiv.style.display = 'block';
+            if (selectorDiv) selectorDiv.style.display = 'none';
+        } else {
+            if (globalDiv) globalDiv.style.display = 'none';
+            if (selectorDiv) selectorDiv.style.display = 'block';
+            const mios = equiposDondeSoyAdmin();
+            if (box) {
+                box.innerHTML = mios.map(t => {
+                    const dentroT = esMiembroDe(key, t);
+                    return `<button type="button" class="admin-team-btn${dentroT ? ' active' : ''}" data-team="${escapeAttr(t)}"
+                        style="width: auto; padding: 0 10px; height: var(--button-height); display: inline-flex; gap: 6px; align-items: center;"
+                        onclick="userModalAlternarEquipo('${escapeJsString(t)}')" aria-pressed="${dentroT}"
+                        title="${dentroT ? 'SACAR DE ' : 'AGREGAR A'} ${escapeAttr(equipoNombre(t))}"
+                        ${propio ? 'disabled' : ''}>${escapeHtml(equipoNombre(t))}</button>`;
+                }).join('') || '<div class="admin-empty">NO TIENES EQUIPOS QUE GESTIONAR</div>';
+            }
+        }
+
+        // nombre
         const inp = document.getElementById('user-modal-nombre');
         if (inp) {
             if (userModalNombre !== null && document.activeElement !== inp) inp.value = userModalNombre;
-            else if (document.activeElement !== inp) inp.value = String(nombreDe(key, team) || '').trim();
-        }
-
-        // equipos que administras (agregar / quitar). Este listado ES la forma de
-        // meter y sacar a la persona de un equipo: por eso alcanza con tocar el equipo.
-        const box = document.getElementById('user-modal-equipos');
-        const mios = equiposDondeSoyAdmin();
-        if (box) {
-            box.innerHTML = mios.map(t => {
-                const dentroT = esMiembroDe(key, t);
-                return `<button type="button" class="admin-team-btn${dentroT ? ' active' : ''}" data-team="${escapeAttr(t)}"
-                    style="width: auto; padding: 0 10px; height: var(--button-height); display: inline-flex; gap: 6px; align-items: center;"
-                    onclick="userModalAlternarEquipo('${escapeJsString(t)}')" aria-pressed="${dentroT}"
-                    title="${dentroT ? 'SACAR DE ' : 'AGREGAR A'} ${escapeAttr(equipoNombre(t))}">${escapeHtml(equipoNombre(t))}</button>`;
-            }).join('') || '<div class="admin-empty">NO TIENES EQUIPOS QUE GESTIONAR</div>';
+            else if (document.activeElement !== inp) inp.value = String(rec.nombre || '').trim();
         }
     }
-    // Enciende o apaga el flag ADMIN del usuario en el equipo del modal. Es independiente
-    // del rol funcional: admin + técnico, admin + tl, admin + solo usuario...
-    function userModalAlternarAdmin() {
-        const key = userModalUser;
-        const team = userModalTeam;
-        if (!key || !team) return;
-        if (!esMiembroDe(key, team)) return showToast('⚠️ AGREGALO AL EQUIPO PRIMERO (ABAJO)');
-        const rr = rolesDe(key, team) || {};
-        adminCambiarAdmin(key, !rr[ROLES_ADMIN.id], team);
-        renderUserModal();
-    }
-
-    // Cambia el rol funcional del usuario en el equipo del modal. Los roles funcionales
-    // son excluyentes: al elegir uno se apagan los demas. Para sacarlo del equipo se
-    // toca su nombre en "EQUIPOS DE ESTA PERSONA", y el admin se cambia aparte.
     function userModalPonerRol(rol) {
         const key = userModalUser;
-        const team = userModalTeam;
-        if (!key || !team) return;
-        if (!esMiembroDe(key, team)) return showToast('⚠️ AGREGALO AL EQUIPO PRIMERO (ABAJO)');
-        if (rolDeUsuario(key, team) === rol) {
-            return showToast('ℹ️ PARA SACARLO DEL EQUIPO, QUÍTALO EN "EQUIPOS DE ESTA PERSONA"');
+        if (!key) return;
+        const propio = esElPropio(key);
+        if (propio) return showToast('⚠️ NO PUEDES CAMBIAR TUS PROPIOS ROLES');
+        const puedeGlobal = isSuperAdmin(sessionUser()) || adminGlobalDe(sessionUser());
+        const esGlobal = ROLES_GLOBALES.indexOf(rol) > -1;
+        if (esGlobal && !puedeGlobal) return showToast('⚠️ NO PUEDES OTORGAR ROLES CON ALCANCE GLOBAL');
+        const adminChk = document.getElementById('user-modal-admin');
+        const admin = !!(adminChk && adminChk.checked);
+
+        if (esGlobal) {
+            guardarRolGlobal(key, rol, admin, true).then(ok => {
+                if (!ok) return false;
+                // limpiar roles por equipo para evitar permisos residuales
+                const rec = usuariosDB[key];
+                const tareas = [];
+                if (rec && rec.roles) {
+                    Object.keys(rec.roles).forEach(t => {
+                        tareas.push(guardarRol(key, t, null, true, rec.roles[t]));
+                    });
+                }
+                return Promise.all(tareas).then(() => true);
+            }).then((ok) => {
+                if (ok === false) return;
+                renderUserModal();
+                refreshAdminList();
+                showToast(`✅ ${etiquetaRol(rol)} GLOBAL: ${String(nombreDe(key)).toUpperCase()}`);
+            }).catch(e => {
+                console.error('FIREBASE WRITE ERROR (cambio a rol global)', e);
+                showToast('⚠️ NO SE PUDO COMPLETAR EL CAMBIO A ROL GLOBAL (' + (e.code || e.message) + ')');
+            });
+        } else {
+            // quitar rol global si lo tenía
+            const tareas = [guardarRolGlobal(key, null, false, true)];
+            const rec = usuariosDB[key];
+            // asegurar al menos un equipo seleccionado: usa los actuales o el del panel
+            let teams = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && (ROLES_POR_EQUIPO.some(r => rec.roles[t][r]) || rec.roles[t].admin === true));
+            if (!teams.length) {
+                const panel = equipoDelPanel();
+                if (panel && puedoGestionarEquipo(panel)) teams = [panel];
+            }
+            if (!teams.length) return showToast('⚠️ SELECCIONA AL MENOS UN EQUIPO ANTES DE CAMBIAR A ROL POR EQUIPO');
+            const rolRec = rolesDeUnRol(rol, admin);
+            teams.forEach(t => tareas.push(guardarRol(key, t, rolRec, true)));
+            Promise.all(tareas).then(() => {
+                renderUserModal();
+                refreshAdminList();
+                showToast(`✅ ${etiquetaRol(rol)} EN ${teams.length} EQUIPO(S): ${String(nombreDe(key)).toUpperCase()}`);
+            }).catch(e => {
+                console.error('FIREBASE WRITE ERROR (cambio a rol por equipo)', e);
+                showToast('⚠️ NO SE PUDO COMPLETAR EL CAMBIO A ROL POR EQUIPO (' + (e.code || e.message) + ')');
+            });
         }
-        adminCambiarRol(key, rol, team);
-        renderUserModal();
+    }
+    function userModalAlternarAdmin() {
+        const key = userModalUser;
+        if (!key) return;
+        if (esElPropio(key)) return showToast('⚠️ NO PUEDES CAMBIAR TU PROPIO ADMIN');
+        const rg = rolGlobalDe(key);
+        const adminChk = document.getElementById('user-modal-admin');
+        const activar = !!(adminChk && adminChk.checked);
+        if (rg) {
+            const puedeGlobal = isSuperAdmin(sessionUser()) || adminGlobalDe(sessionUser());
+            if (!puedeGlobal) return showToast('⚠️ NO PUEDES CAMBIAR ADMIN GLOBAL');
+            guardarRolGlobal(key, rg, activar, true).then(() => renderUserModal()).catch(e => {
+                console.error('FIREBASE WRITE ERROR (admin global)', e);
+                showToast('⚠️ NO SE PUDO CAMBIAR EL ADMIN GLOBAL (' + (e.code || e.message) + ')');
+            });
+        } else {
+            const rec = usuariosDB[key];
+            const teams = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && ROLES_POR_EQUIPO.some(r => rec.roles[t][r]));
+            if (!teams.length) return showToast('⚠️ EL USUARIO NO TIENE EQUIPOS PARA ADMINISTRAR');
+            let ultimo = false;
+            teams.forEach(t => { if (esElUltimoAdmin(key, t)) ultimo = true; });
+            const aplicar = () => {
+                const tareas = teams.map(t => {
+                    const rr = Object.assign({}, rec.roles[t]);
+                    fijarAdmin(rr, activar);
+                    return guardarRol(key, t, rr, true);
+                });
+                Promise.all(tareas).then(() => {
+                    renderUserModal();
+                    refreshAdminList();
+                    showToast(activar ? `✅ ADMIN EN ${teams.length} EQUIPO(S): ${String(nombreDe(key)).toUpperCase()}` : `⚠️ YA NO ES ADMIN: ${String(nombreDe(key)).toUpperCase()}`);
+                }).catch(e => {
+                    console.error('FIREBASE WRITE ERROR (admin por equipo)', e);
+                    showToast('⚠️ NO SE PUDO CAMBIAR EL ADMIN (' + (e.code || e.message) + ')');
+                });
+            };
+            if (!activar && ultimo) {
+                showConfirm('⚠️ ES EL ÚLTIMO ADMIN DE ALGUNO DE ESOS EQUIPOS. ¿QUITARLE EL ADMIN IGUAL?', aplicar);
+            } else {
+                aplicar();
+            }
+        }
     }
     function userModalAlternarEquipo(team) {
         const key = userModalUser;
         if (!key || !team) return;
+        if (rolGlobalDe(key)) return showToast('⚠️ LOS ROLES GLOBALES NO PERMITEN EDITAR EQUIPOS INDIVIDUALES');
         adminAlternarEquipoUsuario(team, key);
-        renderUserModal();
     }
     // remembers what you type so that touching a role doesn't wipe it
     function userModalEscribeNombre() {
@@ -5145,9 +5434,8 @@
     function userModalGuardarNombre() {
         const key = userModalUser;
         if (!key) return;
-        // the check is against the team that is open in the modal, not the panel's
-        const aviso = userModalTeam ? avisoEquipo(userModalTeam) : avisoEquipoPanel();
-        if (aviso) return showToast(aviso);
+        const puedeEditar = administraAlgunEquipo(sessionUser()) || isSuperAdmin(sessionUser());
+        if (!puedeEditar) return showToast('⚠️ NO TIENES PERMISOS PARA EDITAR ESTE USUARIO');
         const nombre = (document.getElementById('user-modal-nombre')?.value || '').trim();
         guardarNombre(key, nombre)
             .then(() => {
@@ -5188,9 +5476,8 @@
     function userModalGuardarEmail() {
         const key = userModalUser;
         if (!key) return;
-        // the check is against the team that is open in the modal, not the panel's
-        const aviso = userModalTeam ? avisoEquipo(userModalTeam) : avisoEquipoPanel();
-        if (aviso) return showToast(aviso);
+        const puedeEditar = administraAlgunEquipo(sessionUser()) || isSuperAdmin(sessionUser());
+        if (!puedeEditar) return showToast('⚠️ NO TIENES PERMISOS PARA EDITAR ESTE USUARIO');
         if (esElPropio(key)) return showToast('⚠️ NO PUEDES CAMBIAR TU PROPIO EMAIL');
         const email = normalizeEmail(document.getElementById('user-modal-email')?.value || '');
         if (!email) return showConfirm('ESCRIBE EL EMAIL DE LA CUENTA (EJ: JUAN.PEREZ@LATAM.COM).', null);
@@ -5252,11 +5539,10 @@
     function userModalEliminar() {
         const key = userModalUser ? userKeyFor(userModalUser) : null;
         if (!key) return;
-        // el permiso se mira sobre el equipo abierto en el modal, no el del panel
-        const aviso = userModalTeam ? avisoEquipo(userModalTeam) : avisoEquipoPanel();
-        if (aviso) return showToast(aviso);
         if (esElPropio(key)) return showToast('⚠️ NO TE PUEDES ELIMINAR A TI MISMO');
         const soySuper = isSuperAdmin(sessionUser());
+        const rg = rolGlobalDe(key);
+        if (rg && !soySuper) return showToast('⚠️ LOS USUARIOS CON ROL GLOBAL SOLO PUEDEN SER ELIMINADOS POR EL SUPER ADMIN');
         const teams = soySuper
             ? usuariosConRolEn(key)
             : equiposDondeSoyAdmin().filter(t => esMiembroDe(key, t));
@@ -5311,8 +5597,7 @@
         const seBorraTodo = completo || !quedaEn.length;
         const quitarRol = (t) => Promise.all([
             remove(ref(db, ruta + '/roles/' + sanitizeTeamId(t))),
-            remove(ref(db, 'mantenimiento/pd/admins/' + claveNodoDe(key) + '/' + sanitizeTeamId(t))),
-            remove(ref(db, 'mantenimiento/pd/supervisors/' + claveNodoDe(key) + '/' + sanitizeTeamId(t)))
+            remove(ref(db, 'mantenimiento/pd/admins/' + claveNodoDe(key) + '/' + sanitizeTeamId(t)))
         ])
             .then(() => true)
             .catch(e => { console.error('FIREBASE WRITE ERROR (borrar usuario)', e); return false; });
@@ -5332,10 +5617,21 @@
                 const fin = completo
                     ? Promise.all([
                         remove(ref(db, 'mantenimiento/pd/admins/' + claveNodoDe(key))),
+                        remove(ref(db, 'mantenimiento/pd/global_admins/' + claveNodoDe(key))),
                         remove(ref(db, 'mantenimiento/pd/supervisors/' + claveNodoDe(key))),
+                        remove(ref(db, 'mantenimiento/pd/planners/' + claveNodoDe(key))),
                         remove(ref(db, ruta))
                     ])
-                    : Promise.all([borrarCampo('email'), borrarCampo('nombre')]);
+                    : (() => {
+                        const t = [borrarCampo('email'), borrarCampo('nombre')];
+                        const rec = usuariosDB[key] || {};
+                        if (rec.rolGlobal) t.push(borrarCampo('rolGlobal'));
+                        if (rec.adminGlobal) t.push(borrarCampo('adminGlobal'));
+                        if (rec.rolGlobal === 'super') t.push(remove(ref(db, 'mantenimiento/pd/supervisors/' + claveNodoDe(key))));
+                        if (rec.rolGlobal === 'planner') t.push(remove(ref(db, 'mantenimiento/pd/planners/' + claveNodoDe(key))));
+                        if (rec.adminGlobal) t.push(remove(ref(db, 'mantenimiento/pd/global_admins/' + claveNodoDe(key))));
+                        return Promise.all(t);
+                    })();
                 return fin.then(r => {
                     const mal = r.filter(x => x === false).length;
                     if (mal) {
@@ -5353,7 +5649,7 @@
     function terminarBorrado(key, quitar, seBorraTodo) {
         if (seBorraTodo) {
             delete usuariosDB[key];
-            userModalUser = null; userModalTeam = null;
+            userModalUser = null;
             userModalNombre = null; userModalEmail = null;
         }
         syncRoleArrays();
@@ -10606,9 +10902,9 @@
         toggleSearch, closeSearch, setSearchOpen,
         openAdminModal, adminAddUser, adminRemoveUser, refreshAdminList, adminSugerir, adminCompletar,
         catalogoUsuarios, buscarUsuarioPorTexto, adminAlternarFiltroEquipo,
-        adminAlternarEquipoUsuario,
+        adminAlternarEquipoUsuario, adminCambiaTipoRol, renderAdminEquiposGrid, adminToggleEquipoNuevo,
         // editar usuario (lápiz de la lista del panel admin)
-        abrirEditarUsuario, renderUserModal, userModalCambiaEquipo, userModalEscribeNombre,
+        abrirEditarUsuario, renderUserModal, userModalCambiaTipoRol, userModalEscribeNombre,
         userModalPonerRol, userModalAlternarAdmin, userModalAlternarEquipo,
         userModalGuardarNombre,
         userModalEscribeEmail, userModalGuardarEmail, userModalEliminar, limpiarRegistrosBasura, registrosBasura,
