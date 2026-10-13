@@ -7377,16 +7377,53 @@
         });
     }
 
-    function removeGlobalTech(index) {
+    async function removeGlobalTech(index) {
         if (!puedeCargarTecnicos()) return showConfirm('NO PUEDES MODIFICAR LA BASE DE TÉCNICOS EN ESTE EQUIPO.', null);
-        showConfirm(`¿CONFIRMAS ELIMINAR A ${globalTechs[index]} DE LA BASE DE DATOS GLOBAL?`, () => {
-            if (selectedGlobalTech === globalTechs[index]) {
+        const nombre = globalTechs[index];
+        showConfirm(`¿CONFIRMAS ELIMINAR A ${nombre} DE LA BASE DE DATOS GLOBAL?\n\nTambién se quitará de las asignaciones del rol mensual.`, async () => {
+            if (selectedGlobalTech === nombre) {
                 selectedGlobalTech = null;
                 const content = document.getElementById('global-tech-details-content');
                 if (content) content.innerHTML = '<div style="font-size:10px; color:var(--comment);">SELECCIONA UN TÉCNICO DE LA LISTA PARA VER SUS DATOS.</div>';
             }
             globalTechs.splice(index, 1);
-            dbSet(globalTechsRef(), globalTechs, 'GUARDAR BASE GLOBAL');
+            const tareas = [dbSet(globalTechsRef(), globalTechs, 'GUARDAR BASE GLOBAL')];
+
+            // También eliminar del rol mensual: de la lista de técnicos y de todas las asignaciones
+            try {
+                const teamPath = datosPath();
+                const snap = await get(ref(db, teamPath + '/rol_mensual'));
+                if (snap.exists()) {
+                    const rol = snap.val();
+                    let cambio = false;
+                    const tecnicos = Object.assign({}, rol.tecnicos || {});
+                    if (tecnicos[nombre]) { delete tecnicos[nombre]; cambio = true; }
+                    const asignaciones = Object.assign({}, rol.asignaciones || {});
+                    Object.keys(asignaciones).forEach(fecha => {
+                        const dia = asignaciones[fecha];
+                        if (!dia) return;
+                        ['Turno Día', 'Turno Tarde', 'Turno Noche'].forEach(turno => {
+                            const arr = dia[turno];
+                            if (Array.isArray(arr)) {
+                                const pos = arr.indexOf(nombre);
+                                if (pos !== -1) { arr.splice(pos, 1); cambio = true; }
+                            }
+                        });
+                        if (dia.codigos && dia.codigos[nombre] !== undefined) {
+                            delete dia.codigos[nombre];
+                            cambio = true;
+                        }
+                    });
+                    if (cambio) {
+                        tareas.push(dbSet(ref(db, teamPath + '/rol_mensual'), Object.assign({}, rol, { tecnicos, asignaciones }), 'ELIMINAR TÉCNICO DEL ROL'));
+                    }
+                }
+            } catch (e) {
+                console.error('ERROR ELIMINANDO TÉCNICO DEL ROL MENSUAL:', e);
+            }
+
+            await Promise.all(tareas);
+            showToast(`✅ ${nombre} ELIMINADO DE LA BASE GLOBAL Y DEL ROL MENSUAL`);
         });
     }
 
@@ -7956,13 +7993,24 @@
             if (!delRol.length) return showConfirm('EL ROL NO TIENE TÉCNICOS ASIGNADOS A ESTE TURNO.', null);
 
             const added = [];
+            const ignorados = [];
             delRol.forEach(nombre => {
+                if (!globalTechs.includes(nombre)) {
+                    ignorados.push(nombre);
+                    return;
+                }
                 if (!shiftTechs.includes(nombre)) {
                     shiftTechs.push(nombre);
                     added.push(nombre);
                 }
             });
-            if (!added.length) return showToast('ℹ️ TODOS LOS TÉCNICOS DEL ROL YA ESTÁN EN EL TURNO');
+            if (ignorados.length) {
+                console.warn('syncShiftWithRol: técnicos del rol no están en la base global:', ignorados);
+            }
+            if (!added.length) {
+                return showToast('ℹ️ TODOS LOS TÉCNICOS DEL ROL YA ESTÁN EN EL TURNO' +
+                    (ignorados.length ? ` · ${ignorados.length} NO ESTÁN EN LA BASE GLOBAL` : ''));
+            }
             shiftTechs.sort();
             const techsPath = getBasePath() + '/techs';
             await dbSet(ref(db, techsPath), shiftTechs, 'SINCRONIZAR TÉCNICOS CON ROL');
