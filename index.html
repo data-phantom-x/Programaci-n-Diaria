@@ -2211,7 +2211,13 @@
                 <div class="admin-card-title">ROL FUNCIONAL</div>
                 <div class="admin-role-grid" id="user-modal-roles"></div>
                 <div class="team-note">SUPER / PLANNER tienen alcance global. TL / TÉCNICO / USUARIO requieren seleccionar equipos.</div>
-                    <label class="admin-role-option" style="margin-top:8px; justify-content:flex-start; padding:4px 8px;" id="user-modal-admin-wrap" title="Puede administrar usuarios y equipos. Con SUPER/PLANNER es admin global; con otros roles es admin solo de los equipos seleccionados.">
+
+                <div id="user-modal-equipo-rol-wrap" class="user-modal-team-bar" style="margin-top:8px; display:none;">
+                    <label for="user-modal-equipo-rol">EQUIPO PARA ESTE ROL</label>
+                    <select id="user-modal-equipo-rol" class="admin-team-select" onchange="userModalCambiarEquipoRol()"></select>
+                </div>
+
+                <label class="admin-role-option" style="margin-top:8px; justify-content:flex-start; padding:4px 8px;" id="user-modal-admin-wrap" title="Puede administrar usuarios y equipos. Con SUPER/PLANNER es admin global; con otros roles es admin solo de los equipos seleccionados.">
                     <input type="checkbox" id="user-modal-admin" onchange="userModalAlternarAdmin()"> ADMIN
                 </label>
             </div>
@@ -2395,13 +2401,78 @@
     }
     function isSuperAdmin(name) {
         if (!name) return false;
-        const lista = Array.isArray(superAdmins) ? superAdmins : Object.values(superAdmins||{});
         const correo = normalizeEmail(name);
         if (!correo.includes('@')) return false; // el super admin solo se reconoce por su correo completo, nunca por el alias
-        return lista.some(v => {
+        let candidatos = [];
+        if (Array.isArray(superAdmins)) {
+            candidatos = superAdmins;
+        } else if (superAdmins && typeof superAdmins === 'object') {
+            // La estructura puede ser:
+            //   {email_saneado: true}          -> claves son los correos
+            //   {uid: email}                   -> valores son los correos
+            //   {email_saneado: email_original} -> ambos son correos
+            // Usamos claves y valores, y filtramos los que parezcan correos.
+            Object.keys(superAdmins).forEach(k => {
+                candidatos.push(k);
+                candidatos.push(superAdmins[k]);
+            });
+        }
+        const ok = candidatos.some(v => {
+            if (typeof v !== 'string') return false;
             const superCorreo = normalizeEmail(v);
             return superCorreo === correo || sanitizeKey(superCorreo) === sanitizeKey(correo);
         });
+        // DEBUG: quitar en produccion una vez resuelto
+        if (typeof console !== 'undefined') {
+            console.log('[isSuperAdmin]', correo, 'candidatos=', candidatos, '=>', ok);
+        }
+        return ok;
+    }
+    // Migra la lista de super admins de un array (o objeto legado) a un objeto
+    // indexado por clave de usuario (email saneado). Las reglas de seguridad usan
+    // esa clave para reconocer al super admin a traves de mantenimiento/uids/<uid>.
+    let superAdminMigrated = false;
+    function migrateSuperAdmin() {
+        if (superAdminMigrated) return Promise.resolve();
+        const u = sessionUser();
+        const g = googleUser();
+        if (!u || !g || !isSuperAdmin(u)) return Promise.resolve();
+        const key = claveNodoDe(u);
+        if (!key) return Promise.resolve();
+        // Solo migrar si la lista sigue siendo un array (o un objeto legado cuyos
+        // valores son correos). Si ya es un objeto {clave_saneada: true}, no tocar.
+        const esArray = Array.isArray(superAdmins);
+        const esObjetoLegado = !esArray && superAdmins && typeof superAdmins === 'object' &&
+            Object.values(superAdmins).some(v => typeof v === 'string' && v.includes('@'));
+        if (!esArray && !esObjetoLegado) return Promise.resolve();
+        superAdminMigrated = true;
+        // Convertir la lista en memoria a objeto {clave_saneada: true}
+        let lista = [];
+        if (esArray) {
+            lista = superAdmins.slice();
+        } else if (superAdmins && typeof superAdmins === 'object') {
+            Object.keys(superAdmins).forEach(k => {
+                lista.push(k);
+                lista.push(superAdmins[k]);
+            });
+        }
+        const payload = {};
+        lista.forEach(v => {
+            const correo = normalizeEmail(typeof v === 'string' ? v : '');
+            if (correo.includes('@')) payload[sanitizeKey(correo)] = true;
+        });
+        // Asegurar que el super admin actual este presente
+        payload[key] = true;
+        return set(ref(db, 'mantenimiento/super_admin'), payload)
+            .then(() => {
+                // Actualizar la lista en memoria para reflejar la nueva estructura
+                superAdmins = Object.assign({}, payload);
+                showToast('✅ SUPER ADMIN INDEXADO');
+            })
+            .catch(e => {
+                console.warn('migracion super_admin:', e && (e.code || e.message));
+                superAdminMigrated = false;
+            });
     }
 
     // REGISTRO ÚNICO DE USUARIOS.
@@ -3429,10 +3500,18 @@
         rolesUnsubs = [];
         rolesUnsubs.push(onValue(superAdminsRef, (snapshot) => {
             const v = snapshot.val();
-            if(Array.isArray(v)) superAdmins = v;
-            else if(v && typeof v==='object') superAdmins = Object.values(v);
-            else superAdmins = [];
+            if (Array.isArray(v)) {
+                superAdmins = v;
+            } else if (v && typeof v === 'object') {
+                // Estructura nueva: objeto indexado por clave de usuario (email saneado).
+                // Conservamos el objeto tal cual para que isSuperAdmin() pueda comparar
+                // tanto por clave como por valor (por si alguien lo migro manualmente).
+                superAdmins = v;
+            } else {
+                superAdmins = [];
+            }
             superAdminsListo = true;
+            migrateSuperAdmin().catch(() => {});
             updateAdminUI();
             refreshAdminListIfOpen();
             if (typeof evaluateGate === 'function') evaluateGate();
@@ -5196,6 +5275,7 @@
     let userModalUser = null;   // clave del usuario abierto
     let userModalNombre = null; // nombre tecleado y aún sin guardar (null = nada tecleado)
     let userModalEmail = null;  // email tecleado y aún sin guardar (null = nada tecleado)
+    let userModalTeam = null;   // equipo seleccionado para aplicar un rol por equipo
     const USER_ROLES_UI = ROLES;
     function abrirEditarUsuario(user) {
         if (!isAdminUser()) return;
@@ -5206,6 +5286,7 @@
         userModalUser = key;
         userModalNombre = null;
         userModalEmail = null;
+        userModalTeam = null;
         const modal = document.getElementById('user-modal');
         if (modal) modal.style.display = 'block';
         renderUserModal();
@@ -5218,6 +5299,11 @@
         const selectorDiv = document.getElementById('user-modal-equipos-selector');
         if (globalDiv) globalDiv.style.display = rg ? 'block' : 'none';
         if (selectorDiv) selectorDiv.style.display = rg ? 'none' : 'block';
+    }
+    function userModalCambiarEquipoRol() {
+        const sel = document.getElementById('user-modal-equipo-rol');
+        if (sel) userModalTeam = sel.value || null;
+        renderUserModal();
     }
     function renderUserModal() {
         const key = userModalUser;
@@ -5271,9 +5357,9 @@
             notaBorrar.style.display = notaBorrar.textContent ? '' : 'none';
         }
 
-        // rol funcional
+        // rol funcional: si hay un equipo seleccionado, mostrar el rol de ESE equipo
         const grid = document.getElementById('user-modal-roles');
-        const rolActual = rg || rolDeUsuario(key, equipoDelPanel()) || 'usuario';
+        const rolActual = rg || rolDeUsuario(key, userModalTeam || equipoDelPanel()) || 'usuario';
         if (grid) {
             grid.innerHTML = USER_ROLES_UI.map(r => {
                 const on = rolActual === r.id;
@@ -5284,12 +5370,37 @@
             }).join('');
         }
 
+        // selector de equipo para roles por equipo
+        const equipoRolWrap = document.getElementById('user-modal-equipo-rol-wrap');
+        const equipoRolSel = document.getElementById('user-modal-equipo-rol');
+        if (equipoRolWrap && equipoRolSel) {
+            if (!rg) {
+                equipoRolWrap.style.display = 'flex';
+                const mios = equiposDondeSoyAdmin();
+                // Se muestran todos los equipos que el admin gestiona, no solo los que ya tiene el usuario.
+                // Esto permite cambiar el rol (o agregar) en cualquier equipo gestionado.
+                const opciones = mios.slice();
+                if (!userModalTeam || opciones.indexOf(userModalTeam) === -1) {
+                    const teamsConRol = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && (ROLES_POR_EQUIPO.some(r => rec.roles[t][r]) || rec.roles[t].admin === true));
+                    userModalTeam = teamsConRol.find(t => opciones.indexOf(t) !== -1) || opciones[0] || equipoDelPanel();
+                }
+                equipoRolSel.innerHTML = opciones.map(t =>
+                    `<option value="${escapeAttr(t)}" ${t === userModalTeam ? 'selected' : ''}>${escapeHtml(equipoNombre(t))}</option>`
+                ).join('') || '<option value="">SIN EQUIPOS</option>';
+                equipoRolSel.disabled = !opciones.length || propio;
+            } else {
+                equipoRolWrap.style.display = 'none';
+                userModalTeam = null;
+            }
+        }
+
         // admin
         const adminChk = document.getElementById('user-modal-admin');
         const adminGlobal = adminGlobalDe(key);
+        const adminEnEquipoSel = !rg && userModalTeam && rec.roles && rec.roles[userModalTeam] && rec.roles[userModalTeam].admin === true;
         const adminEnEquipos = !rg && Object.keys(rec.roles || {}).some(t => rec.roles[t] && rec.roles[t].admin === true);
         if (adminChk) {
-            adminChk.checked = adminGlobal || adminEnEquipos;
+            adminChk.checked = adminGlobal || adminEnEquipoSel || adminEnEquipos;
             adminChk.disabled = propio;
         }
 
@@ -5356,22 +5467,28 @@
                 showToast('⚠️ NO SE PUDO COMPLETAR EL CAMBIO A ROL GLOBAL (' + (e.code || e.message) + ')');
             });
         } else {
-            // quitar rol global si lo tenía
-            const tareas = [guardarRolGlobal(key, null, false, true)];
+            const tareas = [];
             const rec = usuariosDB[key];
-            // asegurar al menos un equipo seleccionado: usa los actuales o el del panel
-            let teams = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && (ROLES_POR_EQUIPO.some(r => rec.roles[t][r]) || rec.roles[t].admin === true));
-            if (!teams.length) {
-                const panel = equipoDelPanel();
-                if (panel && puedoGestionarEquipo(panel)) teams = [panel];
+            // quitar rol global solo si lo tenía (requiere permiso global)
+            if (rec && rec.rolGlobal) {
+                tareas.push(guardarRolGlobal(key, null, false, true));
             }
-            if (!teams.length) return showToast('⚠️ SELECCIONA AL MENOS UN EQUIPO ANTES DE CAMBIAR A ROL POR EQUIPO');
+            // Se aplica SOLO al equipo seleccionado en el desplegable, no a todos los equipos
+            let team = userModalTeam;
+            if (!team || !puedoGestionarEquipo(team)) {
+                team = equipoDelPanel();
+            }
+            if (!team || !puedoGestionarEquipo(team)) {
+                return showToast('⚠️ SELECCIONA UN EQUIPO QUE GESTIONES ANTES DE CAMBIAR EL ROL');
+            }
+            // Si el usuario no es miembro de ese equipo, primero lo agregamos como usuario
+            const previo = Object.assign({}, rec.roles && rec.roles[team] || {});
             const rolRec = rolesDeUnRol(rol, admin);
-            teams.forEach(t => tareas.push(guardarRol(key, t, rolRec, true)));
+            tareas.push(guardarRol(key, team, rolRec, true, previo));
             Promise.all(tareas).then(() => {
                 renderUserModal();
                 refreshAdminList();
-                showToast(`✅ ${etiquetaRol(rol)} EN ${teams.length} EQUIPO(S): ${String(nombreDe(key)).toUpperCase()}`);
+                showToast(`✅ ${etiquetaRol(rol)} EN ${equipoNombre(team).toUpperCase()}: ${String(nombreDe(key, team)).toUpperCase()}`);
             }).catch(e => {
                 console.error('FIREBASE WRITE ERROR (cambio a rol por equipo)', e);
                 showToast('⚠️ NO SE PUDO COMPLETAR EL CAMBIO A ROL POR EQUIPO (' + (e.code || e.message) + ')');
@@ -5394,27 +5511,33 @@
             });
         } else {
             const rec = usuariosDB[key];
-            const teams = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && ROLES_POR_EQUIPO.some(r => rec.roles[t][r]));
-            if (!teams.length) return showToast('⚠️ EL USUARIO NO TIENE EQUIPOS PARA ADMINISTRAR');
-            let ultimo = false;
-            teams.forEach(t => { if (esElUltimoAdmin(key, t)) ultimo = true; });
+            // Se aplica SOLO al equipo seleccionado en el desplegable
+            let team = userModalTeam;
+            if (!team || !puedoGestionarEquipo(team)) {
+                team = equipoDelPanel();
+            }
+            if (!team || !puedoGestionarEquipo(team)) {
+                return showToast('⚠️ SELECCIONA UN EQUIPO QUE GESTIONES ANTES DE CAMBIAR EL ADMIN');
+            }
+            if (!rec.roles || !rec.roles[team] || !ROLES_POR_EQUIPO.some(r => rec.roles[team][r])) {
+                return showToast('⚠️ EL USUARIO NO TIENE ROL EN EL EQUIPO SELECCIONADO');
+            }
+            const ultimo = esElUltimoAdmin(key, team);
             const aplicar = () => {
-                const tareas = teams.map(t => {
-                    const rr = Object.assign({}, rec.roles[t]);
-                    fijarAdmin(rr, activar);
-                    return guardarRol(key, t, rr, true);
-                });
-                Promise.all(tareas).then(() => {
+                const rr = Object.assign({}, rec.roles[team]);
+                const previo = Object.assign({}, rr);
+                fijarAdmin(rr, activar);
+                guardarRol(key, team, rr, true, previo).then(() => {
                     renderUserModal();
                     refreshAdminList();
-                    showToast(activar ? `✅ ADMIN EN ${teams.length} EQUIPO(S): ${String(nombreDe(key)).toUpperCase()}` : `⚠️ YA NO ES ADMIN: ${String(nombreDe(key)).toUpperCase()}`);
+                    showToast(activar ? `✅ ADMIN EN ${equipoNombre(team).toUpperCase()}: ${String(nombreDe(key, team)).toUpperCase()}` : `⚠️ YA NO ES ADMIN: ${String(nombreDe(key, team)).toUpperCase()}`);
                 }).catch(e => {
                     console.error('FIREBASE WRITE ERROR (admin por equipo)', e);
                     showToast('⚠️ NO SE PUDO CAMBIAR EL ADMIN (' + (e.code || e.message) + ')');
                 });
             };
             if (!activar && ultimo) {
-                showConfirm('⚠️ ES EL ÚLTIMO ADMIN DE ALGUNO DE ESOS EQUIPOS. ¿QUITARLE EL ADMIN IGUAL?', aplicar);
+                showConfirm(`⚠️ ES EL ÚLTIMO ADMIN DE ${equipoNombre(team).toUpperCase()}. ¿QUITARLE EL ADMIN IGUAL?`, aplicar);
             } else {
                 aplicar();
             }
