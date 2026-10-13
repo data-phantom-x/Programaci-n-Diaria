@@ -784,7 +784,7 @@
             box-shadow: 0 2px 6px color-mix(in srgb, var(--primary) 20%, transparent);
         }
 
-        .modal-footer { display: flex; gap: 10px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+        .modal-footer { display: flex; gap: 10px; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border); }
         .btn-modal-action { flex: 1; padding: 0; height: var(--button-height); font-size: 10px; border-radius: var(--button-radius);}
         /* PANEL ADMIN: caja de altura fija, igual que un diálogo de verdad.
            Encabezado, barra de equipo y pie quedan FIJOS (flex: none) y solo el
@@ -2212,14 +2212,14 @@
                 <div class="admin-role-grid" id="user-modal-roles"></div>
                 <div class="team-note">SUPER / PLANNER tienen alcance global. TL / TÉCNICO / USUARIO requieren seleccionar equipos.</div>
 
+                <label class="admin-role-option" style="margin-top:8px; justify-content:center; padding:4px 8px;" id="user-modal-admin-wrap" title="Puede administrar usuarios y equipos. Con SUPER/PLANNER es admin global; con otros roles es admin solo de los equipos seleccionados.">
+                    <input type="checkbox" id="user-modal-admin" onchange="userModalAlternarAdmin()"> ADMIN
+                </label>
+
                 <div id="user-modal-equipo-rol-wrap" class="user-modal-team-bar" style="margin-top:8px; display:none;">
                     <label for="user-modal-equipo-rol">EQUIPO PARA ESTE ROL</label>
                     <select id="user-modal-equipo-rol" class="admin-team-select" onchange="userModalCambiarEquipoRol()"></select>
                 </div>
-
-                <label class="admin-role-option" style="margin-top:8px; justify-content:flex-start; padding:4px 8px;" id="user-modal-admin-wrap" title="Puede administrar usuarios y equipos. Con SUPER/PLANNER es admin global; con otros roles es admin solo de los equipos seleccionados.">
-                    <input type="checkbox" id="user-modal-admin" onchange="userModalAlternarAdmin()"> ADMIN
-                </label>
             </div>
 
             <div class="admin-card">
@@ -2342,7 +2342,7 @@
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js" onerror="this.onerror=null;this.src='https://unpkg.com/xlsx@0.18.5/dist/xlsx.full.min.js'"></script>
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
-    import { getDatabase, ref, set, get, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    import { getDatabase, ref, set, update, get, remove, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
     // C5 App Check: descomenta cuando actives ReCaptcha en consola Firebase > App Check. Dominios autorizados solo protege Login, App Check protege la DB.
     // import { initializeAppCheck, ReCaptchaEnterpriseProvider } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app-check.js";
     
@@ -2395,10 +2395,7 @@
     function normalizeEmail(email) {
         return (email || '').trim().toLowerCase();
     }
-    function aliasCandidates(id) {
-        const n = normalizeEmail(id);
-        return n.includes('@') ? [n, n.split('@')[0]] : [n];
-    }
+    
     function isSuperAdmin(name) {
         if (!name) return false;
         const correo = normalizeEmail(name);
@@ -2422,10 +2419,6 @@
             const superCorreo = normalizeEmail(v);
             return superCorreo === correo || sanitizeKey(superCorreo) === sanitizeKey(correo);
         });
-        // DEBUG: quitar en produccion una vez resuelto
-        if (typeof console !== 'undefined') {
-            console.log('[isSuperAdmin]', correo, 'candidatos=', candidatos, '=>', ok);
-        }
         return ok;
     }
     // Migra la lista de super admins de un array (o objeto legado) a un objeto
@@ -2610,18 +2603,18 @@
     // El super admin puede todo, aunque no tenga ningún rol en la base: sin este
     // atajo, cambiar estas funciones por poderes le quitaría el sistema de encima.
     function esSuper() { return isSuperAdmin(sessionUser()); }
-    function puedeVer()           { return esSuper() || puede(sessionUser(), POD_LEER); }
-    function puedeCompletar()     { return esSuper() || puede(sessionUser(), POD_TRABAJAR); }
+    
+    
     function puedeLiderar()       { return esSuper() || puede(sessionUser(), POD_LIDER); }
     function puedePlanificar()    { return esSuper() || puede(sessionUser(), POD_PLANIFICAR) || puede(sessionUser(), POD_LIDER); }
-    function puedeAsignar()       { return esSuper() || puede(sessionUser(), POD_ASIGNAR) || puede(sessionUser(), POD_PLANIFICAR) || puede(sessionUser(), POD_LIDER); }
+    
     function puedeCargarTecnicos(){ return esSuper() || puede(sessionUser(), POD_TECNICOS) || puede(sessionUser(), POD_LIDER); }
     // Las mismas preguntas, pero de un equipo concreto. En la vista de todos cada
     // tarjeta sabe de qué equipo es: los permisos se le preguntan a ESE equipo,
     // que es lo que el usuario está mirando en pantalla.
     function puedeCompletarEn(t)    { return esSuper() || puede(sessionUser(), POD_TRABAJAR, t); }
     function puedePlanificarEn(t)  { return esSuper() || puede(sessionUser(), POD_PLANIFICAR, t) || puede(sessionUser(), POD_LIDER, t); }
-    function puedeAsignarEn(t)     { return esSuper() || puede(sessionUser(), POD_ASIGNAR, t) || puede(sessionUser(), POD_PLANIFICAR, t) || puede(sessionUser(), POD_LIDER, t); }
+    
     function puedeLiderarEn(t)     { return esSuper() || puede(sessionUser(), POD_LIDER, t); }
     function puedeCargarTecnicosEn(t) { return esSuper() || puede(sessionUser(), POD_TECNICOS, t) || puede(sessionUser(), POD_LIDER, t); }
     function puedeEditarTurnoEn(t) { return esSuper() || puede(sessionUser(), POD_LIDER, t) || puede(sessionUser(), POD_PLANIFICAR, t); }
@@ -2777,9 +2770,7 @@
         return (ROLES_PODERES[rolUnico(r)] || []).indexOf(poder) > -1;
     }
     // La misma pregunta sobre un rol funcional (sin el flag admin)
-    function puedeRol(rol, poder) {
-        return (ROLES_PODERES[rol] || []).indexOf(poder) > -1;
-    }
+    
     // Registro de roles ya normalizado: UN rol funcional en true, mas el flag admin
     // aparte. O null si el usuario no es miembro de ese equipo.
     // Si el usuario tiene rol global (super/planner), ese rol aplica a cualquier equipo.
@@ -3266,8 +3257,13 @@
         // Sin ningún rol funcional por equipo se BORRA el registro del equipo.
         const vacio = rolesVacias(rolRecData);
         const payload = vacio ? null : rolRecData;
-        return set(ref(db, rolesPath(user, team)), payload)
+        const rutaRoles = rolesPath(user, team);
+        // Se anota qué escritura falló: hay varias y sin esto no se sabe cuál
+        // pidió permiso, que es justo lo que hace falta para arreglar reglas.
+        let paso = 'roles';
+        return set(ref(db, rutaRoles), payload)
             .then(() => {
+                paso = 'indices';
                 aplicarRolesLocal(user, team, rolRecData);
                 return Promise.all([
                     sincronizarIndiceAdmins(user, team),
@@ -3277,6 +3273,7 @@
                 ]);
             })
             .then(() => {
+                paso = 'refrescar';
                 syncRoleArrays();
                 updateTeamSwitcher();
                 refreshAdminListIfOpen();
@@ -3286,7 +3283,9 @@
                 return true;
             })
             .catch((e) => {
-                console.error('FIREBASE WRITE ERROR', e);
+                // El paso dice qué escritura pidió permiso y no lo consiguió.
+                // Sin esto solo sale PERMISSION_DENIED y no se sabe dónde.
+                console.error('FIREBASE WRITE ERROR [paso=' + paso + '] ' + rutaRoles, e);
                 if (previo) aplicarRolesLocal(user, team, previo);
                 Promise.all([
                     sincronizarIndiceAdmins(user, team),
@@ -3300,7 +3299,8 @@
                 refreshAdminListIfOpen();
                 renderAdminTeamBar();
                 showToast('⚠️ NO SE GUARDÓ EL ROL EN ' + String(equipoNombre(team)).toUpperCase() +
-                          (e.code ? ' (' + e.code + ')' : '') + '. Tienes que ser admin de ese equipo.');
+                          (e.code ? ' (' + e.code + ')' : '') + '. Tienes que ser admin de ese equipo.' +
+                          (paso === 'indices' ? ' Detalle: se pudo guardar el rol, pero no actualizar el índice de permisos.' : ''));
                 return false;
             });
     }
@@ -3878,11 +3878,7 @@
     // Puede trabajar (marcar tareas, etc). El rol 'usuario' es solo lectura.
     // Esto se pregunta por CAPACIDAD: da igual que rol tenga, asi que un TL o un admin
     // siguen pudiendo trabajar igual que antes.
-    function isTechRole(u) {
-        if (!u) return false;
-        if (isSuperAdmin(u)) return true;
-        return puede(u, 'trabajar');
-    }
+    
     // Puede liderar el turno. El admin tambien: es una capacidad, no un rol heredado.
     function hasLeaderRole(u) {
         if (!u) return false;
@@ -4302,6 +4298,23 @@
         });
     }
 
+    // Igual que dbSet pero para escribir varias hojas en una sola operacion.
+    // Se usa para marcar tareas: las reglas dejan al tecnico tocar solo
+    // 'done', 'atencion' y las alertas, no el turno entero.
+    function dbUpd(r, obj, label) {
+        return update(r, obj).catch((e) => {
+            console.error('FIREBASE WRITE ERROR', e);
+            let msg = '⚠️ NO SE GUARDÓ' + (label ? ' (' + label + ')' : '') + ': ' + (e.code || e.message);
+            if ((e.code || '').includes('permission')) {
+                msg = !googleUser()
+                    ? '🔒 SIN PERMISO DE ESCRITURA: CIERRA SESIÓN Y ENTRA CON GOOGLE'
+                    : '🔒 SIN PERMISO DE ESCRITURA (' + (e.code || '') + ')';
+            }
+            toastThrottled(msg);
+            return Promise.reject(e);
+        });
+    }
+
     function readErr(err) {
         console.error('FIREBASE READ ERROR', err);
         if ((err.code || '').includes('permission') && !googleUser()) evaluateGate(); // sesión caída: vuelve a la puerta de Google
@@ -4368,7 +4381,7 @@
     // El equipo de destino ya lo dice el desplegable de arriba, asi que el alta de
     // usuarios no repite ninguna nota: solo el equipo, el nombre y el rol.
     function renderNewTeamsGrid() { /* el equipo lo elige el desplegable del panel */ };
-    function adminToggleNuevoEquipo() { /* el equipo lo elige el desplegable del panel */ };
+    ;
 
     // ─── GESTIÓN DEL EQUIPO SELECCIONADO ────────────────────────────────────
     // Sin pestañas: todo gira en torno al equipo del desplegable.
@@ -4810,18 +4823,7 @@
         });
     }
     // Alta / baja de un usuario en un equipo = crear o borrar sus roles en ese equipo
-    function adminAsignarEquipo(team, user, agregar) {
-        if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
-        const key = userKeyFor(user);
-        if (!key) return;
-        if (agregar) {
-            guardarRol(key, team, rolesDeUnRol('usuario')).then((ok) => {
-                if (ok) showToast('✅ AGREGADO A ' + equipoNombre(team).toUpperCase() + ': ' + String(nombreDe(key, team)).toUpperCase());
-            });
-        } else {
-            window.adminQuitarDeEquipo(team, key);
-        }
-    }
+    
 
     // Orden del panel: admin, TL, tecnico y despues solo lectura; dentro de cada grupo por nombre
     // Orden del panel: primero los que administran, luego TL, técnico y solo lectura.
@@ -4955,10 +4957,7 @@
             return `<button type="button" class="admin-team-btn ${activo}" data-team="${escapeAttr(t)}" onclick="adminToggleEquipoNuevo(this)" title="${escapeAttr(titulo)}">${escapeHtml(equipoNombre(t))}</button>`;
         }).join('') || '<span class="team-note">NO TIENES EQUIPOS PARA GESTIONAR</span>';
     }
-    function abreviaturaEquipo(team) {
-        const nom = equipoNombre(team) || team;
-        return nom.split(/\s+/).map(p => p[0]).join('').toUpperCase().slice(0, 3) || team.slice(0, 3).toUpperCase();
-    }
+    
     function adminToggleEquipoNuevo(btn) {
         btn.classList.toggle('active');
     }
@@ -5024,9 +5023,24 @@
             promesa = Promise.all(tareas).then(res => res.every(Boolean));
         }
 
+        // El correo ES la identidad de la persona. Por seguridad las reglas solo
+        // dejan escribirlo mientras el usuario TODAVIA no tiene roles asignados,
+        // asi que el alta se tiene que guardar en este orden: correo y nombre
+        // primero, rol despues. Al editar el rol de alguien que ya existe el
+        // correo no se vuelve a tocar: de eso se encarga el super admin.
+        const recPrevio = usuariosDB[key];
+        const esAlta = !(recPrevio && recPrevio.roles);
+        const correoDistinto = String((recPrevio && recPrevio.email) || '').toLowerCase() !== name.toLowerCase();
+        if (esAlta && correoDistinto) {
+            const identidad = Promise.all([
+                guardarEmailEnElMismoNodo(key, name),
+                guardarNombre(key, nombre)
+            ]);
+            promesa = identidad.then(() => promesa);
+        }
+
         promesa.then(ok => {
             if (!ok) return;
-            guardarEmailEnElMismoNodo(key, name).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL EMAIL (' + (e.code || e.message) + ')'));
             guardarNombre(key, nombre).catch(e => showToast('⚠️ NO SE PUDO GUARDAR EL NOMBRE (' + (e.code || e.message) + ')'));
             document.getElementById('admin-name').value = '';
             document.getElementById('admin-realname').value = '';
@@ -5093,20 +5107,7 @@
     }
     // Estado de solo lectura: lo usan las pruebas automaticas (sondas/) para
     // comprobar en que equipo quedo la app sin depender del DOM.
-    function estadoActual() {
-        return {
-            equipo: currentTeam,
-            email: sessionUser(),
-            guardado: localStorage.getItem('pd_equipo_activo'),
-            equipos: equiposDeUsuario(sessionUser()),
-            catalogo: equiposCatalogo,
-            panel: adminEquipoSel,
-            panelEquipos: equiposDelPanel(),
-            super: isSuperAdmin(sessionUser()),
-            admin: isAdminUser(),
-            usuarios: usuariosDB
-        };
-    }
+    
 
     // Usuarios que tienen registro de roles/<equipo>, aunque esten vacios: si no, un rol
     // huerfano (por ejemplo de una version anterior) dejaria el equipo apareciendo en las listas.
@@ -5120,30 +5121,11 @@
         if (puedoGestionarEquipo(t)) return '';
         return '⚠️ NO ERES ADMIN DEL EQUIPO ' + String(equipoNombre(t)).toUpperCase() + ': PIDE A UN ADMIN DE ESE EQUIPO';
     }
-    function avisoEquipoPanel() { return avisoEquipo(equipoDelPanel()); }
+    
     // Cambia el ROL FUNCIONAL del usuario (usuario | tecnico | tl) en el equipo visible.
     // No toca el flag admin: ese se cambia aparte con adminCambiarAdmin.
     // teamEq permite hacerlo sobre un equipo concreto (lo usa el modal de usuario).
-    function adminCambiarRol(user, rol, teamEq) {
-        if (!isAdminUser()) return;
-        if (!ROLES_ORDEN.includes(rol)) return showToast('⚠️ ROL DESCONOCIDO: ' + rol);
-        if (!preparaCambio(user, teamEq)) return;
-        const team = teamEq || equipoDelPanel();
-        const autorizado = puedoGestionarEquipo(team);
-        const actual = rolDeUsuario(user, team);
-        if (actual === rol) return showToast('ℹ️ ' + nombreDe(user, team).toUpperCase() + ' YA ES ' + etiquetaRol(rol) + ' EN ' + equipoNombre(team).toUpperCase());
-        const rr = rolRec(user, team);
-        const previo = Object.assign({}, rr);          // copia para poder revertir
-        const eraAdmin = !!rr[ROLES_ADMIN.id];         // el admin no se toca aqui
-        fijarRol(rr, rol);
-        fijarAdmin(rr, eraAdmin);
-        guardarRol(user, team, rr, autorizado, previo).then((ok) => {
-            if (!ok) return;
-            refreshAdminList();
-            showToast(`✅ ${etiquetaRol(rol)} EN ${equipoNombre(team).toUpperCase()}: ${nombreDe(user, team).toUpperCase()}`
-                      + (actual ? ` · ANTES ERA ${actual.toUpperCase()}` : ''));
-        });
-    }
+    
     // Enciende o apaga el flag ADMIN. Es INDEPENDIENTE del rol funcional: se puede ser
     // admin y tecnico a la vez, o admin y solo usuario. Admin no da poderes de turno.
     function adminCambiarAdmin(user, activar, teamEq) {
@@ -5206,49 +5188,7 @@
 
     // Quita al usuario del equipo visible (no borra su cuenta: solo este equipo).
     // teamEq permite quitarlo de un equipo concreto (lo usa el modal de usuario).
-    function adminRemoveUser(user, teamEq) {
-        if (!isAdminUser()) return;
-        if (isSuperAdmin(user)) return showToast('⚠️ ESA CUENTA NO SE PUEDE ELIMINAR');
-        const team = teamEq || equipoDelPanel();
-        const aviso = avisoEquipo(team);
-        if (aviso) return showToast(aviso);
-        // un admin no se saca a si mismo del equipo: lo hace otro admin
-        if (esElPropio(user)) return showToast('\u26a0\ufe0f NO TE PUEDES SACAR DE ' + String(equipoNombre(team)).toUpperCase() + ': TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO');
-        const administra = puede(user, 'administrar', team);
-        const otros = usuariosDeEquipo(team).filter(x => x !== userKeyFor(user));
-        const sinAdmin = administra && !otros.some(x => puede(x, 'administrar', team));
-        showConfirm(`\u00bfQUITAR A ${nombreDe(user, team).toUpperCase()} DEL EQUIPO ${equipoNombre(team).toUpperCase()}?` +
-                    (sinAdmin ? '\n\n\u26a0\ufe0f ES EL \u00daltimo ADMIN DEL EQUIPO: SE QUEDAR\u00c1 SIN ADMIN.' : '') +
-                    `\n\nEl usuario conserva sus roles en los otros equipos.`, () => {
-            const previo = Object.assign({}, rolesDe(userKeyFor(user), team) || {});
-            const rec = usuariosDB[userKeyFor(user)];
-            if (rec && rec.roles) delete rec.roles[team];
-            set(ref(db, rolesPath(user, team)), null)
-                .then(() => {
-                    sincronizarIndiceAdmins(user, team);   // ya no administra este equipo
-                    sincronizarIndiceGlobalAdmins(user);
-                    sincronizarIndiceSupervisors(user);    // índices globales
-                    sincronizarIndicePlanners(user);
-                    syncRoleArrays();
-                    updateTeamSwitcher();
-                    refreshAdminList();
-                    showToast(`✖ FUERA DE ${equipoNombre(team).toUpperCase()}: ${user.toUpperCase()}`);
-                })
-                .catch((e) => {
-                    console.error('FIREBASE WRITE ERROR', e);
-                    // si la BD lo conservo, la pantalla no puede mostrar al usuario fuera
-                    aplicarRolesLocal(userKeyFor(user), team, previo);
-                    sincronizarIndiceAdmins(user, team);
-                    sincronizarIndiceGlobalAdmins(user);
-                    sincronizarIndiceSupervisors(user);
-                    sincronizarIndicePlanners(user);
-                    syncRoleArrays();
-                    updateTeamSwitcher();
-                    refreshAdminList();
-                    showToast('⚠️ NO SE PUDO QUITAR DEL EQUIPO (' + (e.code || e.message) + ')');
-                });
-        });
-    }
+    
 
     // ─── AGREGAR / QUITAR USUARIO DE UN EQUIPO ─────────────────────────────
     // Se usa desde el modal de edición de usuario ("EQUIPOS DE ESTA PERSONA"): tocar
@@ -5291,15 +5231,7 @@
         if (modal) modal.style.display = 'block';
         renderUserModal();
     }
-    function userModalCambiaTipoRol() {
-        const key = userModalUser;
-        if (!key) return;
-        const rg = rolGlobalDe(key);
-        const globalDiv = document.getElementById('user-modal-equipos-global');
-        const selectorDiv = document.getElementById('user-modal-equipos-selector');
-        if (globalDiv) globalDiv.style.display = rg ? 'block' : 'none';
-        if (selectorDiv) selectorDiv.style.display = rg ? 'none' : 'block';
-    }
+    
     function userModalCambiarEquipoRol() {
         const sel = document.getElementById('user-modal-equipo-rol');
         if (sel) userModalTeam = sel.value || null;
@@ -5319,24 +5251,50 @@
         // requieren permiso global; los por equipo requieren admin de algún equipo.
         const editableCuenta = !propio && (esGlobal ? puedeGlobal : equiposDondeSoyAdmin().length > 0);
 
+        // El correo ES la identidad de la persona: quien lo cambia se hace pasar
+        // por ella. Por eso, una vez que el usuario ya existe, solo el super
+        // admin puede corregirlo. El alta de usuarios nuevos sigue igual.
+        const editableEmail = !propio && isSuperAdmin(sessionUser());
+
+        // Definir primero contra qué equipo se está viendo el rol: el desplegable
+        // muestra los equipos que administra el admin; si el equipo elegido no está
+        // entre ellos (o no hay ninguno aun), se cae al primero donde el usuario ya
+        // tiene rol, y si no, al primero que administra el admin. Se resuelve ANTES
+        // de pintar la grilla para que el desplegable y el rol que se ve siempre
+        // hablen del mismo equipo.
+        const equipoRolWrap = document.getElementById('user-modal-equipo-rol-wrap');
+        const equipoRolSel = document.getElementById('user-modal-equipo-rol');
+        const equiposAdmin = equiposDondeSoyAdmin();
+        if (!esGlobal) {
+            if (!userModalTeam || equiposAdmin.indexOf(userModalTeam) === -1) {
+                const conRol = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && (ROLES_POR_EQUIPO.some(r => rec.roles[t][r]) || rec.roles[t].admin === true));
+                userModalTeam = conRol.find(t => equiposAdmin.indexOf(t) !== -1) || equiposAdmin[0] || equipoDelPanel();
+            }
+        } else {
+            userModalTeam = null;
+        }
+
         // email
         const emailGuardado = String(rec.email || '').trim();
         const inpEmail = document.getElementById('user-modal-email');
         if (inpEmail) {
             if (userModalEmail !== null && document.activeElement !== inpEmail) inpEmail.value = userModalEmail;
             else if (document.activeElement !== inpEmail) inpEmail.value = emailGuardado;
-            inpEmail.disabled = !editableCuenta;
-            inpEmail.title = propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL' : 'EL CORREO CON EL QUE ENTRA A LA PLATAFORMA';
+            inpEmail.disabled = !editableEmail;
+            inpEmail.title = propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL'
+                : editableEmail ? 'EL CORREO CON EL QUE ENTRA A LA PLATAFORMA'
+                : 'SOLO EL SUPER ADMIN PUEDE CORREGIR EL CORREO DE UN USUARIO YA CREADO';
         }
         const btnGuardarEmail = document.getElementById('user-modal-guardar-email');
         if (btnGuardarEmail) {
-            btnGuardarEmail.disabled = !editableCuenta;
+            btnGuardarEmail.disabled = !editableEmail;
             btnGuardarEmail.title = inpEmail ? inpEmail.title : '';
         }
         const correoRoto = emailGuardado.indexOf('@') > -1 && emailGuardado.split('@')[1].indexOf('_') > -1;
         const notaEmail = document.getElementById('user-modal-email-nota');
         if (notaEmail) {
             notaEmail.textContent = propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL.'
+                : !editableEmail && !esSuperAdmin(sessionUser()) ? 'SOLO EL SUPER ADMIN PUEDE CORREGIR ESTE CORREO.'
                 : correoRoto ? '⚠️ ESTE CORREO ESTÁ MAL: TIENE "_" EN VEZ DE ".". ESCRÍBELO DE NUEVO Y GUÁRDALO.'
                 : '';
             notaEmail.style.color = correoRoto ? 'var(--danger)' : 'var(--comment)';
@@ -5357,7 +5315,7 @@
             notaBorrar.style.display = notaBorrar.textContent ? '' : 'none';
         }
 
-        // rol funcional: si hay un equipo seleccionado, mostrar el rol de ESE equipo
+        // rol funcional: se muestra el del equipo elegido en el desplegable
         const grid = document.getElementById('user-modal-roles');
         const rolActual = rg || rolDeUsuario(key, userModalTeam || equipoDelPanel()) || 'usuario';
         if (grid) {
@@ -5371,37 +5329,35 @@
         }
 
         // selector de equipo para roles por equipo
-        const equipoRolWrap = document.getElementById('user-modal-equipo-rol-wrap');
-        const equipoRolSel = document.getElementById('user-modal-equipo-rol');
         if (equipoRolWrap && equipoRolSel) {
             if (!rg) {
                 equipoRolWrap.style.display = 'flex';
-                const mios = equiposDondeSoyAdmin();
-                // Se muestran todos los equipos que el admin gestiona, no solo los que ya tiene el usuario.
-                // Esto permite cambiar el rol (o agregar) en cualquier equipo gestionado.
-                const opciones = mios.slice();
-                if (!userModalTeam || opciones.indexOf(userModalTeam) === -1) {
-                    const teamsConRol = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && (ROLES_POR_EQUIPO.some(r => rec.roles[t][r]) || rec.roles[t].admin === true));
-                    userModalTeam = teamsConRol.find(t => opciones.indexOf(t) !== -1) || opciones[0] || equipoDelPanel();
-                }
+                // Se muestran los equipos que administra este admin, no solo los
+                // que ya tiene el usuario: asi se puede agregar o cambiar el rol
+                // en cualquier equipo gestionado.
+                const opciones = equiposAdmin.slice();
                 equipoRolSel.innerHTML = opciones.map(t =>
                     `<option value="${escapeAttr(t)}" ${t === userModalTeam ? 'selected' : ''}>${escapeHtml(equipoNombre(t))}</option>`
                 ).join('') || '<option value="">SIN EQUIPOS</option>';
                 equipoRolSel.disabled = !opciones.length || propio;
             } else {
                 equipoRolWrap.style.display = 'none';
-                userModalTeam = null;
             }
         }
 
         // admin
         const adminChk = document.getElementById('user-modal-admin');
         const adminGlobal = adminGlobalDe(key);
+        // El checkbox refleja SOLO el equipo seleccionado en el desplegable. Si
+        // se mezclara con "es admin en algún equipo", al cambiar de equipo el
+        // checkbox seguiría marcado y aplicaría mal el flag al equipo nuevo.
         const adminEnEquipoSel = !rg && userModalTeam && rec.roles && rec.roles[userModalTeam] && rec.roles[userModalTeam].admin === true;
-        const adminEnEquipos = !rg && Object.keys(rec.roles || {}).some(t => rec.roles[t] && rec.roles[t].admin === true);
         if (adminChk) {
-            adminChk.checked = adminGlobal || adminEnEquipoSel || adminEnEquipos;
+            adminChk.checked = adminGlobal || !!adminEnEquipoSel;
             adminChk.disabled = propio;
+            adminChk.title = adminGlobal
+                ? 'ADMIN GLOBAL: APLICA A TODOS LOS EQUIPOS'
+                : (userModalTeam ? 'ADMIN SOLO DE ' + String(equipoNombre(userModalTeam)).toUpperCase() : 'ADMIN');
         }
 
         // equipos
@@ -5414,9 +5370,8 @@
         } else {
             if (globalDiv) globalDiv.style.display = 'none';
             if (selectorDiv) selectorDiv.style.display = 'block';
-            const mios = equiposDondeSoyAdmin();
             if (box) {
-                box.innerHTML = mios.map(t => {
+                box.innerHTML = equiposAdmin.map(t => {
                     const dentroT = esMiembroDe(key, t);
                     return `<button type="button" class="admin-team-btn${dentroT ? ' active' : ''}" data-team="${escapeAttr(t)}"
                         style="width: auto; padding: 0 10px; height: var(--button-height); display: inline-flex; gap: 6px; align-items: center;"
@@ -6992,6 +6947,26 @@
                          .then(() => seguroCompartidas(publicarIndiceTareas)));
     }
     function saveTechs() { if (checkLock()) return; asegurarEquipoLigado(); dbSet(dbRefs.techs, shiftTechs, 'GUARDAR TÉCNICOS'); }
+
+    // Marcar una tarea o poner una alerta escribe solo esas hojas, no el turno.
+    // Antes se guardaba el turno entero con saveData(), y eso rompia dos cosas:
+    // las reglas ya no dejan que un tecnico escriba la programacion, y ademas
+    // pisaba lo que otro habia guardado en el instante anterior.
+    // OJO: en la base los aviones y las tareas se guardan por su POSICION en la
+    // lista, no por su 'id'. Hay que buscar el indice antes de armar la ruta.
+    function guardarMarcaTarea(aId, tId, cambios) {
+        if (checkLock()) return Promise.resolve();
+        asegurarEquipoLigado();
+        const ia = (avionesData || []).findIndex(a => a.id == aId);
+        if (ia < 0) return Promise.resolve();
+        const avion = (avionesData || [])[ia];
+        const it = (avion.tareas || []).findIndex(t => t.id == tId);
+        if (it < 0) return Promise.resolve();
+        const upd = {};
+        Object.keys(cambios).forEach(campo => { upd[`${ia}/tareas/${it}/${campo}`] = cambios[campo]; });
+        return dbUpd(dbRefs.aviones, upd, 'GUARDAR TAREA')
+            .then(() => seguroCompartidas(publicarIndiceTareas));
+    }
     
     // Sugerencias del campo TEAM LEADER: los miembros del equipo que se está viendo, con
     // los que ya tienen rol TL primero, y el TL que ya tiene el turno. Cambia de equipo
@@ -7817,7 +7792,7 @@
                 <tr class="rol-tech-row" data-grupo="${escapeAttr(t.grupo)}">
                     <td style="padding:5px; border-bottom:1px solid var(--border); white-space:nowrap;">${escapeHtml(t.grupo)}</td>
                     <td style="padding:5px; border-bottom:1px solid var(--border);">
-                        <input type="text" class="rol-name-input" data-rol-id="${t.id}" id="rol-name-${t.id}" value="${escapeAttr(suggested)}" style="width:100%; font-size:10px;">
+                        <input type="text" class="rol-name-input" data-rol-id="${escapeAttr(t.id)}" id="rol-name-${escapeAttr(t.id)}" value="${escapeAttr(suggested)}" style="width:100%; font-size:10px;">
                     </td>
                     <td style="padding:5px; border-bottom:1px solid var(--border);">${escapeHtml(t.bp)}</td>
                     <td style="padding:5px; border-bottom:1px solid var(--border);">${escapeHtml(t.skill)}</td>
@@ -8400,21 +8375,21 @@
         const locked = turnoCerradoPara(equipoT);
         const puedeCompletarTarea = !locked && puedeCompletarEn(equipoT);
         const puedeEditarTarea = !locked && puedePlanificarEn(equipoT);
-        const toggleClick = puedeCompletarTarea ? `onclick="toggleTask(${avion.id}, ${t.id})"` : "";
+        const toggleClick = puedeCompletarTarea ? `onclick="toggleTask(${Number(avion.id)}, ${Number(t.id)})"` : "";
         const toggleCursor = puedeCompletarTarea ? "" : "cursor: default; opacity: 0.6;";
         const toggleHtml = puedeCompletarTarea ? `<div class="status-toggle no-print" ${toggleClick} style="${toggleCursor}">✓</div>` : '';
 
         let actionButtonsHtml = '';
         if (puedeCompletarTarea || puedeEditarTarea) {
             actionButtonsHtml = (puedeCompletarTarea
-                ? `<button class="action-btn ${t.atencion ? (t.alertaByTL ? 'active-alerta-tl' : 'active-alerta-tech') : ''}" onclick="toggleAtencion(${avion.id}, ${t.id})">⚠️</button>`
+                ? `<button class="action-btn ${t.atencion ? (t.alertaByTL ? 'active-alerta-tl' : 'active-alerta-tech') : ''}" onclick="toggleAtencion(${Number(avion.id)}, ${Number(t.id)})">⚠️</button>`
                 : '') + (puedeEditarTarea
-                ? `<div class="leader-only leader-wrapper"><button class="action-btn" onclick="openEditTaskModal(${avion.id}, ${t.id})">✏️ EDITAR</button></div>`
+                ? `<div class="leader-only leader-wrapper"><button class="action-btn" onclick="openEditTaskModal(${Number(avion.id)}, ${Number(t.id)})">✏️ EDITAR</button></div>`
                 : '');
         }
 
         const handleHtml = showHandle
-            ? `<span class="drag-handle leader-only no-print" onpointerdown="startOrderDrag(event, 'tarea', ${avion.id}, ${t.id})" oncontextmenu="event.preventDefault(); return false;" title="Sostener y arrastrar para ordenar">⋮⋮</span>`
+            ? `<span class="drag-handle leader-only no-print" onpointerdown="startOrderDrag(event, 'tarea', ${Number(avion.id)}, ${Number(t.id)})" oncontextmenu="event.preventDefault(); return false;" title="Sostener y arrastrar para ordenar">⋮⋮</span>`
             : '';
 
         // Distintivo de tarea compartida: solo tiene sentido para quien la mandó.
@@ -8428,7 +8403,7 @@
         }
 
         return `
-            <div class="task-item ${t.done ? 'completed' : ''} ${t.atencion ? (t.alertaByTL ? 'alerta-tl' : 'alerta-tech') : ''}" data-avion-id="${avion.id}" data-task-id="${t.id}">
+            <div class="task-item ${t.done ? 'completed' : ''} ${t.atencion ? (t.alertaByTL ? 'alerta-tl' : 'alerta-tech') : ''}" data-avion-id="${escapeAttr(avion.id)}" data-task-id="${escapeAttr(t.id)}">
                 ${toggleHtml}
                 <div class="task-main">
                     <div class="task-info">
@@ -8602,9 +8577,9 @@
             if (!lockedAvion && puedePlanificarEn(equipoAvion)) {
                 avionActionBtns = `
                     <div class="leader-only leader-wrapper">
-                        <button class="avion-btn" onclick="openAddTaskModal(${avion.id})">➕ TAREA</button>
-                        <button class="avion-btn" onclick="openPredefModal(${avion.id})" title="Agregar Tareas Predefinidas / Preventivas">📑 PREDEF.</button>
-                        <button class="avion-btn" onclick="openEditAvionModal(${avion.id})">✏️ EDITAR</button>
+                        <button class="avion-btn" onclick="openAddTaskModal(${Number(avion.id)})">➕ TAREA</button>
+                        <button class="avion-btn" onclick="openPredefModal(${Number(avion.id)})" title="Agregar Tareas Predefinidas / Preventivas">📑 PREDEF.</button>
+                        <button class="avion-btn" onclick="openEditAvionModal(${Number(avion.id)})">✏️ EDITAR</button>
                     </div>
                 `;
             }
@@ -8617,7 +8592,7 @@
                     </div>
                     <div class="avion-actions no-print">
                         ${avionActionBtns}
-                        ${allowOrder ? `<span class="drag-handle leader-only no-print" onpointerdown="startOrderDrag(event, 'avion', ${avion.id})" oncontextmenu="event.preventDefault(); return false;" title="Sostener y arrastrar para ordenar">⋮⋮</span>` : ''}
+                        ${allowOrder ? `<span class="drag-handle leader-only no-print" onpointerdown="startOrderDrag(event, 'avion', ${Number(avion.id)})" oncontextmenu="event.preventDefault(); return false;" title="Sostener y arrastrar para ordenar">⋮⋮</span>` : ''}
                     </div>
                 </div>
                 <div class="task-container">
@@ -8724,7 +8699,7 @@
         }
         setTimeout(() => {
             localMutation = true;
-            saveData();
+            guardarMarcaTarea(aId, tId, { done: true, atencion: false });
         }, delay);
     }
 
@@ -8743,7 +8718,7 @@
         }
         setTimeout(() => {
             localMutation = true;
-            saveData();
+            guardarMarcaTarea(aId, tId, { done: false });
         }, delay);
     }
 
@@ -8753,7 +8728,10 @@
         const tarea = (avion.tareas || []).find(t => t.id == tId); if (!tarea) return;
         if (tarea.done) return showConfirm("LA TAREA ESTÁ COMPLETADA.", null);
         if (tarea.atencion) {
-            showConfirm("¿DESACTIVAR ALERTA?", () => { tarea.atencion = false; tarea.alertaNombre = ''; saveData(); });
+            showConfirm("¿DESACTIVAR ALERTA?", () => {
+                tarea.atencion = false; tarea.alerta = ''; tarea.alertaByTL = false; tarea.alertaNombre = '';
+                guardarMarcaTarea(aId, tId, { atencion: false, alerta: '', alertaByTL: false, alertaNombre: '' });
+            });
         } else {
             showAlertaPrompt(aId, tId);
         }
@@ -8766,7 +8744,8 @@
         document.getElementById('prompt-input').placeholder = 'Ej: APOYO, URGENTE, PRECAUCIÓN...';
         showPromptModal("DEFINIR ALERTA", "", (val) => {
             if (isTeamLeader) {
-                tarea.atencion = true; tarea.alerta = val; tarea.alertaByTL = true; tarea.alertaNombre = ''; saveData();
+                tarea.atencion = true; tarea.alerta = val; tarea.alertaByTL = true; tarea.alertaNombre = '';
+                guardarMarcaTarea(aId, tId, { atencion: true, alerta: val, alertaByTL: true, alertaNombre: '' });
             } else {
                 showNamePrompt(aId, tId, val, tarea);
             }
@@ -8782,7 +8761,8 @@
                 showConfirm("DEBES INGRESAR TU NOMBRE.", () => { showNamePrompt(aId, tId, alertaVal, tarea); });
                 return;
             }
-            tarea.atencion = true; tarea.alerta = alertaVal; tarea.alertaNombre = name; tarea.alertaByTL = false; saveData();
+            tarea.atencion = true; tarea.alerta = alertaVal; tarea.alertaNombre = name; tarea.alertaByTL = false;
+            guardarMarcaTarea(aId, tId, { atencion: true, alerta: alertaVal, alertaNombre: name, alertaByTL: false });
         });
     }
 
@@ -10141,7 +10121,7 @@
     }
 
     function groupMessageHTML(m, index) {
-        const color = m.color || '#2A0087';
+        const color = escapeColor(m.color || '#2A0087');
         const weight = m.negrita !== false ? '800' : '600';
         const fontSize = m.tamano === 'grande' ? '1.15em' : '0.95em';
         return `
@@ -10531,22 +10511,9 @@
         });
     }
 
-    function editAvionComment(id) {
-        if(checkLock()) return;
-        const avion = avionEditable(id); if (!avion) return;
-        showPromptModal("NOTA", avion.comment, (val) => {
-            avion.comment = val; saveData();
-        });
-    }
+    
 
-    function editTaskComment(aId, tId) {
-        if(checkLock()) return;
-        const avion = avionEditable(aId); if (!avion) return;
-        const tarea = (avion.tareas || []).find(t => t.id == tId); if (!tarea) return;
-        showPromptModal("NOTA DE TAREA/ACTIVIDAD", tarea.comment, (val) => {
-            tarea.comment = val; saveData();
-        });
-    }
+    
 
     // ─── AJUSTE DE LA IMPRESIÓN A UNA HOJA ──────────────────────────────────
     // La escala sale de MEDIR el contenido, y hay que medirlo AL ANCHO CON EL QUE SE
@@ -10804,7 +10771,24 @@
     // Para poner un string literal dentro de un atributo onclick (entre comillas
     // simples de JS). Escapa lo justo para que el navegador lo pase intacto a JS.
     function escapeJsString(str) {
-        return String(str || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'").replace(/\n/g, '\\n').replace(/\r/g, '');
+        // Sin el escapado de " y de <, un texto con comillas cerraba el atributo
+        // onclick y con < abria una etiqueta: eso era XSS con solo escribir texto.
+        return String(str || '')
+            .replace(/\\/g, '\\\\')
+            .replace(/'/g, "\\'")
+            .replace(/"/g, '\\"')
+            .replace(/</g, '\\u003c')
+            .replace(/>/g, '\\u003e')
+            .replace(/\n/g, '\\n')
+            .replace(/\r/g, '');
+    }
+
+    // Un color viene escrito por una persona y se pinta en un atributo de estilo:
+    // solo se acepta un hexadecimal, y si no, el que usa la app por defecto.
+    const COLOR_SEGURO = '#7B2CBF';
+    function escapeColor(str) {
+        const s = String(str || '').trim();
+        return /^#[0-9a-fA-F]{3}$|^#[0-9a-fA-F]{6}$/.test(s) ? s : COLOR_SEGURO;
     }
 
     function highlightText(text, query) {
@@ -11055,7 +11039,7 @@
         abrirModalCompartidas, compartirTareaActual, retirarCompartida, aceptarCompartida, rechazarCompartida,
         crearEnvioCompartido,
         abrirPanelTareaCompartida, limpiarAddTaskLock, irATurnoCompartido, cambioDestinoCompartida,
-        editAvionComment, editTaskComment, closeConfirmModal, closePromptModal,
+        closeConfirmModal, closePromptModal,
         changeViewMode, applyLocalFilter, resetLocalFilter, handleTaskDescInput,
         formatTime, changeTurno, changeDate, goToToday, toggleLockShift,
         finalizeTime, onTimeKeyEnter,
@@ -11071,23 +11055,22 @@
         turnoCerradoPara, equipoEnEdicion,
         openManageShiftModal, deleteEntireShift, moveShift, startOrderDrag, performSearch, clearSearch,
         toggleSearch, closeSearch, setSearchOpen,
-        openAdminModal, adminAddUser, adminRemoveUser, refreshAdminList, adminSugerir, adminCompletar,
+        openAdminModal, adminAddUser, refreshAdminList, adminSugerir, adminCompletar,
         catalogoUsuarios, buscarUsuarioPorTexto, adminAlternarFiltroEquipo,
         adminAlternarEquipoUsuario, adminCambiaTipoRol, renderAdminEquiposGrid, adminToggleEquipoNuevo,
         // editar usuario (lápiz de la lista del panel admin)
-        abrirEditarUsuario, renderUserModal, userModalCambiaTipoRol, userModalEscribeNombre,
-        userModalPonerRol, userModalAlternarAdmin, userModalAlternarEquipo,
+        abrirEditarUsuario, renderUserModal, userModalEscribeNombre,
+        userModalPonerRol, userModalAlternarAdmin, userModalAlternarEquipo, userModalCambiarEquipoRol,
         userModalGuardarNombre,
         userModalEscribeEmail, userModalGuardarEmail, userModalEliminar, limpiarRegistrosBasura, registrosBasura,
-        adminCambiarRol, adminCambiarAdmin,
-        switchTeam, adminToggleNuevoEquipo,
-        adminCambiaEquipoPanel, adminCrearEquipo, abrirNuevoEquipo, cerrarNuevoEquipo, newTeamEscribe,
+        adminCambiarAdmin,
+        switchTeam, adminCambiaEquipoPanel, adminCrearEquipo, abrirNuevoEquipo, cerrarNuevoEquipo, newTeamEscribe,
         cerrarAdminModal,
         adminAlternarEquipo, adminQuitarDeEquipo,
         adminRenombrarEquipoSeleccion, adminAlternarEquipoSeleccion, adminEliminarEquipoSeleccion,
         // mantenimiento (solo super admin)
         adminAlternarMantenimiento,
-        estadoActual, equiposDelPanel, puedoGestionarEquipo, usuariosDeEquipo, avisosEquipoBar,
+        equiposDelPanel, puedoGestionarEquipo, usuariosDeEquipo, avisosEquipoBar,
         doGoogleLogin, logoutFull
     });
 
