@@ -4,6 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Programación Diaria - LATAM</title>
+    <!-- PWA: instalable en Android/iOS/escritorio y funciona sin conexión en la
+         interfaz. Rutas relativas para que sirva igual en GitHub Pages y local. -->
+    <meta name="theme-color" content="#2A0087">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="PD">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
 
@@ -11097,6 +11107,17 @@
         if (groupFilter) groupFilter.addEventListener('change', filterGlobalTechs);
     })();
 
+</script>
+<!-- PWA: registra el service worker que deja la app instalable y disponible sin
+     conexión. Se registra de inmediato, NO en 'load': PD.html depende de varios
+     CDN externos y con la red lenta del hangar 'load' se demora, dejando la app
+     sin service worker (es decir, sin poder instalarse). -->
+<script>
+    if ('serviceWorker' in navigator && (location.protocol === 'https:' || location.hostname === 'localhost' || location.hostname === '127.0.0.1')) {
+        navigator.serviceWorker.register('sw.js').catch(function (err) {
+            console.warn('PWA: no se pudo registrar el service worker', err);
+        });
+    }
 </script>
 </body>
 </html>
