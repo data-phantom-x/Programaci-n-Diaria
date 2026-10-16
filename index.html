@@ -3683,6 +3683,11 @@
     let myEmail = '';
     let localMutation = false;
 
+    let compartidasRecibidas = {};
+    let compartidasSalientesPorEquipo = {};
+    let compartidasEnviadas = {};
+    let compartidasUnsubs = [];
+
     document.getElementById('global-turno-select').value = activeTurno;
     document.getElementById('view-mode-select').value = currentViewMode;
     document.getElementById('global-date-select').value = viewingDate;
@@ -6017,11 +6022,6 @@
     // Por eso el TL de origen NO necesita permiso en el equipo destino: escribe
     // en la carpeta del destino, pero la regla lo autoriza por ser líder del
     // propio origen.
-    let compartidasRecibidas = {};
-    let compartidasSalientesPorEquipo = {};   // <equipo> -> {id: share}
-    let compartidasEnviadas = {};
-    let compartidasUnsubs = [];
-
     function compartidasBase() { return 'mantenimiento/pd/compartidas'; }
     // La bandeja se lee en la carpeta del equipo destino, pero adentro hay un nivel
     // más: cada envío vive bajo el nombre del equipo que lo mandó. Se aplana para
