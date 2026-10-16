@@ -758,8 +758,8 @@
         }
         
         .modal-header { font-weight: 800; font-size: 1.1em; margin-bottom: 15px; color: var(--primary); border-bottom: 2px solid var(--accent); padding-bottom: 8px; }
-        .modal-content input[type="text"], .modal-content select { width: 100%; margin-bottom: 10px; box-sizing: border-box; }
-        .modal-row { display: flex; gap: 12px; margin-bottom: 12px; }
+        .modal-content input[type="text"], .modal-content select { width: 100%; box-sizing: border-box; }
+        .modal-row { gap: 12px; }
         .modal-row > input { margin-bottom: 0 !important; }
 
         .tech-grid {
@@ -784,7 +784,7 @@
             box-shadow: 0 2px 6px color-mix(in srgb, var(--primary) 20%, transparent);
         }
 
-        .modal-footer { display: flex; gap: 10px; margin-top: 5px; padding-top: 15px; border-top: 1px solid var(--border); }
+        .modal-footer { display: flex; gap: 10px; margin-top: 15px; padding-top: 10px; border-top: 1px solid var(--border); }
         .btn-modal-action { flex: 1; padding: 0; height: var(--button-height); font-size: 10px; border-radius: var(--button-radius);}
         /* PANEL ADMIN: caja de altura fija, igual que un diálogo de verdad.
            Encabezado, barra de equipo y pie quedan FIJOS (flex: none) y solo el
@@ -1755,7 +1755,7 @@
             <strong style="font-size: 10px; color: var(--primary);">TRASLADAR PROGRAMACIÓN A:</strong>
             <div class="modal-row" style="margin-top: 8px;">
                 <input type="date" id="manage-shift-date" style="font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light);">
-                <select id="manage-shift-turno" style="font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light);">
+                <select id="manage-shift-turno" style="font-weight: bold; border: 2px solid var(--primary-light); color: var(--primary-light); with: auto;">
                     <option value="Turno Día">DÍA</option>
                     <option value="Turno Tarde">TARDE</option>
                     <option value="Turno Noche">NOCHE</option>
