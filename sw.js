@@ -18,6 +18,7 @@ const PRECACHE = [
   './icons/icon-512.png',
   './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png',
+  './icons/favicon.png',
   './icons/favicon-32.png',
   './icons/share-ios.png',
 ];
