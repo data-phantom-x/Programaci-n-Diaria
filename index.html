@@ -10,7 +10,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="apple-mobile-web-app-title" content="PD">
+    <meta name="apple-mobile-web-app-title" content="ALISTEO">
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -1554,6 +1554,28 @@
         .login-btn-danger { background: var(--danger); }
         .login-error { color: var(--danger); font-size: 10px; font-weight: 700; min-height: 14px; }
 
+        /* Instalación de la app (PWA). En Android el navegador entrega el evento
+           beforeinstallprompt y esto se convierte en un botón de un toque. En iPhone
+           ese evento NO existe (Apple lo cerró como no implementado), así que no hay
+           forma de automatizar: solo se puede indicar dónde está el botón. Por eso
+           hay dos ramas y no una sola. */
+        .instalar-ayuda { display: none; margin-top: 16px; padding-top: 26px; border-top: 1px dashed var(--border); position: relative; }
+        .instalar-ayuda.visible { display: block; }
+        .instalar-btn { width: 100%; height: 38px !important; border: none; border-radius: var(--button-radius); cursor: pointer; font-size: 11px; font-weight: 800; color: var(--surface); background: var(--gradient-primary); box-shadow: 0 2px 6px color-mix(in srgb, var(--primary) 30%, transparent); transition: opacity 0.2s; }
+        .instalar-btn:hover { opacity: 0.88; }
+        .instalar-ios { display: none; font-size: 11px; font-weight: 700; color: var(--comment); line-height: 1.6; text-align: left; text-transform: none; }
+        .instalar-ios.visible { display: block; }
+        .instalar-ios img { width: 15px; height: auto; vertical-align: -3px; margin: 0 2px; }
+        .instalar-ios strong { color: var(--primary); }
+        .instalar-cerrar { position: absolute; top: 0; right: 0; width: 22px !important; height: 22px !important; border: none; background: none; cursor: pointer; color: var(--comment); font-size: 12px; border-radius: 50%; }
+        .instalar-cerrar:hover { background: var(--surface-muted); }
+        .instalar-help-link { margin-top: 10px; border: none; background: none; cursor: pointer; font-size: 9px; font-weight: 700; color: var(--comment); text-decoration: underline; padding: 4px; }
+        .instalar-help-link:hover { color: var(--primary); }
+        /* La app tiene button { display: inline-flex } en el CSS general, y eso
+           anula el atributo hidden del navegador: sin esta linea el boton de
+           ayuda se veria siempre. */
+        .instalar-help-link[hidden] { display: none; }
+
         /* Pantalla de mantenimiento: reutiliza la carta de acceso, cambia el contenido.
            El aviso se muestra incluso sin sesión, para que nadie piense que la
            plataforma falló. */
@@ -1588,6 +1610,118 @@
     </style>
 </head>
 <body>
+<script>
+    /* ─── PWA: GUÍA DE INSTALACIÓN ────────────────────────────────────────────
+       Va al principio del <body> a propósito: el evento beforeinstallprompt puede
+       dispararse ANTES de que termine de parsearse el HTML, así que el listener
+       tiene que existir desde el primer momento. Lo que sí dibuja espera al DOM.
+
+       Android y escritorio: el navegador autoriza un botón propio, un toque y listo.
+       iPhone: Apple nunca implementó esa API (la petición está cerrada como NO
+       IMPLEMENTADO), así que no existe automatismo: solo se le indica dónde está el
+       botón. Son dos ramas a propósito, no un intento de automatizar iPhone. */
+    (function () {
+        'use strict';
+        var CLAVE = 'pd-instalar-visto';
+        var pendiente = null;      // evento de instalación que entrega el navegador
+        var linkAyuda = null;
+        var listo = false;         // iniciar() puede correr dos veces: solo se enlaza una
+
+        function yaInstalada() {
+            return window.matchMedia('(display-mode: standalone)').matches
+                || window.matchMedia('(display-mode: fullscreen)').matches
+                || navigator.standalone === true;
+        }
+
+        function esIOS() {
+            return /iPad|iPhone|iPod/.test(navigator.userAgent)
+                || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+        }
+
+        function marcarVisto() {
+            try { localStorage.setItem(CLAVE, '1'); } catch (e) {}
+        }
+
+        function yaVisto() {
+            try { return localStorage.getItem(CLAVE) === '1'; } catch (e) { return false; }
+        }
+
+        function mostrarAyuda(visible) {
+            var bloque = document.getElementById('instalar-ayuda');
+            if (bloque) bloque.classList.toggle('visible', visible);
+            if (linkAyuda) linkAyuda.hidden = visible ? true : !yaVisto();
+        }
+
+        // El evento no se repite: si se pierde aquí, no hay segunda oportunidad.
+        window.addEventListener('beforeinstallprompt', function (e) {
+            e.preventDefault();
+            pendiente = e;
+            iniciar();
+        });
+
+        window.addEventListener('appinstalled', function () {
+            marcarVisto();
+            mostrarAyuda(false);
+        });
+
+        function iniciar() {
+            if (listo) return;
+            var bloque = document.getElementById('instalar-ayuda');
+            var boton = document.getElementById('instalar-btn');
+            var ios = document.getElementById('instalar-ios');
+            var cerrar = document.getElementById('instalar-cerrar');
+            if (!bloque || !boton || !ios || !cerrar) return;   // aún no está el HTML
+            linkAyuda = document.getElementById('instalar-help-link');
+            listo = true;
+
+            if (yaInstalada()) return;      // abierta desde el ícono: no hay nada que ofrecer
+
+            var iosEs = esIOS();
+
+            if (iosEs) {
+                ios.classList.add('visible');
+                boton.style.display = 'none';
+            } else {
+                ios.classList.remove('visible');
+                // Sin evento no hay botón. Mejor no mostrar uno que no hace nada
+                // (Firefox, o cuando la app ya está instalada).
+                boton.style.display = pendiente ? '' : 'none';
+            }
+
+            boton.addEventListener('click', function () {
+                if (!pendiente) return;
+                pendiente.prompt();
+                pendiente.userChoice.then(function () {
+                    pendiente = null;
+                    marcarVisto();
+                    mostrarAyuda(false);
+                });
+            });
+
+            cerrar.addEventListener('click', function () {
+                marcarVisto();
+                mostrarAyuda(false);
+            });
+
+            if (linkAyuda) {
+                linkAyuda.addEventListener('click', function () {
+                    mostrarAyuda(true);
+                    linkAyuda.hidden = true;
+                });
+            }
+
+            // Ya lo habían cerrado antes: se deja solo el link para recuperarlo.
+            if (yaVisto()) { mostrarAyuda(false); return; }
+
+            // En iPhone se muestra siempre. En el resto, solo si el navegador
+            // confirmó que la app es instalable.
+            if (iosEs || pendiente) mostrarAyuda(true);
+            else if (linkAyuda) linkAyuda.hidden = true;
+        }
+
+        document.addEventListener('DOMContentLoaded', iniciar);
+    })();
+</script>
 
     <div id="boot-splash">
     <img src="https://raw.githubusercontent.com/data-phantom-x/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo-light.svg" alt="LATAM Airlines">
@@ -1605,6 +1739,16 @@
         <div id="login-sub" class="login-sub">ACCESO RESTRINGIDO · PERSONAL AUTORIZADO</div>
         <button id="login-google-btn" class="login-btn login-btn-google" onclick="doGoogleLogin()"><span class="g-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"><path fill="var(--google-blue)" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="var(--google-green)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="var(--google-yellow)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="var(--google-red)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></span> ENTRAR CON GOOGLE</button>
         <div id="login-google-sub" class="login-sub" style="font-size: 9px; margin-top: 2px;">USA TU CUENTA CORPORATIVA DE GOOGLE</div>
+        <!-- PWA: guía de instalación. En Android se reemplaza por un botón de un toque;
+             en iPhone muestra los pasos, porque Apple no ofrece ninguna API. -->
+        <div id="instalar-ayuda" class="instalar-ayuda">
+            <button type="button" id="instalar-btn" class="instalar-btn">📲 INSTALAR ALISTEO EN ESTE TELÉFONO</button>
+            <div id="instalar-ios" class="instalar-ios">
+                <span>Toca el botón <img src="icons/share-ios.png" alt="Compartir" width="15"> y luego <strong>"Añadir a pantalla de inicio"</strong>. Quedará como una app más en tu teléfono.</span>
+            </div>
+            <button type="button" id="instalar-cerrar" class="instalar-cerrar" aria-label="Cerrar">✕</button>
+        </div>
+        <button type="button" id="instalar-help-link" class="instalar-help-link" hidden>¿CÓMO INSTALO EN MI TELÉFONO?</button>
         <div id="login-mantenimiento-msg" class="login-maint">
             <p class="login-maint-txt">La Programación Diaria se encuentra <strong>temporalmente fuera de servicio</strong>: se están realizando trabajos de mantención y mejoras al sistema.</p>
             <p class="login-maint-txt">Durante este período no es posible leer ni registrar información en la plataforma. El servicio se restablece de forma automática una vez finalizado el trabajo.</p>
@@ -2220,7 +2364,7 @@
             <div class="admin-card">
                 <div class="admin-card-title">ROL FUNCIONAL</div>
                 <div class="admin-role-grid" id="user-modal-roles"></div>
-                <div class="team-note">SUPER / PLANNER tienen alcance global. TL / TÉCNICO / USUARIO requieren seleccionar equipos.</div>
+                <div class="team-note" id="user-modal-roles-nota">SUPER / PLANNER tienen alcance global. TL / TÉCNICO / USUARIO requieren seleccionar equipos.</div>
 
                 <label class="admin-role-option" style="margin-top:8px; justify-content:center; padding:4px 8px;" id="user-modal-admin-wrap" title="Puede administrar usuarios y equipos. Con SUPER/PLANNER es admin global; con otros roles es admin solo de los equipos seleccionados.">
                     <input type="checkbox" id="user-modal-admin" onchange="userModalAlternarAdmin()"> ADMIN
@@ -2828,6 +2972,73 @@
             const r = rec.roles[t];
             return r && (r.usuario || r.tech || r.tl || r.admin);
         });
+    }
+
+    // ─── A QUIÉN PUEDO DARLE QUÉ ROL ──────────────────────────────────────
+    // Nadie otorga un rol SUPERIOR al suyo: un admin que es USUARIO no puede
+    // dejar a otro de TL, y uno que es TÉCNICO no puede dejar a otro de TL
+    // tampoco. El flag ADMIN es aparte y va "a la par" (quien administra un
+    // equipo puede dejar a otro administrando ese MISMO equipo), porque el rol
+    // funcional y el flag son cosas independientes en todo el modelo.
+    // Quien tiene alcance GLOBAL (super admin, supervisor, planner o admin
+    // global) administra todos los equipos: para esos no hay tope.
+    const RANGO_ROL = { usuario: 1, tech: 2, tl: 3 };
+    // Mi nivel funcional en ese equipo. Sin rol funcional (solo ADMIN) se trata
+    // como USUARIO: es el piso, y el admin sigue pudiendo administrar y quitar
+    // gente, solo que no puede promover a nadie por encima de sí mismo.
+    function rangoPropioEn(user, team) {
+        return RANGO_ROL[rolUnico(rolesDe(user, team))] || 1;
+    }
+    function esGlobalDe(user) {
+        return isSuperAdmin(user) || !!rolGlobalDe(user) || adminGlobalDe(user);
+    }
+    // ¿La persona que estoy editando está POR ENCIMA de mí en ese equipo? Si lo
+    // está, no se le toca: ni para bajarla ni para subirla. Un admin que es
+    // USUARIO no administra a un TL, y por lo mismo no le puede quitar el rol:
+    // el poder va con la jerarquía, no solo con el flag de administrador.
+    // Quien tiene alcance global administra todos los equipos: para ese no hay tope.
+    function targetPorEncimaDeMi(target, team) {
+        if (!target) return false;
+        const yo = sessionUser();
+        if (esGlobalDe(yo)) return false;
+        // PLANNER / SUPER están por encima de cualquier rol de equipo.
+        if (rolGlobalDe(target)) return true;
+        return rangoPropioEn(target, team) > rangoPropioEn(yo, team);
+    }
+    // ¿Puedo asignarle a ESTA persona el rol `rol` en el equipo `team`?
+    // `target` es a QUIÉN se lo voy a poner (opcional): hace falta porque quitarle
+    // el alcance global a un PLANNER/SUPER es un cambio de alcance, no un rol de
+    // equipo, y eso también es solo del super admin o de un admin global.
+    function rolOtorgable(team, rol, target) {
+        const yo = sessionUser();
+        // Los roles globales (SUPER / PLANNER) son de todo el sistema: solo el
+        // super admin o un admin global los otorga.
+        if (ROLES_GLOBALES.indexOf(rol) > -1) return esGlobalDe(yo);
+        // A quien está por encima de mí no se le toca, en ninguna dirección: bajarlo
+        // de rol también es administrar a alguien de más nivel.
+        if (target && targetPorEncimaDeMi(target, team)) return false;
+        if (!puedoGestionarEquipo(team)) return false;
+        if (esGlobalDe(yo)) return true;
+        return (RANGO_ROL[rol] || 0) <= rangoPropioEn(yo, team);
+    }
+    // El motivo, para el tooltip y para el aviso: el mismo en todas partes.
+    function motivoRolNoOtorgable(team, rol, target) {
+        const yo = sessionUser();
+        if (target && targetPorEncimaDeMi(target, team)) {
+            return rolGlobalDe(target)
+                ? String(nombreDe(target) || 'ESTE USUARIO').toUpperCase()
+                    + ' TIENE ALCANCE GLOBAL: SOLO EL SUPER ADMIN O UN ADMIN GLOBAL PUEDE MODIFICARLO'
+                : 'NO PUEDES MODIFICAR A ' + String(nombreDe(target) || 'ESTE USUARIO').toUpperCase()
+                    + ': TIENE UN ROL SUPERIOR AL TUYO EN ' + String(equipoNombre(team) || '').toUpperCase();
+        }
+        if (ROLES_GLOBALES.indexOf(rol) > -1 && !esGlobalDe(yo)) {
+            return 'SOLO EL SUPER ADMIN O UN ADMIN GLOBAL PUEDE OTORGAR ' + etiquetaRol(rol);
+        }
+        if (!puedoGestionarEquipo(team)) {
+            return 'NO ADMINISTRAS EL EQUIPO ' + String(equipoNombre(team) || '').toUpperCase();
+        }
+        return 'NO PUEDES OTORGAR ' + etiquetaRol(rol) + ': TIENES UN ROL IGUAL O MENOR EN '
+            + String(equipoNombre(team) || '').toUpperCase();
     }
 
     // ─── MULTI-EQUIPOS (solo PD) ──────────────────────────────────────────────
@@ -5015,7 +5226,7 @@
                 const rec = usuariosDB[key];
                 if (rec && rec.roles) {
                     const tareas = Object.keys(rec.roles).map(t => guardarRol(key, t, null, true, rec.roles[t]));
-                    return Promise.all(tareas).then(() => true);
+                return Promise.all(tareas).then(r => r.every(x => x !== false));
                 }
                 return true;
             });
@@ -5024,6 +5235,13 @@
             if (!teams.length) return showToast('⚠️ SELECCIONA AL MENOS UN EQUIPO');
             const noAutorizados = teams.filter(t => !puedoGestionarEquipo(t));
             if (noAutorizados.length) return showToast('⚠️ NO PUEDES GESTIONAR ' + noAutorizados.map(equipoNombre).join(', '));
+            // Nadie da un rol superior al suyo, y el alcance global es del super
+            // admin o de un admin global: el mismo criterio que en el modal de
+            // editar usuario, para que el alta no sea una puerta trasera.
+            const noOtorgables = teams.filter(t => !rolOtorgable(t, rol, key));
+            if (noOtorgables.length) {
+                return showToast('⚠️ ' + noOtorgables.map(t => motivoRolNoOtorgable(t, rol, key)).join(' · '));
+            }
             const recExistente = usuariosDB[key];
             if (recExistente && recExistente.rolGlobal && !puedeGlobal) {
                 return showToast('⚠️ ESTE USUARIO TIENE UN ROL GLOBAL. NO PUEDES EDITARLO DESDE ACÁ.');
@@ -5131,6 +5349,14 @@
             && Object.prototype.hasOwnProperty.call(usuariosDB[k].roles, team));
     }
 
+    // Equipos donde ESTA persona tiene un registro de roles, aunque esté vacío.
+    // Es el inverso de usuariosConRolEn (que devuelve las personas de un equipo):
+    // al borrar un usuario hay que saber en qué equipos queda, y no al revés.
+    function equiposConRolDe(user) {
+        const rec = usuariosDB[userKeyFor(user)] || {};
+        return Object.keys(rec.roles || {});
+    }
+
     function avisoEquipo(team) {
         const t = team || equipoDelPanel();
         if (puedoGestionarEquipo(t)) return '';
@@ -5184,6 +5410,12 @@
         if (aviso) { showToast(aviso); return false; }
         const auto = avisoAutoRoles(user);
         if (auto) { showToast(auto); return false; }
+        // A quien está por encima de mí en ese equipo no se le toca (tampoco para
+        // bajarlo de rol): el poder va con la jerarquía, no solo con el flag admin.
+        if (targetPorEncimaDeMi(user, team)) {
+            showToast('⚠️ ' + motivoRolNoOtorgable(team, 'usuario', user));
+            return false;
+        }
         if (!puedoGestionarEquipo(team)) {
             showToast('⚠️ NO PUEDES GESTIONAR EL EQUIPO ' + String(equipoNombre(team)).toUpperCase());
             return false;
@@ -5210,6 +5442,7 @@
     // un equipo lo mete o lo saca, segun este dentro o no.
     function adminAlternarEquipoUsuario(team, key) {
         if (!puedoGestionarEquipo(team)) return showToast('⚠️ NO PUEDES GESTIONAR ESE EQUIPO');
+        if (targetPorEncimaDeMi(key, team)) return showToast('⚠️ ' + motivoRolNoOtorgable(team, 'usuario', key));
         const dentro = esMiembroDe(key, team);
         if (dentro && esElPropio(key)) return showToast('⚠️ NO TE PUEDES SACAR DE ' + String(equipoNombre(team)).toUpperCase() + ': TIENE QUE HACERLO OTRO ADMIN DEL EQUIPO');
         if (!dentro) {
@@ -5280,13 +5513,14 @@
         const equipoRolWrap = document.getElementById('user-modal-equipo-rol-wrap');
         const equipoRolSel = document.getElementById('user-modal-equipo-rol');
         const equiposAdmin = equiposDondeSoyAdmin();
-        if (!esGlobal) {
-            if (!userModalTeam || equiposAdmin.indexOf(userModalTeam) === -1) {
-                const conRol = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && (ROLES_POR_EQUIPO.some(r => rec.roles[t][r]) || rec.roles[t].admin === true));
-                userModalTeam = conRol.find(t => equiposAdmin.indexOf(t) !== -1) || equiposAdmin[0] || equipoDelPanel();
-            }
-        } else {
-            userModalTeam = null;
+        // Un usuario de alcance GLOBAL (planner/super) no tiene un rol de equipo:
+        // manda el global. Pero quien tiene autoridad global sí puede bajarlo a un
+        // equipo concreto, así que también necesita un equipo sobre el que decidir.
+        // Por eso el equipo se resuelve siempre; lo que cambia es si se muestra.
+        const yoGlobal = esGlobalDe(sessionUser());
+        if (!userModalTeam || equiposAdmin.indexOf(userModalTeam) === -1) {
+            const conRol = Object.keys(rec.roles || {}).filter(t => rec.roles[t] && (ROLES_POR_EQUIPO.some(r => rec.roles[t][r]) || rec.roles[t].admin === true));
+            userModalTeam = conRol.find(t => equiposAdmin.indexOf(t) !== -1) || equiposAdmin[0] || equipoDelPanel();
         }
 
         // email
@@ -5309,7 +5543,7 @@
         const notaEmail = document.getElementById('user-modal-email-nota');
         if (notaEmail) {
             notaEmail.textContent = propio ? 'NO PUEDES CAMBIAR TU PROPIO EMAIL.'
-                : !editableEmail && !esSuperAdmin(sessionUser()) ? 'SOLO EL SUPER ADMIN PUEDE CORREGIR ESTE CORREO.'
+                : !editableEmail && !isSuperAdmin(sessionUser()) ? 'SOLO EL SUPER ADMIN PUEDE CORREGIR ESTE CORREO.'
                 : correoRoto ? '⚠️ ESTE CORREO ESTÁ MAL: TIENE "_" EN VEZ DE ".". ESCRÍBELO DE NUEVO Y GUÁRDALO.'
                 : '';
             notaEmail.style.color = correoRoto ? 'var(--danger)' : 'var(--comment)';
@@ -5336,16 +5570,30 @@
         if (grid) {
             grid.innerHTML = USER_ROLES_UI.map(r => {
                 const on = rolActual === r.id;
-                const disabled = propio || (ROLES_GLOBALES.indexOf(r.id) > -1 && !puedeGlobal);
-                return `<label class="admin-role-option${on ? ' checked' : ''}" style="${on ? 'border-color:var(--primary);background:var(--surface-violet);' : ''}">
-                    <input type="radio" name="user-modal-rol" value="${r.id}" ${on ? 'checked' : ''} ${disabled ? 'disabled' : ''} onchange="userModalPonerRol('${r.id}')"> ${r.txt}
+                // Nadie da un rol superior al suyo, y tocar el alcance global es
+                // cosa del super admin o de un admin global: la opción sale apagada
+                // y con el motivo, para que no parezca un botón que no responde.
+                const bloqueado = propio || !rolOtorgable(userModalTeam, r.id, key);
+                const motivo = bloqueado
+                    ? (propio ? 'NO PUEDES CAMBIAR TUS PROPIOS ROLES' : motivoRolNoOtorgable(userModalTeam, r.id, key))
+                    : (rg && ROLES_GLOBALES.indexOf(r.id) > -1 ? 'ALCANCE GLOBAL: TODOS LOS EQUIPOS' : '');
+                return `<label class="admin-role-option${on ? ' checked' : ''}" style="${on ? 'border-color:var(--primary);background:var(--surface-violet);' : ''}${bloqueado ? 'opacity:.45;' : ''}" title="${escapeAttr(motivo)}">
+                    <input type="radio" name="user-modal-rol" value="${r.id}" ${on ? 'checked' : ''} ${bloqueado ? 'disabled' : ''} onchange="userModalPonerRol('${r.id}')"> ${r.txt}
                 </label>`;
             }).join('');
+        }
+        const notaRoles = document.getElementById('user-modal-roles-nota');
+        if (notaRoles) {
+            notaRoles.textContent = (rg && yoGlobal)
+                ? 'ESTE USUARIO ALCANZA TODOS LOS EQUIPOS. ELIGE UN ROL DE EQUIPO PARA DEJARLO SOLO EN ESE EQUIPO (SE LE QUITA EL ALCANCE GLOBAL).'
+                : 'SUPER / PLANNER tienen alcance global (todos los equipos). TL / TÉCNICO / USUARIO son de un solo equipo.';
         }
 
         // selector de equipo para roles por equipo
         if (equipoRolWrap && equipoRolSel) {
-            if (!rg) {
+            // Con alcance global el selector solo aparece si quien edita tiene
+            // autoridad global: es el que puede bajarlo a un equipo.
+            if (!rg || yoGlobal) {
                 equipoRolWrap.style.display = 'flex';
                 // Se muestran los equipos que administra este admin, no solo los
                 // que ya tiene el usuario: asi se puede agregar o cambiar el rol
@@ -5367,10 +5615,16 @@
         // se mezclara con "es admin en algún equipo", al cambiar de equipo el
         // checkbox seguiría marcado y aplicaría mal el flag al equipo nuevo.
         const adminEnEquipoSel = !rg && userModalTeam && rec.roles && rec.roles[userModalTeam] && rec.roles[userModalTeam].admin === true;
+        // El flag ADMIN también es "nivel": en un equipo donde la persona está por
+        // encima de mí, no le puedo administrar. Se muestra igual, para que se vea
+        // su estado, pero apagado con el motivo.
+        const bloqueadoPorJerarquia = !rg && targetPorEncimaDeMi(key, userModalTeam);
         if (adminChk) {
             adminChk.checked = adminGlobal || !!adminEnEquipoSel;
-            adminChk.disabled = propio;
-            adminChk.title = adminGlobal
+            adminChk.disabled = propio || bloqueadoPorJerarquia;
+            adminChk.title = bloqueadoPorJerarquia
+                ? motivoRolNoOtorgable(userModalTeam, 'usuario', key)
+                : adminGlobal
                 ? 'ADMIN GLOBAL: APLICA A TODOS LOS EQUIPOS'
                 : (userModalTeam ? 'ADMIN SOLO DE ' + String(equipoNombre(userModalTeam)).toUpperCase() : 'ADMIN');
         }
@@ -5388,11 +5642,16 @@
             if (box) {
                 box.innerHTML = equiposAdmin.map(t => {
                     const dentroT = esMiembroDe(key, t);
+                    // Por equipo: si ahí la persona está por encima de mí, ese equipo
+                    // queda en solo lectura. En los equipos donde está a mi nivel o
+                    // abajo, se puede agregar o quitar con normalidad.
+                    const arriba = targetPorEncimaDeMi(key, t);
                     return `<button type="button" class="admin-team-btn${dentroT ? ' active' : ''}" data-team="${escapeAttr(t)}"
-                        style="width: auto; padding: 0 10px; height: var(--button-height); display: inline-flex; gap: 6px; align-items: center;"
+                        style="width: auto; padding: 0 10px; height: var(--button-height); display: inline-flex; gap: 6px; align-items: center;${arriba ? ' opacity:.45;' : ''}"
                         onclick="userModalAlternarEquipo('${escapeJsString(t)}')" aria-pressed="${dentroT}"
-                        title="${dentroT ? 'SACAR DE ' : 'AGREGAR A'} ${escapeAttr(equipoNombre(t))}"
-                        ${propio ? 'disabled' : ''}>${escapeHtml(equipoNombre(t))}</button>`;
+                        title="${arriba ? escapeAttr(motivoRolNoOtorgable(t, 'usuario', key))
+                            : (dentroT ? 'SACAR DE ' : 'AGREGAR A') + escapeAttr(equipoNombre(t))}"
+                        ${propio || arriba ? 'disabled' : ''}>${escapeHtml(equipoNombre(t))}</button>`;
                 }).join('') || '<div class="admin-empty">NO TIENES EQUIPOS QUE GESTIONAR</div>';
             }
         }
@@ -5439,10 +5698,6 @@
         } else {
             const tareas = [];
             const rec = usuariosDB[key];
-            // quitar rol global solo si lo tenía (requiere permiso global)
-            if (rec && rec.rolGlobal) {
-                tareas.push(guardarRolGlobal(key, null, false, true));
-            }
             // Se aplica SOLO al equipo seleccionado en el desplegable, no a todos los equipos
             let team = userModalTeam;
             if (!team || !puedoGestionarEquipo(team)) {
@@ -5451,13 +5706,32 @@
             if (!team || !puedoGestionarEquipo(team)) {
                 return showToast('⚠️ SELECCIONA UN EQUIPO QUE GESTIONES ANTES DE CAMBIAR EL ROL');
             }
+            // Nadie promueve por encima de sí mismo, y a quien está por encima no se
+            // le toca (ni para bajarlo): quitarle el alcance global es cosa del super
+            // admin o de un admin global (ver rolOtorgable). Se comprueba ANTES de
+            // encolar escrituras: quitarle el rol global es una de ellas, y si el
+            // cambio por equipo no va a ocurrir tampoco debe tocarlo.
+            if (!rolOtorgable(team, rol, key)) {
+                return showToast('⚠️ ' + motivoRolNoOtorgable(team, rol, key));
+            }
+            // quitar rol global solo si lo tenía (requiere permiso global)
+            if (rec && rec.rolGlobal) {
+                tareas.push(guardarRolGlobal(key, null, false, true));
+            }
             // Si el usuario no es miembro de ese equipo, primero lo agregamos como usuario
             const previo = Object.assign({}, rec.roles && rec.roles[team] || {});
             const rolRec = rolesDeUnRol(rol, admin);
             tareas.push(guardarRol(key, team, rolRec, true, previo));
-            Promise.all(tareas).then(() => {
+            Promise.all(tareas).then(r => {
                 renderUserModal();
                 refreshAdminList();
+                // guardarRol NO lanza si Firebase rechaza: devuelve false. Antes se
+                // mostraba "✅" igual y el cambio se perdía en silencio, que es peor
+                // que un error: parecía guardado y no lo estaba.
+                if (r.some(x => x === false)) {
+                    return showToast('⚠️ NO SE GUARDÓ EL ROL EN ' + String(equipoNombre(team)).toUpperCase()
+                        + '. REVISA QUE LAS REGLAS DE FIREBASE ESTÉN PUBLICADAS.');
+                }
                 showToast(`✅ ${etiquetaRol(rol)} EN ${equipoNombre(team).toUpperCase()}: ${String(nombreDe(key, team)).toUpperCase()}`);
             }).catch(e => {
                 console.error('FIREBASE WRITE ERROR (cambio a rol por equipo)', e);
@@ -5489,6 +5763,11 @@
             if (!team || !puedoGestionarEquipo(team)) {
                 return showToast('⚠️ SELECCIONA UN EQUIPO QUE GESTIONES ANTES DE CAMBIAR EL ADMIN');
             }
+            // El flag ADMIN también es nivel: a quien está por encima de mí en ese
+            // equipo no le administro, ni para ponerle ni para quitarle el admin.
+            if (targetPorEncimaDeMi(key, team)) {
+                return showToast('⚠️ ' + motivoRolNoOtorgable(team, 'usuario', key));
+            }
             if (!rec.roles || !rec.roles[team] || !ROLES_POR_EQUIPO.some(r => rec.roles[team][r])) {
                 return showToast('⚠️ EL USUARIO NO TIENE ROL EN EL EQUIPO SELECCIONADO');
             }
@@ -5497,9 +5776,14 @@
                 const rr = Object.assign({}, rec.roles[team]);
                 const previo = Object.assign({}, rr);
                 fijarAdmin(rr, activar);
-                guardarRol(key, team, rr, true, previo).then(() => {
+                guardarRol(key, team, rr, true, previo).then(ok => {
                     renderUserModal();
                     refreshAdminList();
+                    // mismo criterio que en el rol: si Firebase lo rechazó, se dice
+                    if (!ok) {
+                        return showToast('⚠️ NO SE CAMBIÓ EL ADMIN EN ' + String(equipoNombre(team)).toUpperCase()
+                            + '. REVISA QUE LAS REGLAS DE FIREBASE ESTÉN PUBLICADAS.');
+                    }
                     showToast(activar ? `✅ ADMIN EN ${equipoNombre(team).toUpperCase()}: ${String(nombreDe(key, team)).toUpperCase()}` : `⚠️ YA NO ES ADMIN: ${String(nombreDe(key, team)).toUpperCase()}`);
                 }).catch(e => {
                     console.error('FIREBASE WRITE ERROR (admin por equipo)', e);
@@ -5517,6 +5801,11 @@
         const key = userModalUser;
         if (!key || !team) return;
         if (rolGlobalDe(key)) return showToast('⚠️ LOS ROLES GLOBALES NO PERMITEN EDITAR EQUIPOS INDIVIDUALES');
+        // Agregar o quitar a alguien de un equipo es administrarlo: en ese equipo
+        // no puede estar por encima de mí.
+        if (targetPorEncimaDeMi(key, team)) {
+            return showToast('⚠️ ' + motivoRolNoOtorgable(team, 'usuario', key));
+        }
         adminAlternarEquipoUsuario(team, key);
     }
     // remembers what you type so that touching a role doesn't wipe it
@@ -5637,25 +5926,32 @@
         const rg = rolGlobalDe(key);
         if (rg && !soySuper) return showToast('⚠️ LOS USUARIOS CON ROL GLOBAL SOLO PUEDEN SER ELIMINADOS POR EL SUPER ADMIN');
         const teams = soySuper
-            ? usuariosConRolEn(key)
+            ? equiposConRolDe(key)
             : equiposDondeSoyAdmin().filter(t => esMiembroDe(key, t));
-        // Si no lo tengo en mis equipos solo se toca cuando ya no está en ninguno:
-        // si estuviera en otro equipo suyo, aquí no se puede llegar.
-        if (!soySuper && !teams.length && usuariosConRolEn(key).length) {
-            return showToast('⚠️ NO TIENE NINGÚN ROL EN LOS EQUIPOS QUE ADMINISTRAS');
+        // A quien está por encima de mí en un equipo no lo puedo sacar de ahí (las
+        // reglas de Firebase tampoco me lo dejan). Esos equipos quedan fuera de la
+        // operación y se dicen, para que no parezca que se le quitó de todos.
+        const porArriba = soySuper ? [] : teams.filter(t => targetPorEncimaDeMi(key, t));
+        const teamsOperables = porArriba.length ? teams.filter(t => porArriba.indexOf(t) === -1) : teams;
+        if (!soySuper && !teamsOperables.length && equiposConRolDe(key).length) {
+            return porArriba.length
+                ? showToast('⚠️ ' + String(nombreDe(key)).toUpperCase() + ' TIENE UN ROL SUPERIOR AL TUYO EN '
+                    + porArriba.map(t => String(equipoNombre(t)).toUpperCase()).join(', ')
+                    + ': QUE LO SAQUE OTRO ADMIN DE ESOS EQUIPOS')
+                : showToast('⚠️ NO TIENE NINGÚN ROL EN LOS EQUIPOS QUE ADMINISTRAS');
         }
         // Equipos que se quedarían sin admin si esta persona los administra
-        const sinAdmin = teams.filter(t => {
+        const sinAdmin = teamsOperables.filter(t => {
             if (!puede(key, 'administrar', t)) return false;
             const otros = usuariosDeEquipo(t).filter(u => userKeyFor(u) !== key);
             return !otros.some(u => puede(u, 'administrar', t));
         });
         const quien = key.toUpperCase();
-        const equiposTxt = teams.length
-            ? teams.map(t => String(equipoNombre(t)).toUpperCase()).join(', ')
+        const equiposTxt = teamsOperables.length
+            ? teamsOperables.map(t => String(equipoNombre(t)).toUpperCase()).join(', ')
             : 'NO ESTÁ EN NINGÚN EQUIPO';
         // ¿le queda algún equipo? se calcula antes de escribir nada
-        const quedaEn = usuariosConRolEn(key).filter(t => teams.indexOf(t) === -1);
+        const quedaEn = equiposConRolDe(key).filter(t => teamsOperables.indexOf(t) === -1);
         const seBorraTodo = !quedaEn.length;
         const cabecera = seBorraTodo
             ? '⚠️ SE BORRARÁ DEFINITIVAMENTE LA CUENTA DE\n' + quien + '\n\n'
@@ -5666,11 +5962,16 @@
               + '• EN LOS DEMÁS EQUIPOS NO SE TOCA NADA\n\n';
         showConfirm(
             cabecera
+            + (porArriba.length
+                ? '⚠️ EN ' + porArriba.map(t => String(equipoNombre(t)).toUpperCase()).join(', ')
+                  + ' TIENE UN ROL SUPERIOR AL TUYO: ESOS NO SE TOCAN.\n'
+                  + '   QUE LOS SAQUE OTRO ADMIN DE ESOS EQUIPOS.\n\n'
+                : '')
             + (sinAdmin.length
                 ? '⚠️ ' + sinAdmin.map(t => String(equipoNombre(t)).toUpperCase()).join(', ') + ' SE QUEDARÍA SIN ADMIN.\n\n'
                 : '')
             + '⚠️ ESTO NO SE PUEDE DESHACER.',
-            () => borrarUsuario(key, teams, soySuper),
+            () => borrarUsuario(key, teamsOperables, soySuper),
             key    // hay que ESCRIBIR el usuario para habilitar el borrado
         );
         const yes = document.getElementById('confirm-yes-btn');
@@ -5686,7 +5987,7 @@
     function borrarUsuario(key, teams, completo) {
         const quitar = teams || [];
         const ruta = 'mantenimiento/pd/usuarios/' + claveNodoDe(key);
-        const quedaEn = usuariosConRolEn(key).filter(t => quitar.indexOf(t) === -1);
+        const quedaEn = equiposConRolDe(key).filter(t => quitar.indexOf(t) === -1);
         const seBorraTodo = completo || !quedaEn.length;
         const quitarRol = (t) => Promise.all([
             remove(ref(db, ruta + '/roles/' + sanitizeTeamId(t))),

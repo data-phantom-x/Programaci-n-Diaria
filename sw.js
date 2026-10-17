@@ -6,7 +6,7 @@
 // Al publicar una versión nueva hay que subir el número de VERSION: eso borra
 // los cachés viejos y fuerza a los clientes a tomar los recursos nuevos.
 
-const VERSION = 'pd-v1';
+const VERSION = 'pd-v3';
 const CACHE_APP = `${VERSION}-app`;
 const CACHE_VENDOR = `${VERSION}-vendor`;
 
@@ -19,6 +19,7 @@ const PRECACHE = [
   './icons/icon-maskable-512.png',
   './icons/apple-touch-icon.png',
   './icons/favicon-32.png',
+  './icons/share-ios.png',
 ];
 
 // Todo lo que toca Firebase/Google NO se cachea ni se intercepta: son peticiones
@@ -70,28 +71,38 @@ function esDeFirebase(url) {
 
 // El HTML (index.html) SIEMPRE desde la red. Si no hay red, se sirve el último
 // guardado, que es preferible a una pantalla en blanco.
-async function redPrimero(request) {
-  const cache = await caches.open(CACHE_APP);
-  try {
-    const respuesta = await fetch(request);
-    if (respuesta && respuesta.ok) cache.put(request, respuesta.clone());
-    return respuesta;
-  } catch (err) {
-    const guardada = await cache.match(request) || await cache.match('./index.html');
-    if (guardada) return guardada;
-    throw err;
-  }
+//
+// `revalidar`_addressa la segunda capa de caché, la del navegador. GitHub Pages
+// manda 'cache-control: max-age=600', así que un icono recién subido puede seguir
+// saliendo el viejo hasta 10 minutos solo porque el navegador no pregunta. Con
+// {cache:'no-cache'} se le pregunta siempre: si el archivo no cambió el servidor
+// responde 304 y no se descarga nada, y si cambió llega el nuevo. Gracias a esto
+// los iconos ya no dependen de que se suba el número de VERSION a mano.
+async function redPrimero(request, revalidar) {
+    const cache = await caches.open(CACHE_APP);
+    try {
+        const respuesta = await fetch(request, revalidar ? { cache: 'no-cache' } : undefined);
+        if (respuesta && respuesta.ok) cache.put(request, respuesta.clone());
+        return respuesta;
+    } catch (err) {
+        const guardada = await cache.match(request)
+            || (request.mode === 'navigate' ? await cache.match('./index.html') : null);
+        if (guardada) return guardada;
+        throw err;
+    }
 }
 
-// Íconos, manifiesto, logos: de la caché al instante y al fondo se actualiza.
+// CDNs de terceros (SDK de Firebase, SheetJS, fuentes, logos de LATAM): sus URLs
+// llevan versión, así que un archivo con el mismo nombre NUNCA cambia de
+// contenido. Servicios de caché de golpe, y si se revalida en segundo plano mejor.
 async function cachePrimeroRevalidando(request, nombreCache) {
-  const cache = await caches.open(nombreCache);
-  const guardada = await cache.match(request);
-  const desdeRed = fetch(request).then((respuesta) => {
-    if (respuesta && respuesta.ok) cache.put(request, respuesta.clone());
-    return respuesta;
-  }).catch(() => null);
-  return guardada || desdeRed;
+    const cache = await caches.open(nombreCache);
+    const guardada = await cache.match(request);
+    const desdeRed = fetch(request, { cache: 'no-cache' }).then((respuesta) => {
+        if (respuesta && respuesta.ok) cache.put(request, respuesta.clone());
+        return respuesta;
+    }).catch(() => null);
+    return guardada || desdeRed;
 }
 
 self.addEventListener('fetch', (event) => {
@@ -107,15 +118,18 @@ self.addEventListener('fetch', (event) => {
 
   // Navegación = abrir la app.
   if (request.mode === 'navigate') {
-    event.respondWith(redPrimero(request));
+    event.respondWith(redPrimero(request, true));
     return;
   }
 
-  // Manifiesto e íconos: cambian muy poco, se sirven al tiro.
+  // Manifiesto e íconos propios: van por la red, pero se le pide al servidor que
+  // confirme (no-cache) para que un icono nuevo se vea en la PRIMERA visita y no
+  //dependa de subir el VERSION. Son unos 34 KB, nada comparado con los 621 KB del
+  // HTML que ya se descargan siempre.
   const esPropio = url.origin === self.location.origin
     && (url.pathname.endsWith('/manifest.json') || url.pathname.includes('/icons/'));
   if (esPropio) {
-    event.respondWith(cachePrimeroRevalidando(request, CACHE_APP));
+    event.respondWith(redPrimero(request, true));
     return;
   }
 
