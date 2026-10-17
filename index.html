@@ -11,11 +11,12 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ALISTEO">
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon.png">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon.png">
-    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png">
-    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png">
+    <link rel="manifest" href="manifest.json?v=20261017">
+    <link rel="icon" type="image/png" sizes="16x16" href="icons/favicon.png?v=20261017">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon.png?v=20261017">
+    <link rel="icon" type="image/png" sizes="192x192" href="icons/icon-192.png?v=20261017">
+    <link rel="apple-touch-icon" sizes="180x180" href="icons/apple-touch-icon.png?v=20261017">
+    <link rel="shortcut icon" href="icons/favicon.png?v=20261017">
 <script>
 (function(){
   var link = document.querySelector('link[rel="icon"]');
@@ -2475,6 +2476,15 @@
             Escribe el nombre completo del técnico. Se guardará en mayúsculas.
         </div>
         <input type="text" id="manual-global-tech-name" placeholder="NOMBRE DEL TÉCNICO" style="font-size:12px; text-transform: uppercase;">
+        <div style="margin-top:8px;">
+            <label style="font-size:10px; font-weight:700; color:var(--comment);">TURNO:</label>
+            <select id="manual-global-tech-turno" style="width:100%; font-size:11px; margin-top:4px;">
+                <option value="Todos">TODOS</option>
+                <option value="Turno Día">TURNO DÍA</option>
+                <option value="Turno Tarde">TURNO TARDE</option>
+                <option value="Turno Noche">TURNO NOCHE</option>
+            </select>
+        </div>
         <div class="modal-footer">
             <button class="btn-outline btn-modal-action" onclick="closeModal('add-global-tech-modal')">CANCELAR</button>
             <button class="btn-leader btn-modal-action" onclick="saveManualGlobalTech()">GUARDAR</button>
@@ -2835,6 +2845,11 @@
         if (unsubPredefTasks) { try { unsubPredefTasks(); } catch (e) {} }
         unsubGlobalTechs = onValue(globalTechsRef(), (snapshot) => {
             globalTechs = snapshot.val() || [];
+            updateGlobalTechsUI();
+        }, readErr);
+        if (unsubGlobalTechTurnos) { try { unsubGlobalTechTurnos(); } catch (e) {} }
+        unsubGlobalTechTurnos = onValue(ref(db, datosPath() + '/global_tech_turnos'), (snapshot) => {
+            globalTechTurnos = snapshot.val() || {};
             updateGlobalTechsUI();
         }, readErr);
         unsubPredefTasks = onValue(predefTasksRef(), (snapshot) => {
@@ -3880,6 +3895,7 @@
     let activeCodeFilter = ''; 
     let globalTechs = [];
     let globalTechDetails = {}; // nombre -> datos del rol mensual
+    let globalTechTurnos = {}; // nombre -> turno (para técnicos manuales)
     let selectedGlobalTech = null;
     let predefTasks = []; 
     let actividadGrupoTitulo = '⭐ ACTIVIDADES EXTRA';
@@ -4079,6 +4095,7 @@
     let sesionVigente = '';
     const staticUnsubs = [];
     let unsubGlobalTechs = null;
+    let unsubGlobalTechTurnos = null;
     let unsubPredefTasks = null;
 
     onAuthStateChanged(auth, (user) => {
@@ -4153,6 +4170,10 @@
             globalTechs = snapshot.val() || [];
             updateGlobalTechsUI();
         }, readErr);
+        unsubGlobalTechTurnos = onValue(ref(db, datosPath() + '/global_tech_turnos'), (snapshot) => {
+            globalTechTurnos = snapshot.val() || {};
+            updateGlobalTechsUI();
+        }, readErr);
         unsubPredefTasks = onValue(predefTasksRef(), (snapshot) => {
             predefTasks = snapshot.val() || [];
             updatePredefTasksUI();
@@ -4167,6 +4188,7 @@
         staticUnsubs.forEach(u => { try { u(); } catch (e) {} });
         staticUnsubs.length = 0;
         if (unsubGlobalTechs) { try { unsubGlobalTechs(); } catch (e) {} unsubGlobalTechs = null; }
+        if (unsubGlobalTechTurnos) { try { unsubGlobalTechTurnos(); } catch (e) {} unsubGlobalTechTurnos = null; }
         if (unsubPredefTasks) { try { unsubPredefTasks(); } catch (e) {} unsubPredefTasks = null; }
         cancelarListenersTurno();
         turnosRefs = {};
@@ -5317,10 +5339,6 @@
     // El rol funcional es UNO: al elegir uno se apagan los demas. El flag admin NO se
     // toca aqui, porque es independiente (se puede ser admin y tecnico, admin y tl, etc).
     // Solo se guardan roles por equipo (usuario/tech/tl); super/planner van en rolGlobal.
-    function fijarRol(rec, rol) {
-        ROLES_POR_EQUIPO.forEach(id => { rec[id] = (id === rol); });
-        return rec;
-    }
     // El admin se enciende o apaga sin tocar el rol funcional.
     function fijarAdmin(rec, sí) {
         rec[ROLES_ADMIN.id] = !!sí;
@@ -7467,8 +7485,9 @@
                 pill.className = 'tech-pill' + (isSelected ? ' selected-tech-pill' : '');
                 pill.dataset.tech = tech;
                 pill.dataset.index = index;
+                const turnoPill = (globalTechTurnos && globalTechTurnos[sanitizeKey(tech)]) || '';
                 pill.innerHTML = `
-                    <span class="tech-name" title="Ver detalles">${escapeHtml(tech)}</span>
+                    <span class="tech-name" title="Ver detalles${turnoPill ? ' · ' + turnoPill : ''}">${escapeHtml(tech)}</span>
                     <span class="tech-remove" title="Eliminar de la Base">✖</span>
                 `;
                 pill.querySelector('.tech-name').addEventListener('click', () => showGlobalTechDetails(tech));
@@ -7486,8 +7505,17 @@
         const content = document.getElementById('global-tech-details-content');
         if (!content) return;
         const data = globalTechDetails[techName];
+        const turnoActual = (globalTechTurnos && globalTechTurnos[sanitizeKey(techName)]) || '';
         if (!data) {
-            content.innerHTML = `<div style="color:var(--comment);">NO HAY DATOS ADICIONALES PARA <b>${escapeHtml(techName)}</b>.</div>`;
+            content.innerHTML = `<div style="color:var(--comment);">NO HAY DATOS ADICIONALES PARA <b>${escapeHtml(techName)}</b>.</div>
+                <div style="margin-top:8px;"><b>TURNO:</b>
+                    <select id="global-tech-turno-sel" style="margin-left:6px; font-size:10px;" onchange="guardarTurnoGlobalTech('${escapeJsString(techName)}', this.value)">
+                        <option value="Todos"${(!turnoActual || turnoActual === 'Todos') ? ' selected' : ''}>TODOS</option>
+                        <option value="Turno Día"${turnoActual === 'Turno Día' ? ' selected' : ''}>TURNO DÍA</option>
+                        <option value="Turno Tarde"${turnoActual === 'Turno Tarde' ? ' selected' : ''}>TURNO TARDE</option>
+                        <option value="Turno Noche"${turnoActual === 'Turno Noche' ? ' selected' : ''}>TURNO NOCHE</option>
+                    </select>
+                </div>`;
             return;
         }
         const vencimientos = data.vencimientos || {};
@@ -7554,6 +7582,13 @@
                 globalTechs[idx] = newName;
                 globalTechs.sort();
                 tareas.push(dbSet(ref(db, teamPath + '/global_techs'), globalTechs, 'RENOMBRAR TÉCNICO EN BASE GLOBAL'));
+            }
+            const turnoPrevio = globalTechTurnos[sanitizeKey(oldName)];
+            if (turnoPrevio !== undefined) {
+                delete globalTechTurnos[sanitizeKey(oldName)];
+                globalTechTurnos[sanitizeKey(newName)] = turnoPrevio;
+                tareas.push(remove(ref(db, teamPath + '/global_tech_turnos/' + sanitizeKey(oldName))));
+                tareas.push(dbSet(ref(db, teamPath + '/global_tech_turnos/' + sanitizeKey(newName)), turnoPrevio, 'RENOMBRAR TURNO DEL TÉCNICO'));
             }
 
             // 2. Renombrar en rol_mensual.tecnicos y en asignaciones
@@ -7638,6 +7673,8 @@
     function openAddGlobalTechModal() {
         const input = document.getElementById('manual-global-tech-name');
         if (input) input.value = '';
+        const sel = document.getElementById('manual-global-tech-turno');
+        if (sel) sel.value = 'Todos';
         document.getElementById('add-global-tech-modal').style.display = 'block';
         setTimeout(() => { if (input) input.focus(); }, 50);
     }
@@ -7648,11 +7685,27 @@
         const name = input.value.trim().toUpperCase();
         if (!name) return;
         if (globalTechs.includes(name)) return showConfirm("EL TÉCNICO YA EXISTE EN LA BASE GLOBAL.", null);
+        const turno = document.getElementById('manual-global-tech-turno').value || 'Todos';
         globalTechs.push(name);
         globalTechs.sort();
         dbSet(globalTechsRef(), globalTechs, 'GUARDAR BASE GLOBAL');
+        globalTechTurnos[sanitizeKey(name)] = turno;
+        dbSet(ref(db, datosPath() + '/global_tech_turnos/' + sanitizeKey(name)), turno, 'GUARDAR TURNO DEL TÉCNICO');
         input.value = '';
         closeModal('add-global-tech-modal');
+    }
+
+    function guardarTurnoGlobalTech(name, turno) {
+        if (!puedeCargarTecnicos()) return showConfirm('NO PUEDES MODIFICAR LA BASE DE TÉCNICOS EN ESTE EQUIPO.', null);
+        const n = String(name || '').trim().toUpperCase();
+        if (!n) return;
+        if (!turno) {
+            delete globalTechTurnos[sanitizeKey(n)];
+            remove(ref(db, datosPath() + '/global_tech_turnos/' + sanitizeKey(n))).catch(() => {});
+            return;
+        }
+        globalTechTurnos[sanitizeKey(n)] = turno;
+        dbSet(ref(db, datosPath() + '/global_tech_turnos/' + sanitizeKey(n)), turno, 'GUARDAR TURNO DEL TÉCNICO');
     }
 
     function populateGlobalTechGroupFilter() {
@@ -7691,6 +7744,8 @@
             }
             globalTechs.splice(index, 1);
             const tareas = [dbSet(globalTechsRef(), globalTechs, 'GUARDAR BASE GLOBAL')];
+            delete globalTechTurnos[sanitizeKey(nombre)];
+            tareas.push(remove(ref(db, datosPath() + '/global_tech_turnos/' + sanitizeKey(nombre))));
 
             // También eliminar del rol mensual: de la lista de técnicos y de todas las asignaciones
             try {
@@ -8310,6 +8365,16 @@
             if (ignorados.length) {
                 console.warn('syncShiftWithRol: técnicos del rol no están en la base global:', ignorados);
             }
+            // Agregar técnicos manuales (empresas terceras, etc.) cuyo turno coincida
+            // con el turno que se está sincronizando (o "Todos").
+            (globalTechs || []).forEach(nombre => {
+                const t = globalTechTurnos && globalTechTurnos[sanitizeKey(nombre)];
+                if (t !== 'Todos' && t !== activeTurno) return;
+                if (!globalTechs.includes(nombre)) return;
+                if (shiftTechs.includes(nombre)) return;
+                shiftTechs.push(nombre);
+                added.push(nombre);
+            });
             if (!added.length) {
                 return showToast('ℹ️ TODOS LOS TÉCNICOS DEL ROL YA ESTÁN EN EL TURNO' +
                     (ignorados.length ? ` · ${ignorados.length} NO ESTÁN EN LA BASE GLOBAL` : ''));
@@ -8317,7 +8382,7 @@
             shiftTechs.sort();
             const techsPath = getBasePath() + '/techs';
             await dbSet(ref(db, techsPath), shiftTechs, 'SINCRONIZAR TÉCNICOS CON ROL');
-            showToast(`✅ SE AGREGARON ${added.length} TÉCNICO(S) DEL ROL`);
+            showToast(`✅ SE AGREGARON ${added.length} TÉCNICO(S) (ROL + MANUALES)`);
         } catch (e) {
             console.error('SYNC ROL ERROR', e);
             const code = e && e.code ? e.code : '';
@@ -11372,7 +11437,7 @@
         formatTime, changeTurno, changeDate, goToToday, toggleLockShift,
         finalizeTime, onTimeKeyEnter,
         openManageTechsModal, showGlobalTechDetails, startEditGlobalTechName, saveGlobalTechNameEdit, removeGlobalTech,
-        openAddGlobalTechModal, saveManualGlobalTech, showTechDetailsFromPanel,
+        openAddGlobalTechModal, saveManualGlobalTech, guardarTurnoGlobalTech, showTechDetailsFromPanel,
         openRolImportModal, handleRolFileSelect, saveRolImport, syncShiftWithRol,
         openPredefModal, createAndAddPredef, addExistingPredef, removePredefTask,
         // carga rápida de work package (.xlsx / .csv)

@@ -6,7 +6,7 @@
 // Al publicar una versión nueva hay que subir el número de VERSION: eso borra
 // los cachés viejos y fuerza a los clientes a tomar los recursos nuevos.
 
-const VERSION = 'pd-v3';
+const VERSION = 'pd-v4';
 const CACHE_APP = `${VERSION}-app`;
 const CACHE_VENDOR = `${VERSION}-vendor`;
 
@@ -14,13 +14,12 @@ const CACHE_VENDOR = `${VERSION}-vendor`;
 const PRECACHE = [
   './',
   './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png',
-  './icons/icon-maskable-512.png',
-  './icons/apple-touch-icon.png',
-  './icons/favicon.png',
-  './icons/favicon-32.png',
-  './icons/share-ios.png',
+  './icons/icon-192.png?v=20261017',
+  './icons/icon-512.png?v=20261017',
+  './icons/icon-maskable-512.png?v=20261017',
+  './icons/apple-touch-icon.png?v=20261017',
+  './icons/favicon.png?v=20261017',
+  './icons/share-ios.png?v=20261017',
 ];
 
 // Todo lo que toca Firebase/Google NO se cachea ni se intercepta: son peticiones
