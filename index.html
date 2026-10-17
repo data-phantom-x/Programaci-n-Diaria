@@ -12,7 +12,22 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="ALISTEO">
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-1710.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon.png">
+<script>
+(function(){
+  var link = document.querySelector('link[rel="icon"]');
+  if (!link) return;
+  var href = link.getAttribute('href');
+  if (!href || href.indexOf('?v=') > -1) return;
+  fetch(href, { method: 'HEAD', cache: 'no-cache' }).then(function(res){
+    var v = res.headers.get('etag') || res.headers.get('last-modified') || Date.now();
+    v = String(v).replace(/[^a-zA-Z0-9_-]/g, '_');
+    link.setAttribute('href', href + '?v=' + v);
+  }).catch(function(){
+    link.setAttribute('href', href + '?v=' + Date.now());
+  });
+})();
+</script>
     <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600;700;800;900&display=swap');
