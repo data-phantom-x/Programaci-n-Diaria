@@ -6,7 +6,7 @@
 // Al publicar una versión nueva hay que subir el número de VERSION: eso borra
 // los cachés viejos y fuerza a los clientes a tomar los recursos nuevos.
 
-const VERSION = 'pd-v5';
+const VERSION = 'pd-v7';
 const CACHE_APP = `${VERSION}-app`;
 const CACHE_VENDOR = `${VERSION}-vendor`;
 
@@ -14,13 +14,13 @@ const CACHE_VENDOR = `${VERSION}-vendor`;
 const PRECACHE = [
   './',
   './manifest.json',
-  './icons/icon-192.png?v=20261017',
-  './icons/icon-512.png?v=20261017',
-  './icons/icon-maskable-512.png?v=20261017',
-  './icons/apple-touch-icon.png?v=20261017',
-  './icons/favicon.png?v=20261017',
-  './icons/share-ios.png?v=20261017',
-  './favicon.ico?v=20261017',
+  './icons/icon-192.png?v=20261020',
+  './icons/icon-512.png?v=20261020',
+  './icons/icon-maskable-512.png?v=20261020',
+  './icons/apple-touch-icon.png?v=20261020',
+  './icons/favicon-20261020.png',
+  './icons/share-ios.png?v=20261020',
+  './favicon-20261020.ico',
 ];
 
 // Todo lo que toca Firebase/Google NO se cachea ni se intercepta: son peticiones
@@ -128,7 +128,7 @@ self.addEventListener('fetch', (event) => {
   //dependa de subir el VERSION. Son unos 34 KB, nada comparado con los 621 KB del
   // HTML que ya se descargan siempre.
   const esPropio = url.origin === self.location.origin
-    && (url.pathname.endsWith('/manifest.json') || url.pathname.includes('/icons/') || url.pathname.endsWith('/favicon.ico'));
+    && (url.pathname.endsWith('/manifest.json') || url.pathname.includes('/icons/') || url.pathname.endsWith('/favicon-20261020.ico'));
   if (esPropio) {
     event.respondWith(redPrimero(request, true));
     return;
