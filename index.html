@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Programación Diaria - LATAM</title>
     <!-- PWA: instalable en Android/iOS/escritorio y funciona sin conexión en la
          interfaz. Rutas relativas para que sirva igual en GitHub Pages y local. -->
@@ -124,20 +124,41 @@
             color: var(--primary);
             margin: 0;
             padding: 20px;
+            touch-action: manipulation;
+            cursor: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #17A8B8 color-mix(in srgb, #1F4A8C 8%, transparent);
         }
+        ::-webkit-scrollbar { width: 10px; height: 10px; }
+        ::-webkit-scrollbar-track { background: color-mix(in srgb, #1F4A8C 6%, transparent); border-radius: 6px; }
+        ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #1F4A8C, #17A8B8); border-radius: 6px; border: 2px solid transparent; background-clip: content-box; }
+        ::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #17A8B8, #1F4A8C); background-clip: content-box; border: 2px solid transparent; }
 
         .container { max-width: 1000px; margin: 0 auto; background: var(--surface); padding: 25px; border-radius: 24px 0 24px 0; box-shadow: 0 4px 12px color-mix(in srgb, var(--black) 5%, transparent); }
+        /* Botón flotante para activar botones en móvil (evita toques accidentales) */
+        .fab-unlock { display: none; position: fixed; bottom: 18px; left: 18px; z-index: 1300; width: 40px; height: 40px; border-radius: 50%; border: 1px solid color-mix(in srgb, var(--primary) 25%, transparent); background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); color: var(--primary); font-size: 16px; cursor: pointer; box-shadow: 0 2px 10px color-mix(in srgb, var(--black) 12%, transparent); align-items: center; justify-content: center; transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease; }
+        .fab-unlock:hover { transform: scale(1.06); box-shadow: 0 4px 14px color-mix(in srgb, var(--primary) 25%, transparent); }
+        .fab-unlock.unlocked { background: color-mix(in srgb, var(--success) 90%, transparent); color: var(--surface); border-color: color-mix(in srgb, var(--success) 40%, transparent); }
+        /* Vista limpia: oculta botones y controles para una lectura sin distracciones */
+        body.clean-view .leader-only { display: none !important; }
+        body.clean-view .action-bar { display: none !important; }
+        body.clean-view .status-toggle { display: none !important; }
+        body.clean-view .view-controls { display: none !important; }
 
         /* Barra superior general */
         .top-bar {
-            display: flex; justify-content: space-between; gap: 6px; flex-wrap: wrap; row-gap: 4px;
-            margin-bottom: 8px; min-height: 32px;
-            background-color: var(--light-gray); padding: 4px 10px;
-            border-radius: 12px 0 12px 0; align-items: center; position: relative;
+            display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; row-gap: 4px;
+            margin-bottom: 8px; min-height: 38px;
+            background: linear-gradient(135deg, var(--surface) 0%, var(--light-gray) 100%);
+            padding: 4px 12px;
+            border-radius: 14px 0 14px 0; align-items: center; position: relative;
+            border: 1px solid var(--border-soft);
+            box-shadow: 0 2px 8px color-mix(in srgb, var(--black) 4%, transparent);
         }
 
-        .top-bar-left { display: flex; gap: 5px; }
-
+        .top-bar-left { display: flex; gap: 6px; align-items: center; }
+        .brand-alisteo { display: inline-flex; align-items: center; text-decoration: none; flex: none !important; margin-right: 8px; cursor: default; padding-right: 8px; border-right: 1px solid var(--border-soft); }
+        .brand-alisteo img { height: 38px; width: auto; }
         /* Selector de equipo (barra superior) */
         .team-switcher {
             display: none; align-items: center; gap: 5px; height: var(--button-height);
@@ -1019,6 +1040,17 @@
         .team-add-row { display: flex; gap: 5px; margin-top: 7px; }
         .team-note { font-size: 9px; color: var(--comment); margin-top: 6px; line-height: 1.4; }
 
+        /* Botón flotante de desbloqueo en móvil */
+        @media (max-width: 900px) and (orientation: portrait) {
+            .fab-unlock { display: flex; }
+            body.mobile-locked .action-bar button,
+            body.mobile-locked .avion-actions button,
+            body.mobile-locked .avion-btn { pointer-events: none; opacity: 0.35; filter: grayscale(0.6); }
+        }
+        @media (min-width: 901px), (orientation: landscape) {
+            .fab-unlock { display: none !important; }
+        }
+
         /* AJUSTES PARA CELULARES */
         /* ── FORMATO DE PANTALLA PEQUEÑA ─────────────────────────────────────
            Se aplica por ANCHO y, además, solo en vertical. Un celular en horizontal
@@ -1241,8 +1273,12 @@
             /* 1500 y no 1001: el modal de usuario es 1250 y el de confirmacion 1400, asi que
                con 1001 todos los avisos se veian DETRAS del modal y parecian no guardar */
             bottom: 30px; left: 50%; transform: translateX(-50%); font-size: 11px; font-weight: bold; box-shadow: 0 4px 12px color-mix(in srgb, var(--black) 20%, transparent);
-            opacity: 0; transition: opacity 0.3s, visibility 0.3s; border-left: 4px solid var(--accent);
-        }
+             opacity: 0; transition: opacity 0.3s, visibility 0.3s; border-left: 4px solid var(--accent);
+         }
+        /* Indicador de reconexión (esquina inferior derecha, sutil) */
+        .conn-spinner { position: fixed; bottom: 20px; right: 20px; z-index: 1500; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; background: var(--surface); border-radius: 50%; box-shadow: 0 4px 14px color-mix(in srgb, var(--black) 25%, transparent); }
+        .conn-spinner-ring { width: 22px; height: 22px; border-radius: 50%; border: 3px solid color-mix(in srgb, var(--primary) 15%, transparent); border-top-color: var(--cyan); animation: bootspin .8s linear infinite; }
+        @keyframes connspin { to { transform: rotate(360deg); } }
         #toast.show { visibility: visible; opacity: 1; }
 
         button {
@@ -1560,17 +1596,23 @@
     </style>
     <style>
         /* Pantalla de inicio de sesión obligatorio */
-        .login-screen { position: fixed; inset: 0; z-index: 9999; background: var(--gradient-brand); display: flex; align-items: center; justify-content: center; padding: 20px; }
-        .login-card { background: var(--surface); border-radius: 16px 0 16px 0; box-shadow: 0 20px 60px color-mix(in srgb, var(--black) 35%, transparent); padding: 32px 28px 24px; width: 100%; max-width: 360px; text-align: center; display: flex; flex-direction: column; gap: 10px; justify-content: center; }
+        .login-screen { position: fixed; inset: 0; z-index: 9999; background: radial-gradient(ellipse at top, color-mix(in srgb, var(--primary-light) 40%, transparent), transparent 60%), var(--gradient-brand); display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { background: var(--surface); border-radius: 20px 0 20px 0; box-shadow: 0 24px 64px color-mix(in srgb, var(--black) 40%, transparent), 0 0 0 1px color-mix(in srgb, var(--surface) 20%, transparent); padding: 36px 32px 28px; width: 100%; max-width: 400px; text-align: center; display: flex; flex-direction: column; gap: 12px; justify-content: center; position: relative; overflow: hidden; }
+        .login-card::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 4px; background: linear-gradient(90deg, #1F4A8C, #17A8B8, #6ED4E4); }
         .login-card img { height: 52px; width: auto; margin: 0 auto; }
-        .login-title { font-size: 1.15em; font-weight: 900; color: var(--primary); }
-        .login-sub { font-size: 10px; font-weight: 700; color: var(--comment); margin-bottom: 6px; }
+        .login-brands { display: inline-flex; align-items: center; justify-content: center; gap: 16px; margin: 0 auto 8px; padding: 10px 16px; background: var(--surface-soft); border-radius: 12px 0 12px 0; border: 1px solid var(--border-soft); }
+        .login-brand { height: 42px; width: auto; }
+        .login-brand.login-brand-alisteo { height: 62px; }
+        .login-brand-sep { width: 1px; height: 52px; background: linear-gradient(to bottom, transparent, var(--border) 30%, var(--border) 70%, transparent); }
+        .login-title { font-size: 1.35em; font-weight: 900; color: var(--primary); letter-spacing: 1.5px; margin-top: 4px; }
+        .login-sub { font-size: 10px; font-weight: 700; color: var(--comment); margin-bottom: 8px; letter-spacing: 0.6px; }
         .login-card input { width: 100%; height: 40px; font-size: 12px; padding: 0 12px; border: 1px solid var(--border); border-radius: 6px; box-sizing: border-box; flex: none; }
         .login-card input:focus { border-color: var(--primary); box-shadow: 0 0 0 2px color-mix(in srgb, var(--primary) 10%, transparent); outline: none; }
         .login-btn { width: 100%; height: 40px !important; border: none; border-radius: var(--button-radius); cursor: pointer; font-size: 11px; font-weight: 800; color: var(--surface); transition: opacity 0.2s; flex: none; }
         .login-btn:hover { opacity: 0.88; }
         .login-btn-primary { background: var(--gradient-primary); }
-        .login-btn-google { background: var(--google-blue); display: inline-flex; align-items: center; justify-content: center; gap: 10px; margin-top: 14px; box-shadow: 0 2px 6px color-mix(in srgb, var(--google-blue) 35%, transparent); }
+        .login-btn-google { background: var(--google-blue); display: inline-flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; box-shadow: 0 4px 14px color-mix(in srgb, var(--google-blue) 40%, transparent); border-radius: 12px !important; height: 46px !important; font-size: 12px; letter-spacing: 0.5px; transition: transform 0.15s ease, box-shadow 0.15s ease; }
+        .login-btn-google:hover { transform: translateY(-1px); box-shadow: 0 6px 18px color-mix(in srgb, var(--google-blue) 50%, transparent); opacity: 1; }
         .login-btn-google .g-icon { background: var(--surface); border-radius: 50%; width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center; flex: none; }
         .login-btn-danger { background: var(--danger); }
         .login-error { color: var(--danger); font-size: 10px; font-weight: 700; min-height: 14px; }
@@ -1621,12 +1663,15 @@
         .login-manto-salir:hover:not(:disabled) { background: var(--primary); color: var(--surface); opacity: 1; }
 
         /* Pantalla de carga profesional */
-        #boot-splash { position: fixed; inset: 0; z-index: 10000; background: var(--gradient-boot); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; transition: opacity .35s ease; }
+        #boot-splash { position: fixed; inset: 0; z-index: 10000; background: radial-gradient(ellipse at center, color-mix(in srgb, var(--primary-light) 30%, transparent), transparent 70%), var(--gradient-boot); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 20px; transition: opacity .35s ease; }
         #boot-splash.hide { opacity: 0; pointer-events: none; }
-        #boot-splash img { height: 56px; width: auto; filter: drop-shadow(0 4px 12px color-mix(in srgb, var(--black) 40%, transparent)); }
-        #boot-splash .boot-title { color: var(--surface); font-weight: 900; font-size: 1.05em; letter-spacing: 2px; }
-        #boot-splash .boot-sub { color: var(--text-lavender); font-size: 10px; font-weight: 700; letter-spacing: 1px; }
-        .boot-spinner { width: 34px; height: 34px; border-radius: 50%; border: 3px solid color-mix(in srgb, var(--surface) 15%, transparent); border-top-color: var(--cyan); animation: bootspin .8s linear infinite; }
+        #boot-splash .boot-brands { display: inline-flex; align-items: center; justify-content: center; gap: 16px; background: #FFFFFF; border-radius: 20px 0 20px 0; padding: 14px 22px; box-shadow: 0 12px 32px color-mix(in srgb, var(--black) 40%, transparent); border: 1px solid color-mix(in srgb, var(--border) 60%, transparent); }
+        #boot-splash .boot-brand { height: 48px; width: auto; }
+        #boot-splash .boot-brand.boot-brand-alisteo { height: 72px; }
+        #boot-splash .boot-brand-sep { width: 1px; height: 60px; background: linear-gradient(to bottom, transparent, var(--border) 30%, var(--border) 70%, transparent); }
+        #boot-splash .boot-title { color: var(--surface); font-weight: 900; font-size: 1.2em; letter-spacing: 3px; text-shadow: 0 2px 8px color-mix(in srgb, var(--black) 40%, transparent); }
+        #boot-splash .boot-sub { color: var(--text-lavender); font-size: 10px; font-weight: 700; letter-spacing: 1.2px; }
+        .boot-spinner { width: 40px; height: 40px; border-radius: 50%; border: 3px solid color-mix(in srgb, var(--surface) 15%, transparent); border-top-color: var(--cyan); animation: bootspin .8s linear infinite; box-shadow: 0 0 12px color-mix(in srgb, var(--cyan) 30%, transparent); }
         @keyframes bootspin { to { transform: rotate(360deg); } }
     </style>
 </head>
@@ -1745,7 +1790,11 @@
 </script>
 
     <div id="boot-splash">
-    <img src="https://raw.githubusercontent.com/data-phantom-x/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo-light.svg" alt="LATAM Airlines">
+    <div class="boot-brands">
+        <img src="icons/alisteo-logo.svg" alt="ALISTEO" class="boot-brand boot-brand-alisteo">
+        <span class="boot-brand-sep"></span>
+        <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines" class="boot-brand">
+    </div>
     <div class="boot-title">PROGRAMACIÓN DIARIA</div>
     <div class="boot-spinner"></div>
     <div class="boot-sub">CONECTANDO CON EL SERVIDOR...</div>
@@ -1755,7 +1804,11 @@
 
 <div id="login-obligatorio" class="login-screen" style="display:none;">
     <div class="login-card">
-        <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines">
+        <div class="login-brands">
+        <img src="icons/alisteo-logo.svg" alt="ALISTEO" class="login-brand login-brand-alisteo">
+        <span class="login-brand-sep"></span>
+        <img src="https://raw.githubusercontent.com/nfuentes-cloud/Programaci-n-Diaria/refs/heads/main/latam-airlines-logo.svg" alt="LATAM Airlines" class="login-brand">
+        </div>
         <div id="login-card-title" class="login-title">PROGRAMACIÓN DIARIA</div>
         <div id="login-sub" class="login-sub">ACCESO RESTRINGIDO · PERSONAL AUTORIZADO</div>
         <button id="login-google-btn" class="login-btn login-btn-google" onclick="doGoogleLogin()"><span class="g-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="14" height="14"><path fill="var(--google-blue)" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="var(--google-green)" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="var(--google-yellow)" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="var(--google-red)" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg></span> ENTRAR CON GOOGLE</button>
@@ -1784,7 +1837,8 @@
 <div class="container">
     <div class="top-bar no-print">
         <div class="top-bar-left">
-            <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleMode()">👤 USUARIO</button>
+            <a class="brand-alisteo" href="#" onclick="return false;" title="ALISTEO"><img src="icons/alisteo-logo.svg" alt="ALISTEO"></a>
+            <button type="button" id="btn-mode-toggle" class="btn-accent btn-top" onclick="toggleCleanView()">👤 USUARIO</button>
             <span id="logged-user" class="leader-only" style="font-size: 10px; font-weight: bold; color: var(--primary); border: 1px solid var(--primary); padding: 0 10px; border-radius: var(--button-radius); background: var(--surface-soft); display: none; align-items: center; height: var(--button-height); box-sizing: border-box; margin: 0;"></span>
             <div id="team-switcher" class="team-switcher">
                 <select id="team-select" class="team-select" onchange="switchTeam(this.value)" title="Equipo que estás viendo"></select>
@@ -1892,6 +1946,12 @@
 </div>
 
 <div id="toast">✅ Acción realizada con éxito</div>
+
+<div id="conn-spinner" class="conn-spinner" aria-label="Reconectando" style="display:none;">
+    <div class="conn-spinner-ring"></div>
+</div>
+
+<button type="button" id="fab-unlock" class="fab-unlock" onclick="toggleMobileUnlock()" aria-label="Activar botones">🔒</button>
 
 <div id="confirm-modal" class="modal">
     <div class="modal-content" style="max-width: 380px;">
@@ -3907,6 +3967,9 @@
     
     let isTeamLeader = false;      // tiene POD_LIDER: es TL de verdad
     let panelAbierto = false;      // ve el panel de trabajo (TL o planner)
+    let cleanView = false;         // vista limpia: oculta botones y controles (solo lectura)
+    let mobileUnlocked = false;    // móvil: botones de acción desbloqueados temporalmente
+    let mobileUnlockTimer = null;
     // La vista TODOS muestra la programación de todos los equipos del usuario en
     // una sola lista. Es SOLO LECTURA: para tocar algo hay que entrar al equipo.
     // Es lo que necesita el que tiene varios equipos (y mañana el super admin).
@@ -4075,7 +4138,40 @@
         seguroCompartidas(() => { renderBotonCompartidas(); renderShareListTarea(); });
     }
 
-    function toggleMode() {
+
+       function toggleCleanView() {
+        cleanView = !cleanView;
+        document.body.classList.toggle('clean-view', cleanView);
+        updateUserButton();
+        render();
+    }
+
+    function isMobileView() {
+        return window.matchMedia('(max-width: 900px) and (orientation: portrait)').matches;
+    }
+    function unlockMobileActions() {
+        mobileUnlocked = true;
+        document.body.classList.remove('mobile-locked');
+        const fab = document.getElementById('fab-unlock');
+        if (fab) { fab.textContent = '🔓'; fab.classList.add('unlocked'); }
+        clearTimeout(mobileUnlockTimer);
+        mobileUnlockTimer = setTimeout(lockMobileActions, 10000);
+        showToast('BOTONES ACTIVADOS (10s)');
+    }
+    function lockMobileActions() {
+        mobileUnlocked = false;
+        document.body.classList.add('mobile-locked');
+        const fab = document.getElementById('fab-unlock');
+        if (fab) { fab.textContent = '🔒'; fab.classList.remove('unlocked'); }
+        clearTimeout(mobileUnlockTimer);
+    }
+    function toggleMobileUnlock() {
+        if (mobileUnlocked) lockMobileActions(); else unlockMobileActions();
+    }
+    // Estado inicial: en móvil, botones bloqueados hasta que el usuario los active
+    if (isMobileView()) { document.body.classList.add('mobile-locked'); }
+
+     function toggleMode() {
         if (panelAbierto) {
             deactivateLeaderUI();
             return;
@@ -4094,6 +4190,9 @@
     let usuariosLoaded = false;
     let dataAttached = false;
     let splashHidden = false;
+    let conexionMonitorActivo = false;
+    let estabaDesconectado = false;
+    let primerConexionVista = false;
     let gateRolesTimer = null;
     let sesionVigente = '';
     const staticUnsubs = [];
@@ -4116,8 +4215,22 @@
         const actual = (auth.currentUser && auth.currentUser.email) || '';
         if (actual !== sesionVigente) location.reload();
     }
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) sincronizarSesion(); });
+    document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        sincronizarSesion();
+        if (dataAttached && estabaDesconectado) {
+            estabaDesconectado = false;
+            const sp = document.getElementById('conn-spinner');
+            if (sp) sp.style.display = 'none';
+            detachData(); attachData();
+        }
+    });
     window.addEventListener('focus', sincronizarSesion);
+    window.addEventListener('online', () => {
+        const sp = document.getElementById('conn-spinner');
+        if (sp) sp.style.display = 'none';
+        if (dataAttached) { detachData(); attachData(); }
+    });
     window.addEventListener('storage', (e) => { if (e.key === AVISO_SESION) location.reload(); });
 
     function googleUser() {
@@ -4153,6 +4266,8 @@
     function attachData() {
         if (dataAttached) return;
         dataAttached = true;
+        monitorConexion();
+        mostrarSpinnerCarga();
         // El equipo se resuelve ANTES de suscribirse: las rutas dependen de él.
         updateTeamSwitcher();
         staticUnsubs.push(
@@ -4201,9 +4316,48 @@
         shiftTechs = [];
         groupMessages = [];
         document.getElementById('display-header').innerHTML = '';
-        render();
+         render();
         renderTechPills();
         renderGroupMessages();
+    }
+
+    // Monitoreo de conexión: avisa si se pierde la conexión y re-suscribe los datos al recuperarla
+    function monitorConexion() {
+        if (conexionMonitorActivo) return;
+        conexionMonitorActivo = true;
+        onValue(ref(db, '.info/connected'), (snap) => {
+            const conectado = snap.val() === true;
+            if (!primerConexionVista) {
+            primerConexionVista = true;
+            if (conectado) { estabaDesconectado = false; }
+            return;
+        }
+        if (!conectado) {
+                estabaDesconectado = true;
+                mostrarSpinnerCarga();
+            } else if (estabaDesconectado) {
+                estabaDesconectado = false;
+                if (dataAttached) { detachData(); attachData(); }
+                else { ocultarSpinnerCarga(); }
+            }
+        }, (e) => console.warn('conexion:', e && e.code));
+    }
+
+    // Spinner de carga (esquina inferior derecha): se muestra durante cargas/reconexiones
+    let cargandoCount = 0;
+    function mostrarSpinnerCarga() {
+        cargandoCount++;
+        const sp = document.getElementById('conn-spinner');
+        if (sp) sp.style.display = 'flex';
+    }
+    function ocultarSpinnerCarga() {
+        cargandoCount = Math.max(0, cargandoCount - 1);
+        if (cargandoCount === 0) {
+            setTimeout(() => {
+                const sp = document.getElementById('conn-spinner');
+                if (sp && cargandoCount === 0) sp.style.display = 'none';
+            }, 500);
+        }
     }
 
     function hideSplash() {
@@ -4548,40 +4702,42 @@
         showToast(msg);
     }
 
-    function dbSet(r, v, label) {
-        return set(r, v).catch((e) => {
-            console.error('FIREBASE WRITE ERROR', e);
-            let msg = '⚠️ NO SE GUARDÓ' + (label ? ' (' + label + ')' : '') + ': ' + (e.code || e.message);
-            if ((e.code || '').includes('permission')) {
-                if (String(r || '').indexOf('/pd/equipos/') > -1) {
-                    msg = '🔒 FALTAN LAS REGLAS NUEVAS: PUBLICA REGLAS_FIREBASE.json (pd/equipos)';
-                } else {
-                    msg = !googleUser()
-                        ? '🔒 SIN PERMISO DE ESCRITURA: CIERRA SESIÓN Y ENTRA CON GOOGLE'
-                        : '🔒 SIN PERMISO DE ESCRITURA (' + (e.code || '') + ')';
-                }
-            }
-            toastThrottled(msg);
-            return Promise.reject(e);
-        });
-    }
+     function dbSet(r, v, label) {
+         mostrarSpinnerCarga();
+         return set(r, v).catch((e) => {
+             console.error('FIREBASE WRITE ERROR', e);
+             let msg = '⚠️ NO SE GUARDÓ' + (label ? ' (' + label + ')' : '') + ': ' + (e.code || e.message);
+             if ((e.code || '').includes('permission')) {
+                 if (String(r || '').indexOf('/pd/equipos/') > -1) {
+                     msg = '🔒 FALTAN LAS REGLAS NUEVAS: PUBLICA REGLAS_FIREBASE.json (pd/equipos)';
+                 } else {
+                     msg = !googleUser()
+                         ? '🔒 SIN PERMISO DE ESCRITURA: CIERRA SESIÓN Y ENTRA CON GOOGLE'
+                         : '🔒 SIN PERMISO DE ESCRITURA (' + (e.code || '') + ')';
+                 }
+             }
+             toastThrottled(msg);
+             return Promise.reject(e);
+         }).finally(() => { ocultarSpinnerCarga(); });
+     }
 
     // Igual que dbSet pero para escribir varias hojas en una sola operacion.
     // Se usa para marcar tareas: las reglas dejan al tecnico tocar solo
     // 'done', 'atencion' y las alertas, no el turno entero.
-    function dbUpd(r, obj, label) {
-        return update(r, obj).catch((e) => {
-            console.error('FIREBASE WRITE ERROR', e);
-            let msg = '⚠️ NO SE GUARDÓ' + (label ? ' (' + label + ')' : '') + ': ' + (e.code || e.message);
-            if ((e.code || '').includes('permission')) {
-                msg = !googleUser()
-                    ? '🔒 SIN PERMISO DE ESCRITURA: CIERRA SESIÓN Y ENTRA CON GOOGLE'
-                    : '🔒 SIN PERMISO DE ESCRITURA (' + (e.code || '') + ')';
-            }
-            toastThrottled(msg);
-            return Promise.reject(e);
-        });
-    }
+     function dbUpd(r, obj, label) {
+         mostrarSpinnerCarga();
+         return update(r, obj).catch((e) => {
+             console.error('FIREBASE WRITE ERROR', e);
+             let msg = '⚠️ NO SE GUARDÓ' + (label ? ' (' + label + ')' : '') + ': ' + (e.code || e.message);
+             if ((e.code || '').includes('permission')) {
+                 msg = !googleUser()
+                     ? '🔒 SIN PERMISO DE ESCRITURA: CIERRA SESIÓN Y ENTRA CON GOOGLE'
+                     : '🔒 SIN PERMISO DE ESCRITURA (' + (e.code || '') + ')';
+             }
+             toastThrottled(msg);
+             return Promise.reject(e);
+         }).finally(() => { ocultarSpinnerCarga(); });
+     }
 
     function readErr(err) {
         console.error('FIREBASE READ ERROR', err);
@@ -6175,6 +6331,7 @@
     // sigue leyendopoon lo mismo (turnoDatos[currentTeam]).
     function listenToTurno(turno) {
         if (!dataAttached) return; // sin acceso: no conectar nada
+        mostrarSpinnerCarga();
         cancelarListenersTurno();
         turnosRefs = {};
         turnoDatos = {};
@@ -6268,6 +6425,7 @@
             renderTechPills();
             if (campo === 'techs') updateTechFilterDropdown();
         }
+        ocultarSpinnerCarga();
     }
     // Avisa哪些 tareas se pasaron a "completadas" en otro equipo o en este mismo.
     // Es solo decoración: no toca los datos.
@@ -6302,7 +6460,7 @@
     // vista de todos se llama para cada equipo, pero solo se pinta la del que
     // está en pantalla.
     function aplicarHeaderEquipo(team, data) {
-        if (vistaTodos) { hideSplash(); return; }
+        if (vistaTodos) { ocultarSpinnerCarga(); hideSplash(); return; }
         seguroCompartidas(publicarIndiceTareas);
         shiftState.estado = data.estado || 'abierto';
         shiftState.cerradoPor = data.cerradoPor || '';
@@ -6330,9 +6488,10 @@
         `;
         document.title = `${equipoNombre(team)} · ${activeTurno} - ${fechaCorta}`;
 
-        updateLockUI();
+         updateLockUI();
         render();
         renderGroupMessages();
+        ocultarSpinnerCarga();
         hideSplash(); // primeros datos recibidos: fin de la pantalla de carga
     }
 
@@ -7286,15 +7445,17 @@
     }
 
     // B1 FIX: Transacción evita que 2 líderes borren lo del otro al guardar a la vez (antes last-write-wins)
-    function saveData() { 
-        if(checkLock()) return;
-        asegurarEquipoLigado();
-        // Transacción = Firebase revisa que nadie cambió el turno mientras guardabas
-        runTransaction(dbRefs.aviones, (current) => avionesData)
-            .then(() => seguroCompartidas(publicarIndiceTareas))
-            .catch((e) => dbSet(dbRefs.aviones, avionesData, 'GUARDAR PROGRAMACIÓN')
-                         .then(() => seguroCompartidas(publicarIndiceTareas)));
-    }
+     function saveData() { 
+         if(checkLock()) return;
+         asegurarEquipoLigado();
+         mostrarSpinnerCarga();
+         // Transacción = Firebase revisa que nadie cambió el turno mientras guardabas
+         runTransaction(dbRefs.aviones, (current) => avionesData)
+             .then(() => { seguroCompartidas(publicarIndiceTareas); ocultarSpinnerCarga(); })
+             .catch((e) => dbSet(dbRefs.aviones, avionesData, 'GUARDAR PROGRAMACIÓN')
+                          .then(() => seguroCompartidas(publicarIndiceTareas))
+                          .finally(() => { ocultarSpinnerCarga(); }));
+     }
     function saveTechs() { if (checkLock()) return; asegurarEquipoLigado(); dbSet(dbRefs.techs, shiftTechs, 'GUARDAR TÉCNICOS'); }
 
     // Marcar una tarea o poner una alerta escribe solo esas hojas, no el turno.
@@ -11467,7 +11628,8 @@
         // mantenimiento (solo super admin)
         adminAlternarMantenimiento,
         equiposDelPanel, puedoGestionarEquipo, usuariosDeEquipo, avisosEquipoBar,
-        doGoogleLogin, logoutFull
+        doGoogleLogin, logoutFull,
+        deactivateLeaderUI, toggleCleanView, toggleMobileUnlock
     });
 
     // Listeners estáticos de la Base Global de Técnicos
