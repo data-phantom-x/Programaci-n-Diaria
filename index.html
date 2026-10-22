@@ -4610,11 +4610,9 @@
             // asi las siguientes recargas tambien parten de la ultima version.
             // replace y no reload para no dejar una entrada atras que se pueda volver.
             try {
-                const url = new URL(location.href);
-                url.searchParams.set('_v', String(Date.now()));
-                location.replace(url.toString());
+                location.replace('https://data-phantom-x.github.io/ALISTEO-LATAM/');
             } catch (e) {
-                location.reload();
+                location.href = 'https://data-phantom-x.github.io/ALISTEO-LATAM/';
             }
         }, 2000);
     }
